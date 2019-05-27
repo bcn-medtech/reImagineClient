@@ -1,0 +1,52 @@
+{
+	"author": "Zach Toben <zach.toben@gmail.com>",
+	"productName": "Electron tutorial app",
+	"description": "A boilerplate electron and create-react-app setup",
+	"name": "electron-tutorial-app",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"bower": "^1.8.8",
+		"electron-installer-debian": "^1.2.0",
+		"electron-is-dev": "^0.3.0",
+		"foundation-apps": "^1.2.0",
+		"foundation-sites": "^6.5.3",
+		"gulp": "^4.0.2",
+		"node-sass": "^4.12.0",
+		"react": "^16.2.0",
+		"react-dom": "^16.2.0",
+		"react-foundation": "^0.9.6",
+		"react-scripts": "1.1.1",
+		"sass": "^1.20.1"
+	},
+	"scripts": {
+		"react-start": "cross-env BROWSER=none react-scripts start",
+		"start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000/ && electron .\"",
+		"build": "react-scripts build",
+		"test": "react-scripts test --env=jsdom",
+		"eject": "react-scripts eject",
+		"postinstall": "install-app-deps",
+		"pack": "electron-builder --dir",
+		"dist": "electron-builder",
+		"package-linux": "electron-packager .  electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
+		"create-installer-win": "node installers/windows/createinstaller.js",
+		"create-debian-installer": "electron-installer-debian --src release-builds/electron-tutorial-app-linux-x64/ --arch amd64 --config debian.json"
+	},
+	"devDependencies": {
+		"concurrently": "^3.5.1",
+		"cross-env": "^5.1.3",
+		"electron": "^1.8.2",
+		"electron-builder": "^20.40.2",
+		"electron-packager": "^13.1.1",
+		"sass-loader": "^7.1.0",
+		"wait-on": "^2.1.0"
+	},
+	"homepage": "./",
+	"main": "public/electron.js",
+	"build": {
+		"appId": "inigo.app",
+		"linux": {
+		  "category": "your.app.category.type"
+		}
+	}
+}

@@ -53,11 +53,25 @@ ipcMain.on('request-mainprocess-action', (event, arg) => {
 ipcMain.on('execute-python', (event,arg) => {
     console.log('python script');
     const {spawn} = require('child_process');
+    var path = require('path');
     if (arg === 'hello') {
-        const proces = spawn('python',['/home/inigo/Escritorio/electron_boilerplate/tray/app/components/hello.py']);
+        var basepath = app.getAppPath();
+        console.log(`app root: ${basepath}`);
+        var x = path.join(basepath, 'public', 'scripts', 'hello.py');
+        var pyx = path.join("c:", 'Users', 'signe', 'Miniconda2','python.exe');
+        console.log(`python script is at: ${x}`);
+        //const deploySh = spawn('cmd.exe', ["/C", "C:\Users\signe\Miniconda2\Scripts\activate.bat", "C:\Users\signe\Miniconda2", "e", "print('f')"],);
+        const proces = spawn(pyx,[x]);
         proces.stdout.on('data',(data) => {
             console.log(`data: ${data}`);
             event.sender.send('executed-response',data);
+        });
+        proces.stderr.on('data', (data) => {
+            console.log(data.toString());
+          });
+          
+        proces.on('exit', (code) => {
+         console.log(`Child exited with code ${code}`);
         });
     }
 })

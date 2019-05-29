@@ -47,14 +47,29 @@ export class DDPage extends Component {
         ipcRenderer.on('executed-response',(event,arg) => {
         console.log(arg.toString());
         });
+/* 
+        console.log("Execute script");
+    
+            let Data = {
+            message: "Hi",
+            someData: "Let's go"
+        };
+    
+        ipcRenderer.send('request-mainprocess-action', Data);
+
+        ipcRenderer.on('mainprocess-response',(event,arg) => {
+            console.log(arg.toString());
+            //alert(arg.toString());
+            alert('executed mainprocess');
+        }) */
     }
 
     render() {
         return(
             <div className="grid-frame pageStyle">
-            <div id="dropbox" className="grid-block vertical draggable">Hello</div>
-            <div className="grid-block shrink">
-                <button className=" anon" onClick={this.To_Anonimize}>Anonimize</button>
+            <div id="dropbox" className="grid-block draggable">Hello</div>
+            <div className="grid-content">
+                <button className=" anon" onClick={this.To_Anonimize} >Anonimize</button>
                 <button className="send">Send Orthanc</button>
             </div>
             </div>

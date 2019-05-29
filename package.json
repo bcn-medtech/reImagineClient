@@ -27,7 +27,7 @@
 		"eject": "react-scripts eject",
 		"postinstall": "install-app-deps",
 		"pack": "electron-builder --dir",
-		"dist": "electron-builder",
+		"dist": "electron-builder --linux deb tar.xz",
 		"package-linux": "electron-packager .  electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
 		"create-installer-win": "node installers/windows/createinstaller.js",
 		"create-debian-installer": "electron-installer-debian --src release-builds/electron-tutorial-app-linux-x64/ --arch amd64 --config debian.json"
@@ -42,11 +42,5 @@
 		"wait-on": "^2.1.0"
 	},
 	"homepage": "./",
-	"main": "public/electron.js",
-	"build": {
-		"appId": "inigo.app",
-		"linux": {
-		  "category": "your.app.category.type"
-		}
-	}
+	"main": "public/electron.js"
 }

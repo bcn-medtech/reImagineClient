@@ -11,7 +11,7 @@ const {ipcMain} = require('electron');
 let mainWindow;
 
 function createWindow() {
-    mainWindow = new BrowserWindow({width: 800, height: 600});
+    mainWindow = new BrowserWindow({width: 800, height: 600, webPreferences: {webSecurity: false}});
     mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
     // mainWindow.webContents.openDevTools();
     mainWindow.on('closed', function () {
@@ -33,6 +33,7 @@ app.on('activate', function () {
     }
 });
 
+
 ipcMain.on('request-mainprocess-action', (event, arg) => {
 
     console.log("Hola");
@@ -51,12 +52,16 @@ ipcMain.on('request-mainprocess-action', (event, arg) => {
 });
 
 ipcMain.on('execute-python', (event,arg) => {
+    console.log(process.platform);
     console.log('python script');
     const {spawn} = require('child_process');
     var path = require('path');
     if (arg === 'hello') {
         var basepath = app.getAppPath();
         console.log(`app root: ${basepath}`);
+        // for production mode
+        //var x = path.join(basepath, '..', '..', 'public', 'scripts', 'hello.py');
+        // for dev mode
         var x = path.join(basepath, 'public', 'scripts', 'hello.py');
         var pyx = path.join("c:", 'Users', 'signe', 'Miniconda2','python.exe');
         console.log(`python script is at: ${x}`);

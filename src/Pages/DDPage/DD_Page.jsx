@@ -1,6 +1,19 @@
 import React, { Component } from 'react';
 import './DD_Page.css';
+import AppBar_Component from './../../Components/AppBar_Component/AppBar_Component';
+import Container from '@material-ui/core/Container';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import { Grid, ListItem, Typography, List, ListItemText } from '@material-ui/core';
 const { ipcRenderer } = window.require("electron");
+/* 
+grid
+list
+typografy
+ListItem
+
+*/
 
 
 export class DDPage extends Component {
@@ -11,7 +24,30 @@ export class DDPage extends Component {
         };
     }
 
+    mapper(files) {
+        if (files != false) {
+
+            console.log(files);
+            return (
+                <List dense={true}>
+                {
+                    files.map((value, idx) => {
+                        console.log(value);
+                        return (
+                            <ListItem >
+                                <ListItemText key={idx} primary={value} />
+                                <img className="ThumbnailStyle" src={value}/>
+                            </ListItem>
+                        )   
+                    })
+                }
+                </List>
+            )
+        }   
+    }
+
     componentDidMount() {
+
         var holder = document.getElementById('dropbox');
 
         holder.ondragover = () => {
@@ -35,8 +71,12 @@ export class DDPage extends Component {
                 console.log('File(s) you dragged here: ', f.path)
                 files.push(f.path);
             }
-  
-            this.setState({files:files});
+            if (this.state.files != false) {
+                let auxArr = this.state.files;
+                auxArr.push(files);
+                this.setState({files:files});
+            }
+            else this.setState({files:files});
   
             return false;
         }; 
@@ -45,34 +85,34 @@ export class DDPage extends Component {
     To_Anonimize() {
         ipcRenderer.send('execute-python','hello');
         ipcRenderer.on('executed-response',(event,arg) => {
-        console.log(arg.toString());
+            alert(`response of python script: ${arg.toString()}`);
         });
-/* 
-        console.log("Execute script");
-    
-            let Data = {
-            message: "Hi",
-            someData: "Let's go"
-        };
-    
-        ipcRenderer.send('request-mainprocess-action', Data);
-
-        ipcRenderer.on('mainprocess-response',(event,arg) => {
-            console.log(arg.toString());
-            //alert(arg.toString());
-            alert('executed mainprocess');
-        }) */
     }
 
     render() {
         return(
-            <div className="grid-frame pageStyle">
-            <div id="dropbox" className="grid-block draggable">Hello</div>
-            <div className="grid-content">
-                <button className=" anon" onClick={this.To_Anonimize} >Anonimize</button>
-                <button className="send">Send Orthanc</button>
-            </div>
-            </div>
+            <CssBaseline>
+                <AppBar_Component/>
+                    <Container fixed>
+                        <Container container maxWidth="sm" >
+                            <Grid container id="dropbox" >
+                                <div className="draggable">drag files here</div>
+                            </Grid>
+                        </Container>
+                        <Button variant="contained" color="primary" className="buttonPrimary" onClick={this.To_Anonimize}>Anonimize</Button>
+                        <Button variant="contained" color="secondary" className="buttonSecondary">Send Orthanc</Button>
+                    </Container>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                            <Typography>
+                                Selected Files
+                            </Typography>
+                            <div>
+                                {this.mapper(this.state.files)}
+                            </div>
+                        </Grid>
+                    </Grid>
+            </CssBaseline>
         )
     }
 }

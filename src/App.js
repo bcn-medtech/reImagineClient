@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-//import { BrowserRouter as Router, Route } from 'react-router-dom';
-import {DDPage} from './Pages/DDPage/DD_Page';
-const { ipcRenderer } = window.require("electron");
+import { DragAndDropPage } from './pages/DragAndDropPage/DragAndDropPage';
+import logo from './logo.svg';
+import './App.css';
+
+//const { ipcRenderer } = window.require('electron');
 
 
 
@@ -10,7 +12,7 @@ class App extends Component {
   render() {
     return (
         <div>
-          <DDPage/>
+          <DragAndDropPage/>
         </div>
     );
   }

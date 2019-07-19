@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import './DD_Page.css';
-import AppBar_Component from './../../Components/AppBar_Component/AppBar_Component';
+
+//import AppBar_Component from './../../Components/AppBar_Component/AppBar_Component';
+import AppBar from '@material-ui/core/AppBar';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Button from '@material-ui/core/Button';
@@ -16,7 +17,7 @@ ListItem
 */
 
 
-export class DDPage extends Component {
+export class DragAndDropPage extends Component {
     constructor() {
         super();
         this.state = {
@@ -34,7 +35,7 @@ export class DDPage extends Component {
                     files.map((value, idx) => {
                         console.log(value);
                         return (
-                            <ListItem >
+                            <ListItem key={idx}>
                                 <ListItemText key={idx} primary={value} />
                                 <img className="ThumbnailStyle" src={value}/>
                             </ListItem>
@@ -83,16 +84,29 @@ export class DDPage extends Component {
     }
 
     To_Anonimize() {
-        ipcRenderer.send('execute-python','hello');
-        ipcRenderer.on('executed-response',(event,arg) => {
-            alert(`response of python script: ${arg.toString()}`);
-        });
+
+        new Promise(resolve => {
+            ipcRenderer.send('Miniconda_Request');
+            ipcRenderer.on('RequestSol', (event,arg) => {
+                if (arg !== null) {
+                    console.log(arg.toString());
+                    resolve(arg);
+                }
+                ipcRenderer.send('Miniconda_Install', arg);
+                ipcRenderer.on('executed_Miniconda', (event,arg) => {
+                    console.log('wasup bro');
+                    console.log(arg.toString());
+                    alert(arg.toString());
+                })
+            })
+        })
     }
 
     render() {
         return(
             <CssBaseline>
-                <AppBar_Component/>
+                
+                <AppBar/>
                     <Container fixed>
                         <Container container maxWidth="sm" >
                             <Grid container id="dropbox" >

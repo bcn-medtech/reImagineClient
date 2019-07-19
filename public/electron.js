@@ -126,6 +126,8 @@ ipcMain.on('Miniconda_Install', (event, arg) => {
   if (arg !== null) {
     console.log('Miniconda has been installed');
 
+    // have to cross activate bat with cmd like %windir%\System32\cmd.exe "/K" C:\Users\signe\Miniconda2\Scripts\activa
+
     var TotalPath = path.join(arg, 'python.exe');
     //var Script_Path = path.join(app.getAppPath(), 'Scripts', 'hello.py');)
     var Script_Path;

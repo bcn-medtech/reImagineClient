@@ -1,7 +1,7 @@
 {
-  "author": "Zach Toben <zach.toben@gmail.com>",
-  "description": "A boilerplate electron and create-react-app setup",
-  "name": "electron-app",
+  "author": "Iñigo Moreno <imr.aem2526@gmail.com>",
+  "description": "An app to deidentificate patients data of dicom",
+  "name": "deid-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

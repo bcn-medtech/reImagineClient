@@ -10,5 +10,4 @@ call conda install --name deid -c conda-forge pydicom -y
 call conda install --name deid -c conda-forge deid -y
 
 
-pause
 

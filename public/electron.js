@@ -11,6 +11,7 @@ const url = require('url');
 const { ipcMain } = require('electron');
 
 let mainWindow;
+console.log(isDev, 'isDev');
 
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 800, height: 600, webPreferences: { webSecurity: false } });
@@ -24,8 +25,7 @@ function createWindow() {
 
 let tray = null
 app.on('ready', () => {
-  console.log(process.cwd());
-  tray = new Tray('icons\\lung.png');
+  tray = new Tray(isDev ? 'public\\resources\\icons\\lung.png' : 'icons\\lung.png');
   const trayMenuTemplate = [
     {
       label: 'Open in browser',
@@ -83,16 +83,6 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
   if (mainWindow === null) {
     createWindow();
-
-    fs.access(app.getAppPath()+"\\installers", fs.F_OK, (err) => {
-      if (err) {
-        console.error(err);
-        process.env["version"] = "prod"
-      }
-      else {
-        process.env["version"] = "dev"
-      }
-    });
   }
 });
 
@@ -100,7 +90,7 @@ app.on('activate', function () {
 ipcMain.on('Miniconda_Request', (event, arg) => {
   var Dir = null;
   
-  console.log(process.env);
+  //console.log(process.env);
 
   const fs = require('fs')
   const GetInfo = require('os');
@@ -122,23 +112,22 @@ ipcMain.on('Miniconda_Request', (event, arg) => {
 
 ipcMain.on('Miniconda_Install', (event, arg) => {
   var env = process.env["version"];
-  console.log(arg);
+  //console.log(arg);
   if (arg !== null) {
     console.log('Miniconda has been installed');
 
     // have to cross activate bat with cmd like %windir%\System32\cmd.exe "/K" C:\Users\signe\Miniconda2\Scripts\activa
 
-    var TotalPath = path.join(arg, 'python.exe');
+    //var TotalPath = path.join(arg, 'python.exe');
     //var Script_Path = path.join(app.getAppPath(), 'Scripts', 'hello.py');)
-    var Script_Path;
-    //if (env === "dev") Script_Path =  path.join('public', 'scripts', 'hello.py');
-    Script_Path = path.join('Scripts', 'hello.py');
-
+    var Script_Path = (isDev ? path.join('public', 'scripts', 'deiden', 'runDeid.bat') : path.join('Scripts', 'deiden', 'runDeid.bat'));
     
-    const deploySh = require('child_process').spawn(TotalPath,[Script_Path]);
+    //const deploySh = require('child_process').spawn(Script_Path, ['C:\\Users\\signe\\Desktop\\patients\\16b32e13-07fa866e-71e2e7b0-62679778-1083b5f4', 'C:\\Users\\signe\\Desktop\\patients\\TestOutput']);
+    const argv = ['C:\\Users\\signe\\Desktop\\patients\\16b32e13-07fa866e-71e2e7b0-62679778-1083b5f4', 'C:\\Users\\signe\\Desktop\\patients\\TestOutput'];
+    const deploySh = require('child_process').execFile(Script_Path, argv);
     deploySh.stdout.on('data', (data) => {
-      console.log(`data: ${data}`);
-      event.sender.send('executed_Miniconda', data);
+      console.log(`data for script: ${data}`);
+      //event.sender.send('executed_Miniconda', data);
     });
 
     deploySh.stderr.on('data', (data) => {
@@ -148,20 +137,19 @@ ipcMain.on('Miniconda_Install', (event, arg) => {
 
   else {
     var os = process.platform;
-    console.log(os);
     var executablePath;
 
     if (os == "win32") {
 
-      //executablePath = 'public\\resources\\win\\Miniconda2-latest-Windows-x86_64.exe';
-      executablePath = 'installers\\Miniconda2-latest-Windows-x86_64.exe';
+      executablePath = (isDev ? 'public\\resources\\win\\Miniconda2-latest-Windows-x86_64.exe' : 'installers\\Miniconda2-latest-Windows-x86_64.exe');
     }
     else if (os == 'MacOS') {
-      executablePath = 'public\resources\mac\Miniconda3-latest-MacOSX-x86_64.sh';
+      
+      executablePath = (isDev ? 'public\resources\mac\Miniconda3-latest-MacOSX-x86_64.sh' : 'installers/Miniconda3-latest-MacOSX-x86_64.sh');
     }
 
     else if (os === 'linux') {
-      executablePath = 'public\resources\linux\Miniconda3-latest-Linux-x86_64.sh';
+      executablePath = (isDev ? 'public\resources\linux\Miniconda3-latest-MacOSX-x86_64.sh' : 'installers/Miniconda3-latest-linux--x86_64.sh');
     }
 
     var child = require('child_process').execFile;

@@ -62,7 +62,7 @@ def _find_or_create_anonid(db, fields):
 def main(args):
   patients = LocalDB(verbose=False)
   patients._initdb()
-  deid_file = os.path.abspath('src/deid_light.dicom')        
+  deid_file = os.path.abspath('Scripts/deiden/src/deid_light.dicom')        
   print("Loading receipe from", deid_file)
   recipe = DeidRecipe(deid=deid_file)
 

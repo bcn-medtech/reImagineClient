@@ -38,9 +38,9 @@ app.on('ready', () => {
         console.log("Clicked on settings")
       }
     }, {
-      label: 'Help',
+      label: '3rdPart Installers',
       click: function () {
-        console.log("Clicked on Help")
+        mainWindow.loadURL(isDev ? 'http://localhost:3000/InstallersPage' : `file://${path.join(__dirname, '../build/index.html#/InstallersPage')}`);
       }
     }, {
       label: 'Logout',
@@ -87,6 +87,11 @@ app.on('activate', function () {
 });
 
 
+ipcMain.on('Files_to_Anonimize', (event,arg) => {
+  console.log(arg);
+})
+
+
 ipcMain.on('Miniconda_Request', (event, arg) => {
   var Dir = null;
   
@@ -110,15 +115,14 @@ ipcMain.on('Miniconda_Request', (event, arg) => {
   });
 });
 
-ipcMain.on('Miniconda_Install', (event, arg) => {
+ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
   var env = process.env["version"];
+  console.log(arg1);
   //console.log(arg);
   if (arg !== null) {
     console.log('Miniconda has been installed');
 
-    // have to cross activate bat with cmd like %windir%\System32\cmd.exe "/K" C:\Users\signe\Miniconda2\Scripts\activa
 
-    //var TotalPath = path.join(arg, 'python.exe');
     //var Script_Path = path.join(app.getAppPath(), 'Scripts', 'hello.py');)
     var Script_Path = (isDev ? path.join('public', 'scripts', 'deiden', 'runDeid.bat') : path.join('Scripts', 'deiden', 'runDeid.bat'));
     

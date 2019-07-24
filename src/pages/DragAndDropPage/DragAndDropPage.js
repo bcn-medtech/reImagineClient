@@ -78,6 +78,8 @@ export class DragAndDropPage extends Component {
                 this.setState({files:files});
             }
             else this.setState({files:files});
+
+            ipcRenderer.send('Files_to_Anonimize', this.state.files);
   
             return false;
         }; 
@@ -92,10 +94,8 @@ export class DragAndDropPage extends Component {
                     console.log(arg.toString());
                     resolve(arg);
                 }
-                ipcRenderer.send('Miniconda_Install', arg);
+                ipcRenderer.send('Miniconda_Install', arg, this.state.files);
                 ipcRenderer.on('executed_Miniconda', (event,arg) => {
-                    console.log('wasup bro');
-                    console.log(arg.toString());
                     alert(arg.toString());
                 })
             })

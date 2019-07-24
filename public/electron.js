@@ -40,7 +40,7 @@ app.on('ready', () => {
     }, {
       label: '3rdPart Installers',
       click: function () {
-        mainWindow.loadURL(isDev ? 'http://localhost:3000/InstallersPage' : `file://${path.join(__dirname, '../build/index.html#/InstallersPage')}`);
+        mainWindow.loadURL(isDev ? 'http://localhost:3000/installers' : `file://${path.join(__dirname, '../build/index.html#/installers')}`);
       }
     }, {
       label: 'Logout',
@@ -116,8 +116,10 @@ ipcMain.on('Miniconda_Request', (event, arg) => {
 });
 
 ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
-  var env = process.env["version"];
-  console.log(arg1);
+  console.log('hi');
+  const ProgressBar = require('electron-progressbar');
+  console.log(arg1, 'latest argument with list of folders');
+
   //console.log(arg);
   if (arg !== null) {
     console.log('Miniconda has been installed');
@@ -127,15 +129,30 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
     var Script_Path = (isDev ? path.join('public', 'scripts', 'deiden', 'runDeid.bat') : path.join('Scripts', 'deiden', 'runDeid.bat'));
     
     //const deploySh = require('child_process').spawn(Script_Path, ['C:\\Users\\signe\\Desktop\\patients\\16b32e13-07fa866e-71e2e7b0-62679778-1083b5f4', 'C:\\Users\\signe\\Desktop\\patients\\TestOutput']);
-    const argv = ['C:\\Users\\signe\\Desktop\\patients\\16b32e13-07fa866e-71e2e7b0-62679778-1083b5f4', 'C:\\Users\\signe\\Desktop\\patients\\TestOutput'];
+    const argv = [arg1, arg1+'output'];
     const deploySh = require('child_process').execFile(Script_Path, argv);
+    var progressBar = new ProgressBar({
+      text: 'Preparing files to deid',
+      detail: 'Wait...'
+    });
+
+    progressBar.on('aborted', () => {
+      console.info('aborted...');
+    })
+
     deploySh.stdout.on('data', (data) => {
       console.log(`data for script: ${data}`);
-      //event.sender.send('executed_Miniconda', data);
+      //event.sender.send('executed_Miniconda', data);      
     });
 
     deploySh.stderr.on('data', (data) => {
       console.log(`stderr: ${data}`)
+    })
+
+    deploySh.on('exit', (data) => {
+      console.log(`final data ${data}`);
+      progressBar.setCompleted();
+      event.sender.send('finished_deid', argv[0]);
     })
   }
 

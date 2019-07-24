@@ -5,23 +5,16 @@ import AppBar from '@material-ui/core/AppBar';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
 import { Grid, ListItem, Typography, List, ListItemText } from '@material-ui/core';
 const { ipcRenderer } = window.require("electron");
-/* 
-grid
-list
-typografy
-ListItem
-
-*/
 
 
 export class DragAndDropPage extends Component {
     constructor() {
         super();
         this.state = {
-            files: false
+            files: false,
+            loading: false,
         };
     }
 
@@ -31,20 +24,20 @@ export class DragAndDropPage extends Component {
             console.log(files);
             return (
                 <List dense={true}>
-                {
-                    files.map((value, idx) => {
-                        console.log(value);
-                        return (
-                            <ListItem key={idx}>
-                                <ListItemText key={idx} primary={value} />
-                                <img className="ThumbnailStyle" src={value}/>
-                            </ListItem>
-                        )   
-                    })
-                }
+                    {
+                        files.map((value, idx) => {
+                            console.log(value);
+                            return (
+                                <ListItem key={idx}>
+                                    <ListItemText key={idx} primary={value} />
+                                    <img className="ThumbnailStyle" src={value} />
+                                </ListItem>
+                            )
+                        })
+                    }
                 </List>
             )
-        }   
+        }
     }
 
     componentDidMount() {
@@ -54,59 +47,73 @@ export class DragAndDropPage extends Component {
         holder.ondragover = () => {
             return false;
         };
-  
+
         holder.ondragleave = () => {
             return false;
         };
-  
+
         holder.ondragend = () => {
             return false;
         };
-  
+
         holder.ondrop = (e) => {
             e.preventDefault();
-  
-            let files=[];
-  
+
+            let files = [];
+
             for (let f of e.dataTransfer.files) {
                 console.log('File(s) you dragged here: ', f.path)
                 files.push(f.path);
             }
-            if (this.state.files != false) {
+            if (this.state.files !== false) {
                 let auxArr = this.state.files;
                 auxArr.push(files);
-                this.setState({files:files});
+                this.setState({ files: files });
+                localStorage.setItem('files', files.toString());
+                console.log(localStorage.getItem('files'));
             }
-            else this.setState({files:files});
-
+            else {
+                this.setState({ files: files });
+                localStorage.setItem('files', files.toString());
+                console.log(localStorage.getItem('files'));
+            }
             ipcRenderer.send('Files_to_Anonimize', this.state.files);
-  
+
             return false;
-        }; 
+        };
+    }
+
+
+    handleState() {
+
     }
 
     To_Anonimize() {
 
-        new Promise(resolve => {
-            ipcRenderer.send('Miniconda_Request');
-            ipcRenderer.on('RequestSol', (event,arg) => {
-                if (arg !== null) {
+            new Promise(resolve => {
+                ipcRenderer.send('Miniconda_Request');
+                ipcRenderer.on('RequestSol', (event, arg) => {
+                    if (arg !== null) {
                     console.log(arg.toString());
                     resolve(arg);
                 }
-                ipcRenderer.send('Miniconda_Install', arg, this.state.files);
-                ipcRenderer.on('executed_Miniconda', (event,arg) => {
-                    alert(arg.toString());
+                console.log(localStorage.getItem('files'));
+                ipcRenderer.send('Miniconda_Install', arg, localStorage.getItem('files'), () => {
+                    this.setState({loading:true});
+                });
+                ipcRenderer.on('finished_deid', (event, arg) => {
+                    console.log(arg.toString());
                 })
             })
         })
     }
 
     render() {
-        return(
-            <CssBaseline>
-                
-                <AppBar/>
+        console.log(this.state.loading);
+        return (
+                <CssBaseline>
+
+                    <AppBar />
                     <Container fixed>
                         <Container container maxWidth="sm" >
                             <Grid container id="dropbox" >
@@ -120,13 +127,13 @@ export class DragAndDropPage extends Component {
                         <Grid item xs={12} md={6}>
                             <Typography>
                                 Selected Files
-                            </Typography>
+                                    </Typography>
                             <div>
                                 {this.mapper(this.state.files)}
                             </div>
                         </Grid>
                     </Grid>
-            </CssBaseline>
+                </CssBaseline>
         )
     }
 }

@@ -19,7 +19,7 @@ SET basedir=%1
 SET outdir=%2
 
 RMDIR /Q  $outdir
-python Scripts\deiden\src\deidTest_pyd.py %basedir% --outdir %outdir%
+python public/scripts\deiden\src\deidTest_pyd.py %basedir% --outdir %outdir%
 
 
 

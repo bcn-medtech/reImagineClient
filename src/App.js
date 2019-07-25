@@ -10,7 +10,9 @@ import './App.css';
 
 class App extends Component {
 
+
   render() {
+    localStorage.clear();
     return (
       <Router>
         <Route path="/" exact component={DragAndDropPage}/>

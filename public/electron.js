@@ -4,6 +4,7 @@ const { Menu, Tray } = require('electron')
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const isDev = require('electron-is-dev');
+const os = require('os');
 
 const path = require('path');
 const url = require('url');
@@ -25,7 +26,7 @@ function createWindow() {
 
 let tray = null
 app.on('ready', () => {
-  tray = new Tray(isDev ? 'public\\resources\\icons\\lung.png' : 'icons\\lung.png');
+  tray = new Tray(isDev ? path.join('public','resources','icons','lung.png') : path.join('icons', 'lung.png'));
   const trayMenuTemplate = [
     {
       label: 'Open in browser',
@@ -101,8 +102,11 @@ ipcMain.on('Miniconda_Request', (event, arg) => {
   const GetInfo = require('os');
 
   var user = GetInfo.userInfo().username;
+  var Path;
 
-  const Path = `C:\\Users\\${user}\\Miniconda2`;
+  if (process.platform === 'win32') Path = `C:\\Users\\${user}\\Miniconda2`;
+  else if (process.platform === 'MacOS') Path = `/Users/${user}/Miniconda3`;
+  else Path = `home/${user}/Miniconda3`
 
   fs.access(Path, fs.F_OK, (err) => {
     if (err) {
@@ -166,11 +170,11 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
     }
     else if (os == 'MacOS') {
       
-      executablePath = (isDev ? 'public\resources\mac\Miniconda3-latest-MacOSX-x86_64.sh' : 'installers/Miniconda3-latest-MacOSX-x86_64.sh');
+      executablePath = (isDev ? 'public/resources/mac/Miniconda3-latest-MacOSX-x86_64.sh' : 'installers/Miniconda3-latest-MacOSX-x86_64.sh');
     }
 
     else if (os === 'linux') {
-      executablePath = (isDev ? 'public\resources\linux\Miniconda3-latest-MacOSX-x86_64.sh' : 'installers/Miniconda3-latest-linux--x86_64.sh');
+      executablePath = (isDev ? 'public/resources/linux/Miniconda3-latest-linux-x86_64.sh' : 'installers/Miniconda3-latest-linux--x86_64.sh');
     }
 
     var child = require('child_process').execFile;

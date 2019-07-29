@@ -10,7 +10,9 @@ import { Button } from '@material-ui/core';
 
 // import logos
 import MinicondaPng from '../../assets/logo_anaconda.png';
-import { notDeepEqual } from 'assert';
+
+const { ipcRenderer } = window.require("electron");
+
 
 function TabContainer({ children, dir }) {
     return (
@@ -55,6 +57,24 @@ export default function FullWidthTabs() {
         if (element === 'Miniconda') return MinicondaPng;
     }
 
+    function Install(program) {
+
+        new Promise(resolve => {
+    
+            ipcRenderer.send('Install_Request', [program]);
+            ipcRenderer.on('InstallAnswer', (event, arg) => {
+                if (arg !== null) {
+                    resolve(arg);
+                    ipcRenderer.send('Program_Install', [program]);
+                }
+                ipcRenderer.send('Miniconda_Install', arg, localStorage.getItem('files'));
+                ipcRenderer.on('finished_deid', (event, arg) => {
+                    console.log(arg.toString());
+                })
+            })
+        })
+    }
+
     function NotInstalledList() {
         return (
             <div>
@@ -63,7 +83,7 @@ export default function FullWidthTabs() {
                         if (element[1] === false) {
                             return (
                                 <div>
-                                    <Button key={idx}>{element}</Button>
+                                    <Button key={idx} onClick={() => Install(element[0])}>{element}</Button>
                                     <img className={classes.imgTam} src={imageRel(element[0])} />
                                 </div>
                             )

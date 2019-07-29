@@ -8,6 +8,7 @@ const os = require('os');
 
 const path = require('path');
 const url = require('url');
+const fs = require('fs');
 
 const { ipcMain } = require('electron');
 
@@ -88,79 +89,36 @@ app.on('activate', function () {
 });
 
 
-ipcMain.on('Files_to_Anonimize', (event,arg) => {
-  console.log(arg);
-})
+ipcMain.on('Install_Request', (event, arg) => {
+
+  var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
+  var SearchUbi = (isDev ? path.join('public','scripts', ExecuteOs) : path.join('Scripts',ExecuteOs));
+
+  const searchProgram = require('child_process').execFile(SearchUbi, [arg]);
 
 
-ipcMain.on('Miniconda_Request', (event, arg) => {
-  var Dir = null;
-  
-  //console.log(process.env);
+  searchProgram.on('exit', (data) => {
+    console.log(`final data ${data}`);
 
-  const fs = require('fs')
-  const GetInfo = require('os');
-
-  var user = GetInfo.userInfo().username;
-  var Path;
-
-  if (process.platform === 'win32') Path = `C:\\Users\\${user}\\Miniconda2`;
-  else if (process.platform === 'MacOS') Path = `/Users/${user}/Miniconda3`;
-  else Path = `home/${user}/Miniconda3`
-
-  fs.access(Path, fs.F_OK, (err) => {
-    if (err) {
-      console.error(err);
-      event.sender.send('RequestSol', null)
-    }
+    if (data === 1) event.sender.send('InstallAnswer', false);
     else {
-      event.sender.send('RequestSol', Path);
+     fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err,data) => {
+       console.log(data);
+       event.sender.send('InstallAnswer', data);
+     }) 
     }
-  });
+  })
 });
 
-ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
-  console.log('hi');
-  const ProgressBar = require('electron-progressbar');
-  console.log(arg1, 'latest argument with list of folders');
 
-  //console.log(arg);
+
+ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
+  
+
   if (arg !== null) {
+    console.log(arg);
     console.log('Miniconda has been installed');
 
-
-    //var Script_Path = path.join(app.getAppPath(), 'Scripts', 'hello.py');)
-    var Script_Path = (isDev ? path.join('public', 'scripts', 'deiden', 'runDeid.bat') : path.join('Scripts', 'deiden', 'runDeid.bat'));
-    
-    //const deploySh = require('child_process').spawn(Script_Path, ['C:\\Users\\signe\\Desktop\\patients\\16b32e13-07fa866e-71e2e7b0-62679778-1083b5f4', 'C:\\Users\\signe\\Desktop\\patients\\TestOutput']);
-    const argv = [arg1, arg1+'output'];
-    const deploySh = require('child_process').execFile(Script_Path, argv);
-    var progressBar = new ProgressBar({
-      text: 'Preparing files to deid',
-      detail: 'Wait...'
-    });
-
-    progressBar.on('aborted', () => {
-      console.info('aborted...');
-    })
-
-    deploySh.stdout.on('data', (data) => {
-      console.log(`data for script: ${data}`);
-      //event.sender.send('executed_Miniconda', data);      
-    });
-
-    deploySh.stderr.on('data', (data) => {
-      console.log(`stderr: ${data}`)
-    })
-
-    deploySh.on('exit', (data) => {
-      console.log(`final data ${data}`);
-      progressBar.setCompleted();
-      event.sender.send('finished_deid', argv[0]);
-    })
-  }
-
-  else {
     var os = process.platform;
     var executablePath;
 
@@ -188,4 +146,45 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
       console.log(data.toString());
     });
   }
+});
+
+
+ipcMain.on('Conda_Script', (event,arg, arg1) => {
+  console.log('Conda_script');
+  /* const ProgressBar = require('electron-progressbar'); */
+  var ExecuteOs;
+  
+    if (process.platform === 'win32') ExecuteOs = path.join('win' ,'runDeid.bat');
+    else ExecuteOs = path.join('linux','runDeid.sh');
+
+
+    var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
+    console.log(Script_Path);
+    
+    const argv = [arg1, arg1+'output'];
+    console.log(argv);
+    const deploySh = require('child_process').execFile(Script_Path, argv);
+
+    /* var progressBar = new ProgressBar({
+      text: 'Preparing files to deid',
+      detail: 'Wait...'
+    });
+
+    progressBar.on('aborted', () => {
+      console.info('aborted...');
+    }) */
+
+    deploySh.stdout.on('data', (data) => {
+      console.log(`data for script: ${data}`);     
+    });
+
+    deploySh.stderr.on('data', (data) => {
+      console.log(`stderr: ${data}`)
+    })
+
+    deploySh.on('exit', (data) => {
+      console.log(`final data ${data}`);
+      /* progressBar.setCompleted(); */
+      event.sender.send('finished_deid', argv[0]);
+    })
 });

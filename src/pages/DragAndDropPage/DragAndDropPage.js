@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 //import AppBar_Component from './../../Components/AppBar_Component/AppBar_Component';
-import AppBar from '@material-ui/core/AppBar';
+import AppBar from '../../Components/AppBar/AppBar';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Button from '@material-ui/core/Button';
@@ -14,7 +14,6 @@ export class DragAndDropPage extends Component {
         super();
         this.state = {
             files: false,
-            loading: false,
         };
     }
 
@@ -84,56 +83,66 @@ export class DragAndDropPage extends Component {
     }
 
 
-    handleState() {
+    Anonimize(program) {
 
-    }
 
-    To_Anonimize() {
-
-            new Promise(resolve => {
-                ipcRenderer.send('Miniconda_Request');
-                ipcRenderer.on('RequestSol', (event, arg) => {
-                    if (arg !== null) {
-                    console.log(arg.toString());
-                    resolve(arg);
-                }
-                console.log(localStorage.getItem('files'));
-                ipcRenderer.send('Miniconda_Install', arg, localStorage.getItem('files'), () => {
-                    this.setState({loading:true});
-                });
+        ipcRenderer.send('Install_Request', [program]);
+        ipcRenderer.on('InstallAnswer', (event, arg) => {
+            if (arg === false) {
+                alert(`Must install ${program} needed`);
+            }
+            else {
+                ipcRenderer.send('Conda_Script', arg, localStorage.getItem('files'));
                 ipcRenderer.on('finished_deid', (event, arg) => {
-                    console.log(arg.toString());
-                })
-            })
+                    console.log('finished');
+                });
+            }
         })
     }
 
-    render() {
-        console.log(this.state.loading);
-        return (
-                <CssBaseline>
 
-                    <AppBar />
-                    <Container fixed>
-                        <Container container maxWidth="sm" >
-                            <Grid container id="dropbox" >
-                                <div className="draggable">drag files here</div>
-                            </Grid>
-                        </Container>
-                        <Button variant="contained" color="primary" className="buttonPrimary" onClick={this.To_Anonimize}>Anonimize</Button>
-                        <Button variant="contained" color="secondary" className="buttonSecondary">Send Orthanc</Button>
-                    </Container>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} md={6}>
-                            <Typography>
-                                Selected Files
-                                    </Typography>
-                            <div>
-                                {this.mapper(this.state.files)}
-                            </div>
+
+
+    render() {
+
+        const dragDropStyle = {
+            position: 'relative',
+            'margin-right': 'auto',
+            'margin-left': 'auto',
+            height: '200px',
+            width: '400px',
+            'margin-bottom': '20px',
+            'margin-top': '15px',
+            'background-color': '#e9e9f2',
+            'webkit-box-shadow': '10px 10px 5px 0px rgba(0, 0, 0, 0.75)',
+            '-moz-box-shadow': '10px 10px 5px 0px rgba(0, 0, 0, 0.75)',
+            'box-shadow': '10px 10px 5px 0px rgba(0, 0, 0, 0.75)',
+
+        }
+        return (
+            <CssBaseline>
+
+                <AppBar page="Anonimizer" />
+                <Container fixed>
+                    <Container container maxWidth="sm" >
+                        <Grid container id="dropbox" >
+                            <div style={dragDropStyle} className="draggable">drag files here</div>
                         </Grid>
+                    </Container>
+                    <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('Miniconda2')}>Anonimize</Button>
+                    <Button variant="contained" color="secondary" className="buttonSecondary">Send Orthanc</Button>
+                </Container>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                        <Typography>
+                            Selected Files
+                                    </Typography>
+                        <div>
+                            {this.mapper(this.state.files)}
+                        </div>
                     </Grid>
-                </CssBaseline>
+                </Grid>
+            </CssBaseline >
         )
     }
 }

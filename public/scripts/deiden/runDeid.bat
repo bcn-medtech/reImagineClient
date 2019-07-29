@@ -2,6 +2,7 @@ echo "Test deiden"
 
 set root=C:\Users\%USERNAME%\Miniconda2
 
+
 call %root%\Scripts\activate.bat %root%
 
 
@@ -19,7 +20,8 @@ SET basedir=%1
 SET outdir=%2
 
 RMDIR /Q  $outdir
-python public/scripts\deiden\src\deidTest_pyd.py %basedir% --outdir %outdir%
+echo %cd% "hi bro"
+python src/deidTest_pyd.py %basedir% --outdir %outdir%
 
 
 

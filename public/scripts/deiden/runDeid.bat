@@ -1,17 +1,12 @@
 echo "Test deiden"
 
-set root=C:\Users\%USERNAME%\Miniconda2
+REM set root=C:\Users\%USERNAME%\Miniconda2
 
 
-call %root%\Scripts\activate.bat %root%
+REM call %root%\Scripts\activate.bat %root%
 
 
-if EXIST %root%\envs\deid (
-    echo yes
-) ELSE (
-    echo no
-    Scripts\deiden\createEnv.bat
-)
+
 
 REM call conda remove --name deid --all -y
 call conda activate deid

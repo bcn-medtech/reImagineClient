@@ -58,6 +58,7 @@ export default function FullWidthTabs() {
     }
 
     function Install(program) {
+        console.log(program);
 
         new Promise(resolve => {
     

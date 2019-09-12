@@ -5,7 +5,7 @@ import AppBar from '../../Components/AppBar/AppBar';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Button from '@material-ui/core/Button';
-import { Grid, ListItem, Typography, List, ListItemText } from '@material-ui/core';
+import { Grid, ListItem, Typography, List, ListItemText, Paper } from '@material-ui/core';
 const { ipcRenderer } = window.require("electron");
 
 
@@ -110,38 +110,40 @@ export class DragAndDropPage extends Component {
             'margin-right': 'auto',
             'margin-left': 'auto',
             height: '200px',
-            width: '400px',
+            width: '700px',
             'margin-bottom': '20px',
             'margin-top': '15px',
-            'background-color': '#e9e9f2',
-            'webkit-box-shadow': '10px 10px 5px 0px rgba(0, 0, 0, 0.75)',
-            '-moz-box-shadow': '10px 10px 5px 0px rgba(0, 0, 0, 0.75)',
-            'box-shadow': '10px 10px 5px 0px rgba(0, 0, 0, 0.75)',
 
         }
         return (
             <CssBaseline>
 
-                <AppBar page="Anonimizer" />
+                <AppBar page="Anonimizer" history={this.props.history} />
                 <Container fixed>
                     <Container container maxWidth="sm" >
                         <Grid container id="dropbox" >
-                            <div style={dragDropStyle} className="draggable">drag files here</div>
+                            <div style={dragDropStyle} className="draggable">
+                                <Paper elevation={4} /* className={classes.paperClone} */ style={{ height: '200px', width: '400px', textAlign: 'center' }}>
+                                    drag files here
+                                </Paper>
+                            </div>
+                        </Grid>
+                        <div style={{ margin: 'auto' }}>
+                            <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('Miniconda2')}>Anonimize</Button>
+                            <Button variant="contained" color="secondary" className="buttonSecondary">Send Orthanc</Button>
+                        </div>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={6}>
+                                <Typography style={{ textAlign: "left", marginTop: '5px' }}>
+                                    Selected Files
+                                    </Typography>
+                                <div>
+                                    {this.mapper(this.state.files)}
+                                </div>
+                            </Grid>
                         </Grid>
                     </Container>
-                    <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('Miniconda2')}>Anonimize</Button>
-                    <Button variant="contained" color="secondary" className="buttonSecondary">Send Orthanc</Button>
                 </Container>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
-                        <Typography>
-                            Selected Files
-                                    </Typography>
-                        <div>
-                            {this.mapper(this.state.files)}
-                        </div>
-                    </Grid>
-                </Grid>
             </CssBaseline >
         )
     }

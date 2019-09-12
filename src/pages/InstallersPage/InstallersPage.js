@@ -14,6 +14,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function InstallersPage(props) {
     const classes = useStyles()
+    console.log(props);
 
     return (
         <div>

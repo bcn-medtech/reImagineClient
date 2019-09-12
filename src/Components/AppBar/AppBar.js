@@ -32,8 +32,8 @@ export default function ButtonAppBar(props) {
         <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="Menu">
-                        <HomeIcon onClick={() => Home()} />
+                    <IconButton edge="start" className={classes.menuButton} color="inherit" onClick={() => Home()} aria-label="Menu">
+                        <HomeIcon />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
                         {props.page}

@@ -25,7 +25,7 @@ export default function ButtonAppBar(props) {
 
         console.log(props.history);
         var browserHistory = props.history;
-        browserHistory.push("/");
+        browserHistory.push("/Anonimizer");
     }
 
     return (

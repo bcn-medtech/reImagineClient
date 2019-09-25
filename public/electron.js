@@ -14,6 +14,7 @@ const { ipcMain } = require('electron');
 
 let mainWindow;
 console.log(isDev, 'isDev');
+console.log(process.platform);
 
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 800, height: 600, webPreferences: { webSecurity: false } });
@@ -91,11 +92,38 @@ app.on('activate', function () {
 
 ipcMain.on('Install_Request', (event, arg) => {
 
+  console.log('install request action');
+
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
-  var SearchUbi = (isDev ? path.join('public','scripts', ExecuteOs) : path.join('Scripts',ExecuteOs));
+  var SearchUbi = (isDev ? path.join('scripts', 'doc.sh') : path.join('Scripts',ExecuteOs));
 
-  const searchProgram = require('child_process').execFile(SearchUbi, [arg]);
+  console.log(ExecuteOs);
+  console.log(SearchUbi);
+  console.log(arg, 'plane arg');
+  console.log(arg[0], 'point arg');
+  console.log(__dirname, '__dirname');
 
+  /*
+    var child = require('child_process').execFile;
+    child(somePath, (err,data) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+     console.log(data.toString());
+   })
+*/
+
+
+  const searchProgram = require('child_process').execFile(SearchUbi);
+
+  searchProgram.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+
+  searchProgram.stderr.on('dataerr', (data) => {
+    console.log(`dataerr: ${data}`);
+  });
 
   searchProgram.on('exit', (data) => {
     console.log(`final data ${data}`);
@@ -105,7 +133,7 @@ ipcMain.on('Install_Request', (event, arg) => {
      fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err,data) => {
        console.log(data);
        event.sender.send('InstallAnswer', data);
-     }) 
+     })
     }
   })
 });
@@ -113,7 +141,7 @@ ipcMain.on('Install_Request', (event, arg) => {
 
 
 ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
-  
+
 
   if (arg !== null) {
     console.log(arg);
@@ -127,7 +155,7 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
       executablePath = (isDev ? 'public\\resources\\win\\Miniconda2-latest-Windows-x86_64.exe' : 'installers\\Miniconda2-latest-Windows-x86_64.exe');
     }
     else if (os == 'MacOS') {
-      
+
       executablePath = (isDev ? 'public/resources/mac/Miniconda3-latest-MacOSX-x86_64.sh' : 'installers/Miniconda3-latest-MacOSX-x86_64.sh');
     }
 
@@ -153,14 +181,14 @@ ipcMain.on('Conda_Script', (event,arg, arg1) => {
   console.log('Conda_script');
   /* const ProgressBar = require('electron-progressbar'); */
   var ExecuteOs;
-  
+
     if (process.platform === 'win32') ExecuteOs = path.join('win' ,'runDeid.bat');
     else ExecuteOs = path.join('linux','runDeid.sh');
 
 
     var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
     console.log(Script_Path);
-    
+
     const argv = [arg1, arg1+'output'];
     console.log(argv);
     const deploySh = require('child_process').execFile(Script_Path, argv);
@@ -175,7 +203,7 @@ ipcMain.on('Conda_Script', (event,arg, arg1) => {
     }) */
 
     deploySh.stdout.on('data', (data) => {
-      console.log(`data for script: ${data}`);     
+      console.log(`data for script: ${data}`);
     });
 
     deploySh.stderr.on('data', (data) => {

@@ -95,13 +95,20 @@ ipcMain.on('Install_Request', (event, arg) => {
   console.log('install request action');
 
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
-  var SearchUbi = (isDev ? path.join('scripts', 'doc.sh') : path.join('Scripts',ExecuteOs));
+  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('Scripts',ExecuteOs));
 
   console.log(ExecuteOs);
   console.log(SearchUbi);
   console.log(arg, 'plane arg');
   console.log(arg[0], 'point arg');
   console.log(__dirname, '__dirname');
+
+  var exec = require('child_process');
+  exec.execFile('sh', [`scripts/searcher.sh`], function(error, stdout, stderr) {
+    if (error) throw error;
+
+    console.log(stdout);
+  });
 
   /*
     var child = require('child_process').execFile;
@@ -115,7 +122,7 @@ ipcMain.on('Install_Request', (event, arg) => {
 */
 
 
-  const searchProgram = require('child_process').execFile(SearchUbi);
+  const searchProgram = require('child_process').execFile(SearchUbi, [arg]);
 
   searchProgram.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);

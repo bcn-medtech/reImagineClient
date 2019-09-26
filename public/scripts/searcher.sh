@@ -3,6 +3,6 @@ echo "search folder"
 
 basedir="$1"
 
-whereis $basedir
+which $basedir
 
 $basedir result

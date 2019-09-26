@@ -1,8 +1,8 @@
 #!/bin/bash
-echo "search folder"
 
-basedir="$1"
+pname="$1"
 
-which $basedir
+echo "hello world"
 
-$basedir result
+echo $(which $pname)
+

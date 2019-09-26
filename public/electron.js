@@ -104,11 +104,12 @@ ipcMain.on('Install_Request', (event, arg) => {
   console.log(__dirname, '__dirname');
 
   var exec = require('child_process');
-  exec.execFile('sh', [`scripts/searcher.sh`], function(error, stdout, stderr) {
+  exec.execFile(SearchUbi, [arg], (error, stdout, stderr) => {
     if (error) throw error;
-
+    console.log(stderr, 'stderr');
     console.log(stdout);
   });
+  console.log('hola');
 
   /*
     var child = require('child_process').execFile;

@@ -1,8 +1,7 @@
-#!/bin/bash
-
+# !/bin/bash
+source ~/.bashrc
 pname="$1"
 
-echo "hello world"
+echo 'mario'
 
-echo $(which $pname)
-
+echo $(which apt)

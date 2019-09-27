@@ -43,7 +43,24 @@ export default function FullWidthTabs() {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
-    var arr = [['Miniconda', true], ['Monoconda', false], ['Munucunda', false]];
+    const [installed, setInstalled] = React.useState(false);
+    var arr = [['Miniconda3', true]];
+
+
+    React.useEffect(() => {
+        ipcRenderer.send('Install_Request', arr[0]);
+        ipcRenderer.on('InstallAnswer', (event, arg) => {
+            console.log(arg, 'hola');
+            if (arg === false) {
+                arr[0][1] = false;
+                
+            }
+        })
+    }),[];
+
+    console.log(arr, 'state arr');
+
+    
 
     function handleChange(event, newValue) {
         setValue(newValue);
@@ -62,7 +79,7 @@ export default function FullWidthTabs() {
 
         new Promise(resolve => {
     
-            ipcRenderer.send('Install_Request', [program]);
+            ipcRenderer.send('Install_Request', [program.toLowerCase()]);
             ipcRenderer.on('InstallAnswer', (event, arg) => {
                 if (arg !== null) {
                     resolve(arg);
@@ -77,11 +94,14 @@ export default function FullWidthTabs() {
     }
 
     function NotInstalledList() {
+        console.log(arr);
         return (
             <div>
                 {
                     arr.map((element, idx) => {
+                        console.log(element, 'before test');
                         if (element[1] === false) {
+                            console.log(element), 'after test';
                             return (
                                 <div>
                                     <Button key={idx} onClick={() => Install(element[0])}>{element}</Button>
@@ -96,6 +116,7 @@ export default function FullWidthTabs() {
     }
 
     function InstalledList(arr) {
+        console.log(arr, 'installed list');
         return (
             <div>
                 {

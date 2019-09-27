@@ -28,7 +28,7 @@ function createWindow() {
 
 let tray = null
 app.on('ready', () => {
-  tray = new Tray(isDev ? path.join('public','resources','icons','lung.png') : path.join('icons', 'lung.png'));
+  tray = new Tray(isDev ? path.join('public', 'resources', 'icons', 'lung.png') : path.join('icons', 'lung.png'));
   const trayMenuTemplate = [
     {
       label: 'Open in browser',
@@ -95,7 +95,7 @@ ipcMain.on('Install_Request', (event, arg) => {
   console.log('install request action');
 
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
-  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('Scripts',ExecuteOs));
+  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('Scripts', ExecuteOs));
 
   console.log(ExecuteOs);
   console.log(SearchUbi);
@@ -103,47 +103,50 @@ ipcMain.on('Install_Request', (event, arg) => {
   console.log(arg[0], 'point arg');
   console.log(__dirname, '__dirname');
 
-  var exec = require('child_process');
-  exec.execFile(SearchUbi, [arg], (error, stdout, stderr) => {
-    if (error) throw error;
-    console.log(stderr, 'stderr');
-    console.log(stdout);
-  });
-  console.log('hola');
 
-  /*
-    var child = require('child_process').execFile;
-    child(somePath, (err,data) => {
-      if (err) {
-        console.log(err);
-        return;
+  // De momento cada SO tiene un modo de lectura de archivos, pero en principio no hace falta
+
+  if (process.platform == 'win32') {
+    console.log('hola windows');
+    const searchProgram = require('child_process').execFile(SearchUbi, [arg]);
+
+    searchProgram.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+
+    searchProgram.stderr.on('dataerr', (data) => {
+      console.log(`dataerr: ${data}`);
+    });
+
+    searchProgram.on('exit', (data) => {
+      console.log(`final data ${data}`);
+
+      if (data === 1) event.sender.send('InstallAnswer', false);
+      else {
+        
+        fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err, data) => {
+          console.log(data);
+          event.sender.send('InstallAnswer', data);
+        })
       }
-     console.log(data.toString());
-   })
-*/
+    })
 
+  }
 
-  const searchProgram = require('child_process').execFile(SearchUbi, [arg]);
-
-  searchProgram.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  });
-
-  searchProgram.stderr.on('dataerr', (data) => {
-    console.log(`dataerr: ${data}`);
-  });
-
-  searchProgram.on('exit', (data) => {
-    console.log(`final data ${data}`);
-
-    if (data === 1) event.sender.send('InstallAnswer', false);
-    else {
-     fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err,data) => {
-       console.log(data);
-       event.sender.send('InstallAnswer', data);
-     })
-    }
-  })
+  else {
+    console.log('hola unix');
+    var exec = require('child_process');
+    arg = 'conda';
+    console.log(arg);
+    // exec.exec(`${__dirname}/${SearchUbi}`, ['conda'], (error, stdout, stderr) => {
+      exec.exec('sh','echo','bin', {shell: 'bin/bash'}, (error, stdout, stderr) => {
+   
+      if (error) throw error;
+      console.log(stdout);
+      if (isNaN(stdout)) event.sender.send('InstallAnswer', stdout);
+      else event.sender.send('InstallAnswer', false);
+    });
+  }
 });
 
 
@@ -185,42 +188,31 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
 });
 
 
-ipcMain.on('Conda_Script', (event,arg, arg1) => {
+ipcMain.on('Conda_Script', (event, arg, arg1) => {
   console.log('Conda_script');
-  /* const ProgressBar = require('electron-progressbar'); */
   var ExecuteOs;
 
-    if (process.platform === 'win32') ExecuteOs = path.join('win' ,'runDeid.bat');
-    else ExecuteOs = path.join('linux','runDeid.sh');
+  if (process.platform === 'win32') ExecuteOs = path.join('win', 'runDeid.bat');
+  else ExecuteOs = path.join('linux', 'runDeid.sh');
 
 
-    var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
-    console.log(Script_Path);
+  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
+  console.log(Script_Path);
 
-    const argv = [arg1, arg1+'output'];
-    console.log(argv);
-    const deploySh = require('child_process').execFile(Script_Path, argv);
+  const argv = [arg1, arg1 + 'output'];
+  console.log(argv);
+  const deploySh = require('child_process').execFile(`${__dirname}/${Script_Path}`, argv);
 
-    /* var progressBar = new ProgressBar({
-      text: 'Preparing files to deid',
-      detail: 'Wait...'
-    });
+  deploySh.stdout.on('data', (data) => {
+    console.log(`data for script: ${data}`);
+  });
 
-    progressBar.on('aborted', () => {
-      console.info('aborted...');
-    }) */
+  deploySh.stderr.on('data', (data) => {
+    console.log(`stderr: ${data}`)
+  })
 
-    deploySh.stdout.on('data', (data) => {
-      console.log(`data for script: ${data}`);
-    });
-
-    deploySh.stderr.on('data', (data) => {
-      console.log(`stderr: ${data}`)
-    })
-
-    deploySh.on('exit', (data) => {
-      console.log(`final data ${data}`);
-      /* progressBar.setCompleted(); */
-      event.sender.send('finished_deid', argv[0]);
-    })
+  deploySh.on('exit', (data) => {
+    console.log(`final data ${data}`);
+    event.sender.send('finished_deid', argv[0]);
+  })
 });

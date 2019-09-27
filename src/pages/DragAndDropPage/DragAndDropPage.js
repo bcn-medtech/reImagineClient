@@ -86,18 +86,26 @@ export class DragAndDropPage extends Component {
     Anonimize(program) {
 
 
-        ipcRenderer.send('Install_Request', [program]);
+        /* ipcRenderer.send('Install_Request', [program.toLowerCase()]);
         ipcRenderer.on('InstallAnswer', (event, arg) => {
+            console.log(arg);
             if (arg === false) {
                 alert(`Must install ${program} needed`);
             }
             else {
+                console.log(arg);
                 ipcRenderer.send('Conda_Script', arg, localStorage.getItem('files'));
                 ipcRenderer.on('finished_deid', (event, arg) => {
                     console.log('finished');
                 });
             }
-        })
+        }) */
+        let arg = 0;
+        ipcRenderer.send('Conda_Script', arg, localStorage.getItem('files'));
+        ipcRenderer.on('finished_deid', (event, arg) => {
+            console.log('finished');
+        });
+
     }
 
 
@@ -129,7 +137,7 @@ export class DragAndDropPage extends Component {
                             </div>
                         </Grid>
                         <div style={{ margin: 'auto' }}>
-                            <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('Miniconda2')}>Anonimize</Button>
+                            <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('Miniconda3')}>Anonimize</Button>
                             <Button variant="contained" color="secondary" className="buttonSecondary">Send Orthanc</Button>
                         </div>
                         <Grid container spacing={2}>

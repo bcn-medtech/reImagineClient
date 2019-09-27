@@ -50,7 +50,12 @@ export default function SimpleZoom(props) {
     const [checked, setChecked] = React.useState(true);
     console.log(props);
 
+    /* React.useEffect(() => {
+        if (localStorage.getItem(''))
+    }) */
+
     function setPage(item) {
+        localStorage.setItem('FirstTime', 1);
         console.log(item);
         var browserHistory = props.history;
         browserHistory.push(item);

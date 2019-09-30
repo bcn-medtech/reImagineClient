@@ -31,24 +31,9 @@ app.on('ready', () => {
   tray = new Tray(isDev ? path.join('public', 'resources', 'icons', 'lung.png') : path.join('icons', 'lung.png'));
   const trayMenuTemplate = [
     {
-      label: 'Open in browser',
-      click: function () {
-        console.log("Clicked on Open")
-      }
-    }, {
-      label: 'Settings',
-      click: function () {
-        console.log("Clicked on settings")
-      }
-    }, {
       label: '3rdPart Installers',
       click: function () {
         mainWindow.loadURL(isDev ? 'http://localhost:3000/installers' : `file://${path.join(__dirname, '../build/index.html#/installers')}`);
-      }
-    }, {
-      label: 'Logout',
-      click: function () {
-        app.quit()
       }
     }, {
       label: 'Quit',
@@ -79,7 +64,6 @@ app.on('ready', () => {
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     console.log("Close the taskbar icon if you really want to call app.quit()")
-    app.quit()
   }
 });
 
@@ -123,7 +107,7 @@ ipcMain.on('Install_Request', (event, arg) => {
 
       if (data === 1) event.sender.send('InstallAnswer', false);
       else {
-        
+
         fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err, data) => {
           console.log(data);
           event.sender.send('InstallAnswer', data);
@@ -139,8 +123,8 @@ ipcMain.on('Install_Request', (event, arg) => {
     arg = 'conda';
     console.log(arg);
     // exec.exec(`${__dirname}/${SearchUbi}`, ['conda'], (error, stdout, stderr) => {
-      exec.exec('sh','echo','bin', {shell: 'bin/bash'}, (error, stdout, stderr) => {
-   
+    exec.exec('sh', 'echo', 'bin', { shell: 'bin/bash' }, (error, stdout, stderr) => {
+
       if (error) throw error;
       console.log(stdout);
       if (isNaN(stdout)) event.sender.send('InstallAnswer', stdout);
@@ -187,17 +171,64 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
   }
 });
 
+/* ipcMain.on('Conda_Script', (event, arg, arg1) => {
 
-ipcMain.on('Conda_Script', (event, arg, arg1) => {
-  console.log('Conda_script');
+  console.log('conda script');
+
   var ExecuteOs;
 
   if (process.platform === 'win32') ExecuteOs = path.join('win', 'runDeid.bat');
-  else ExecuteOs = path.join('linux', 'runDeid.sh');
+  else ExecuteOs = path.join('scripts', 'deiden', 'linux', 'runDeid.sh');
 
+  const exec = require('child_process');
 
   var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
   console.log(Script_Path);
+  var thePath = '/home/eneko/Projects/workflows_platform/electron/public/scripts/deiden/linux/runDeid.sh';
+  const argv = [arg1, arg1 + 'output'];
+  console.log(argv);
+
+
+  exec.exec('sh', thePath, argv, (error, stdout, stderr) => {
+    console.log(error);
+    console.log(stdout);
+    console.log(stderr);
+  });
+}) */
+
+ipcMain.on('Conda_Script', (event, arg, arg1) => {
+  console.log(process.env.SHELL);
+  console.log('Conda_script');
+  var ExecuteOs, PrepareConda;
+
+  if (process.platform === 'win32') {
+    ExecuteOs = path.join('win', 'runDeid.bat');
+    PrepareConda = path.join('win', 'createEnv.bat');
+  }
+  else {
+    ExecuteOs = path.join('linux', 'runDeid.sh');
+    PrepareConda = path.join('linux', 'createEnv.sh');
+  }
+
+
+  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
+  var prepare_path = (isDev ? path.join('scripts', 'deiden', PrepareConda) : path.join('Scripts', 'deiden', PrepareConda)); 
+  console.log(Script_Path);
+
+  const prepare = require('child_process').execFile(__dirname+'/'+prepare_path, {env: 'bin/bash'});
+
+  prepare.stdout.on('data', (data) => {
+    console.log (`data ${data}`)
+  });
+
+  prepare.stderr.on('data', (data) => {
+    console.log('errdata', data);
+  });
+
+  prepare.on('exit', (data) => {
+    console.log(`final data = ${data}`);
+  })
+
 
   const argv = [arg1, arg1 + 'output'];
   console.log(argv);
@@ -216,3 +247,29 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
     event.sender.send('finished_deid', argv[0]);
   })
 });
+
+ipcMain.on('CondaUpload', (event, arg) => {
+  if (process.platform === 'win32') {
+    ExecuteOs = path.join('win', 'uploadImages.bat');
+  }
+  else {
+    ExecuteOs = path.join('linux', 'uploadImages.sh');
+  }
+
+  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
+
+  const upload = require('child_process').execFile(`${__dirname}/${Script_Path}`, [arg]);
+
+  upload.stdout.on('data', (data) => {
+    console.log (`stdout data: ${data}`);
+  });
+
+  upload.stderr.on('data', (data) => {
+    console.log (`stderr data: ${data}`);
+  });
+
+  upload.on('exit', (data) => {
+    console.log (`final data: ${data}`);
+  });
+
+})

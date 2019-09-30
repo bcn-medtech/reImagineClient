@@ -12,11 +12,17 @@ import './App.css';
 class App extends Component {
 
 
+  first_page() {
+    let local = localStorage.getItem('started');
+    if (local) return DragAndDropPage;
+    else return InitialPage
+  }
+
+
   render() {
-    localStorage.clear();
     return (
       <Router>
-        <Route path="/" exact component={InitialPage}/>
+        <Route path="/" exact component={this.first_page()}/>
         <Route path="/Anonimizer" component={DragAndDropPage}/>
         <Route path="/installers/" component={InstallersPage}/>
       </Router>

@@ -108,6 +108,13 @@ export class DragAndDropPage extends Component {
 
     }
 
+    sendOrthanc() {
+        ipcRenderer.send('CondaUpload', localStorage.getItem('files'));
+        ipcRenderer.on('uploaded', (event, arg) => {
+            console.log('uploaded');
+        })
+    }
+
 
 
 
@@ -138,7 +145,7 @@ export class DragAndDropPage extends Component {
                         </Grid>
                         <div style={{ margin: 'auto' }}>
                             <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('Miniconda3')}>Anonimize</Button>
-                            <Button variant="contained" color="secondary" className="buttonSecondary">Send Orthanc</Button>
+                            <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.sendOrthanc()}>Send Orthanc</Button>
                         </div>
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={6}>

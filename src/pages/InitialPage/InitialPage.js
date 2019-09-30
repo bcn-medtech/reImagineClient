@@ -13,8 +13,9 @@ export class InitialPage extends Component {
         super();
     }
 
-    
-   
+    componentDidMount() {
+        localStorage.setItem('started', true);
+    }
 
     render() {
         console.log(this.props);

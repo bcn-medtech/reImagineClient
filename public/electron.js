@@ -16,6 +16,12 @@ let mainWindow;
 console.log(isDev, 'isDev');
 console.log(process.platform);
 
+// process is not fedora
+if (process.platform === 'fedora') {
+  const spawn = require('child_process').spawn;
+  spawn('export','XDG_CURRENT_DESKTOP=Unity');
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 800, height: 600, webPreferences: { webSecurity: false } });
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);

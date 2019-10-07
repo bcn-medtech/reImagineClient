@@ -18,7 +18,7 @@ export class DragAndDropPage extends Component {
     }
 
     mapper(files) {
-        if (files != false) {
+        if (files !== false) {
 
             console.log(files);
             return (
@@ -86,7 +86,7 @@ export class DragAndDropPage extends Component {
     Anonimize(program) {
 
 
-        /* ipcRenderer.send('Install_Request', [program.toLowerCase()]);
+        ipcRenderer.send('Install_Request', [program.toLowerCase()]);
         ipcRenderer.on('InstallAnswer', (event, arg) => {
             console.log(arg);
             if (arg === false) {
@@ -99,13 +99,11 @@ export class DragAndDropPage extends Component {
                     console.log('finished');
                 });
             }
-        }) */
-        let arg = 0;
-        ipcRenderer.send('Conda_Script', arg, localStorage.getItem('files'));
-        ipcRenderer.on('finished_deid', (event, arg) => {
-            console.log('finished');
+            ipcRenderer.send('Conda_Script', arg, localStorage.getItem('files'));
+            ipcRenderer.on('finished_deid', (event, arg) => {
+                console.log('finished');
+            })
         });
-
     }
 
     sendOrthanc() {
@@ -113,6 +111,7 @@ export class DragAndDropPage extends Component {
         ipcRenderer.on('uploaded', (event, arg) => {
             console.log('uploaded');
         })
+        localStorage.removeItem('files');
     }
 
 

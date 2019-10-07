@@ -44,16 +44,15 @@ export default function FullWidthTabs() {
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
     const [installed, setInstalled] = React.useState(false);
-    var arr = [['Miniconda3', true]];
+    var arr = [['Miniconda3', true], ['gdmscu', false], ['program', false]];
 
 
     React.useEffect(() => {
+
         ipcRenderer.send('Install_Request', arr[0]);
         ipcRenderer.on('InstallAnswer', (event, arg) => {
-            console.log(arg, 'hola');
             if (arg === false) {
                 arr[0][1] = false;
-                
             }
         })
     }),[];

@@ -1,10 +1,10 @@
 import React from 'react';
-import Switch from '@material-ui/core/Switch';
+//import Switch from '@material-ui/core/Switch';
 import Paper from '@material-ui/core/Paper';
 import Zoom from '@material-ui/core/Zoom';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+//import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { makeStyles } from '@material-ui/core/styles';
-import { useMediaQuery } from '@material-ui/core';
+//import { useMediaQuery } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 
 
@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function SimpleZoom(props) {
     const classes = useStyles();
-    const [checked, setChecked] = React.useState(true);
+    const [checked, /* setChecked */] = React.useState(true);
     console.log(props);
 
     /* React.useEffect(() => {

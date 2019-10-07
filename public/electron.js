@@ -87,13 +87,6 @@ ipcMain.on('Install_Request', (event, arg) => {
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
   var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('Scripts', ExecuteOs));
 
-  console.log(ExecuteOs);
-  console.log(SearchUbi);
-  console.log(arg, 'plane arg');
-  console.log(arg[0], 'point arg');
-  console.log(__dirname, '__dirname');
-
-
   // De momento cada SO tiene un modo de lectura de archivos, pero en principio no hace falta
 
   if (process.platform == 'win32') {
@@ -125,17 +118,12 @@ ipcMain.on('Install_Request', (event, arg) => {
 
   else {
     console.log('hola unix');
-    var exec = require('child_process');
-    arg = 'conda';
-    console.log(arg);
-    // exec.exec(`${__dirname}/${SearchUbi}`, ['conda'], (error, stdout, stderr) => {
-    exec.exec('sh', 'echo', 'bin', { shell: 'bin/bash' }, (error, stdout, stderr) => {
-
-      if (error) throw error;
-      console.log(stdout);
+    var exec = require('child_process')
+    exec.execFile(__dirname+'/'+SearchUbi, (err, stdout, stderr) => {
+      if (err) throw err;
       if (isNaN(stdout)) event.sender.send('InstallAnswer', stdout);
       else event.sender.send('InstallAnswer', false);
-    });
+    })
   }
 });
 
@@ -176,31 +164,6 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
     });
   }
 });
-
-/* ipcMain.on('Conda_Script', (event, arg, arg1) => {
-
-  console.log('conda script');
-
-  var ExecuteOs;
-
-  if (process.platform === 'win32') ExecuteOs = path.join('win', 'runDeid.bat');
-  else ExecuteOs = path.join('scripts', 'deiden', 'linux', 'runDeid.sh');
-
-  const exec = require('child_process');
-
-  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
-  console.log(Script_Path);
-  var thePath = '/home/eneko/Projects/workflows_platform/electron/public/scripts/deiden/linux/runDeid.sh';
-  const argv = [arg1, arg1 + 'output'];
-  console.log(argv);
-
-
-  exec.exec('sh', thePath, argv, (error, stdout, stderr) => {
-    console.log(error);
-    console.log(stdout);
-    console.log(stderr);
-  });
-}) */
 
 ipcMain.on('Conda_Script', (event, arg, arg1) => {
   console.log(process.env.SHELL);
@@ -277,5 +240,4 @@ ipcMain.on('CondaUpload', (event, arg) => {
   upload.on('exit', (data) => {
     console.log (`final data: ${data}`);
   });
-
 })

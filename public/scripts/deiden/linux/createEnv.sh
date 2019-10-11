@@ -14,6 +14,8 @@ if [ -z "$ENVS" ]; then
     conda install --name deid -c SimpleITK SimpleITK python=3.5 -y
     conda install --name deid -c conda-forge pydicom -y
     conda install --name deid -c conda-forge deid -y
+    conda install --name deid -c https://services.simbiosys.upf.edu/conda/ -c conda-forge gdcm -y
+
     
 else 
     echo 'deid is installed'

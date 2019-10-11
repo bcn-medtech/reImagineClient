@@ -43,23 +43,27 @@ export default function FullWidthTabs() {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
-    const [installed, setInstalled] = React.useState(false);
-    var arr = [['Miniconda3', true], ['gdmscu', false], ['program', false]];
+    var arr = [['conda', true], ['gdmscu', true], ['program', true]];
+    const [installed, setInstalled] = React.useState(arr);
 
 
     React.useEffect(() => {
 
-        ipcRenderer.send('Install_Request', arr[0]);
-        ipcRenderer.on('InstallAnswer', (event, arg) => {
-            if (arg === false) {
-                arr[0][1] = false;
-            }
+        arr.map((el, idx) => {
+            console.log(el[0].toString());
+            ipcRenderer.send('Install_Request', el[0].toString());
+            ipcRenderer.on('InstallAnswer', (event, arg) => {
+                if (arg === false) {
+                    console.log(installed[idx], 'bchange');
+                    setInstalled(installed[idx] = [el[0],false])
+                    console.log(installed[idx], 'achange');
+                }
+            })
         })
-    }),[];
+    }), 100;
 
-    console.log(arr, 'state arr');
 
-    
+
 
     function handleChange(event, newValue) {
         setValue(newValue);
@@ -77,7 +81,7 @@ export default function FullWidthTabs() {
         console.log(program);
 
         new Promise(resolve => {
-    
+
             ipcRenderer.send('Install_Request', [program.toLowerCase()]);
             ipcRenderer.on('InstallAnswer', (event, arg) => {
                 if (arg !== null) {
@@ -93,7 +97,9 @@ export default function FullWidthTabs() {
     }
 
     function NotInstalledList() {
-        console.log(arr);
+        console.log(installed, 'not');
+        var arr = [installed];
+        
         return (
             <div>
                 {
@@ -115,7 +121,8 @@ export default function FullWidthTabs() {
     }
 
     function InstalledList(arr) {
-        console.log(arr, 'installed list');
+        console.log(installed, 'not');
+        var arr = [installed];
         return (
             <div>
                 {

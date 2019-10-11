@@ -16,7 +16,7 @@ let mainWindow;
 console.log(isDev, 'isDev');
 console.log(process.platform);
 
-// process is not fedora
+// process isn't fedora
 if (process.platform === 'fedora') {
   const spawn = require('child_process').spawn;
   spawn('export','XDG_CURRENT_DESKTOP=Unity');
@@ -118,9 +118,10 @@ ipcMain.on('Install_Request', (event, arg) => {
 
   else {
     console.log('hola unix');
-    var exec = require('child_process')
-    exec.execFile(__dirname+'/'+SearchUbi, (err, stdout, stderr) => {
+    var exec = require('child_process');
+    exec.execFile(__dirname+'/'+SearchUbi, [arg], (err, stdout, stderr) => {
       if (err) throw err;
+      console.log(stdout);
       if (isNaN(stdout)) event.sender.send('InstallAnswer', stdout);
       else event.sender.send('InstallAnswer', false);
     })
@@ -224,6 +225,8 @@ ipcMain.on('CondaUpload', (event, arg) => {
   else {
     ExecuteOs = path.join('linux', 'uploadImages.sh');
   }
+
+  console.log(__dirname);
 
   var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
 

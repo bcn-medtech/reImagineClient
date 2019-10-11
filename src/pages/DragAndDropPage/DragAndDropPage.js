@@ -143,7 +143,7 @@ export class DragAndDropPage extends Component {
                             </div>
                         </Grid>
                         <div style={{ margin: 'auto' }}>
-                            <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('Miniconda3')}>Anonimize</Button>
+                            <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('conda')}>Anonimize</Button>
                             <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.sendOrthanc()}>Send Orthanc</Button>
                         </div>
                         <Grid container spacing={2}>

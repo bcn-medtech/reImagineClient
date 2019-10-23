@@ -1,6 +1,7 @@
 const electron = require('electron');
 const { Menu, Tray } = require('electron')
 
+
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const isDev = require('electron-is-dev');
@@ -17,9 +18,24 @@ console.log(isDev, 'isDev');
 console.log(process.platform);
 
 // process isn't fedora
-if (process.platform === 'fedora') {
-  const spawn = require('child_process').spawn;
-  spawn('export','XDG_CURRENT_DESKTOP=Unity');
+if (process.platform === 'linux') {
+  console.log(__dirname);
+  const exec = require('child_process').execFile;
+  var exPath = (isDev ? 'scripts/fedora/fedora.sh' : 'Scripts/fedora/fedora.sh');
+  var Fedora = exec(exPath);
+  
+  Fedora.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  })
+
+  Fedora.stderr.on('data',(data) => {
+    console.log(`stderr: ${data}`);
+  })
+
+  Fedora.on('close',(code) => {
+    console.log(`final data: ${code}`);
+  })
+
 }
 
 function createWindow() {
@@ -119,7 +135,7 @@ ipcMain.on('Install_Request', (event, arg) => {
   else {
     console.log('hola unix');
     var exec = require('child_process');
-    exec.execFile(__dirname+'/'+SearchUbi, [arg], (err, stdout, stderr) => {
+    exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
       if (err) throw err;
       console.log(stdout);
       if (isNaN(stdout)) event.sender.send('InstallAnswer', stdout);
@@ -182,13 +198,13 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
 
 
   var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
-  var prepare_path = (isDev ? path.join('scripts', 'deiden', PrepareConda) : path.join('Scripts', 'deiden', PrepareConda)); 
+  var prepare_path = (isDev ? path.join('scripts', 'deiden', PrepareConda) : path.join('Scripts', 'deiden', PrepareConda));
   console.log(Script_Path);
 
-  const prepare = require('child_process').execFile(__dirname+'/'+prepare_path, {env: 'bin/bash'});
+  const prepare = require('child_process').execFile(__dirname + '/' + prepare_path, { env: 'bin/bash' });
 
   prepare.stdout.on('data', (data) => {
-    console.log (`data ${data}`)
+    console.log(`data ${data}`)
   });
 
   prepare.stderr.on('data', (data) => {
@@ -219,28 +235,30 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
 });
 
 ipcMain.on('CondaUpload', (event, arg) => {
-  if (process.platform === 'win32') {
-    ExecuteOs = path.join('win', 'uploadImages.bat');
+  function CondaUpload(event, arg) {
+    if (process.platform === 'win32') {
+      ExecuteOs = path.join('win', 'uploadImages.bat');
+    }
+    else {
+      ExecuteOs = path.join('linux', 'uploadImages.sh');
+    }
+
+    console.log(__dirname);
+
+    var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
+
+    const upload = require('child_process').execFile(`${__dirname}/${Script_Path}`, [arg]);
+
+    upload.stdout.on('data', (data) => {
+      console.log(`stdout data: ${data}`);
+    });
+
+    upload.stderr.on('data', (data) => {
+      console.log(`stderr data: ${data}`);
+    });
+
+    upload.on('exit', (data) => {
+      console.log(`final data: ${data}`);
+    });
   }
-  else {
-    ExecuteOs = path.join('linux', 'uploadImages.sh');
-  }
-
-  console.log(__dirname);
-
-  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
-
-  const upload = require('child_process').execFile(`${__dirname}/${Script_Path}`, [arg]);
-
-  upload.stdout.on('data', (data) => {
-    console.log (`stdout data: ${data}`);
-  });
-
-  upload.stderr.on('data', (data) => {
-    console.log (`stderr data: ${data}`);
-  });
-
-  upload.on('exit', (data) => {
-    console.log (`final data: ${data}`);
-  });
 })

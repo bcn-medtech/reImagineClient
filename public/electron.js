@@ -1,3 +1,5 @@
+import {CONSTANTS} from './constants';
+
 const electron = require('electron');
 const { Menu, Tray } = require('electron')
 
@@ -5,10 +7,10 @@ const { Menu, Tray } = require('electron')
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const isDev = require('electron-is-dev');
-const os = require('os');
+//const os = require('os');
 
 const path = require('path');
-const url = require('url');
+//const url = require('url');
 const fs = require('fs');
 
 const { ipcMain } = require('electron');
@@ -158,15 +160,15 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
 
     if (os == "win32") {
 
-      executablePath = (isDev ? 'public\\resources\\win\\Miniconda2-latest-Windows-x86_64.exe' : 'installers\\Miniconda2-latest-Windows-x86_64.exe');
+      executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
     }
     else if (os == 'MacOS') {
 
-      executablePath = (isDev ? 'public/resources/mac/Miniconda3-latest-MacOSX-x86_64.sh' : 'installers/Miniconda3-latest-MacOSX-x86_64.sh');
+      executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);
     }
 
     else if (os === 'linux') {
-      executablePath = (isDev ? 'public/resources/linux/Miniconda3-latest-linux-x86_64.sh' : 'installers/Miniconda3-latest-linux--x86_64.sh');
+      executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_LIN : CONSTANTS.INSTALLERS.LIN);
     }
 
     var child = require('child_process').execFile;

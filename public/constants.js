@@ -1,3 +1,9 @@
+/*
+    constants.js
+
+    just a file to save constant values and do bigger files more readable
+*/
+
 export const CONSTANTS = {};
 
 CONSTANTS.INSTALLERS = {};

@@ -1,3 +1,13 @@
+/* 
+electron.js
+
+  "Server side" file. electron have to play with stuff react cannot play, like interactions with os,file searching and so long.
+
+  we use two basic imports: ipcMain and ipcRenderer.
+
+  ipcMain is for recieve and send calls from/to react. ipcRenderer has the same objective but implemented on react, to render responses of icpMain
+*/
+
 import {CONSTANTS} from './constants';
 
 const electron = require('electron');
@@ -19,7 +29,7 @@ let mainWindow;
 console.log(isDev, 'isDev');
 console.log(process.platform);
 
-// process isn't fedora
+// implement of linux startup extension for possible problems with platforms like fedora.
 if (process.platform === 'linux') {
   console.log(__dirname);
   const exec = require('child_process').execFile;
@@ -40,6 +50,9 @@ if (process.platform === 'linux') {
 
 }
 
+/* 
+  Creation of main window with this function. the loading of first page starts on a html template that runs our framework
+*/
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 800, height: 600, webPreferences: { webSecurity: false } });
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
@@ -49,7 +62,7 @@ function createWindow() {
   })
 }
 
-
+// Tray just let us have an icon saved in taskbar to do more easily to use the app and do it less heavy interface
 let tray = null
 app.on('ready', () => {
   tray = new Tray(isDev ? path.join('public', 'resources', 'icons', 'lung.png') : path.join('icons', 'lung.png'));
@@ -97,7 +110,9 @@ app.on('activate', function () {
   }
 });
 
-
+// Request to install a dependency. React asks to electron if a dependency needed to run a script exists in our pc.
+// If it exists, the script will run normally, if it does not, the app will advice you to install the dependencies needed
+// going to dependencies page.
 ipcMain.on('Install_Request', (event, arg) => {
 
   console.log('install request action');
@@ -147,7 +162,7 @@ ipcMain.on('Install_Request', (event, arg) => {
 });
 
 
-
+// Script to isntall program requested for, like miniconda
 ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
 
 
@@ -184,6 +199,8 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
   }
 });
 
+
+// Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
 ipcMain.on('Conda_Script', (event, arg, arg1) => {
   console.log(process.env.SHELL);
   console.log('Conda_script');
@@ -236,6 +253,8 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
   })
 });
 
+
+// uploading of images deidentificated for deid script
 ipcMain.on('CondaUpload', (event, arg) => {
   function CondaUpload(event, arg) {
     if (process.platform === 'win32') {

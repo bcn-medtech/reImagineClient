@@ -41,7 +41,7 @@ console.log(isDev, 'isDev');
 console.log(process.platform);
 
 // implement of linux startup extension for possible problems with platforms like fedora.
-if (process.platform === 'linux') {
+/* if (process.platform === 'linux') {
   console.log(__dirname);
   const exec = require('child_process').execFile;
   var exPath = (isDev ? 'scripts/fedora/fedora.sh' : 'Scripts/fedora/fedora.sh');
@@ -59,7 +59,7 @@ if (process.platform === 'linux') {
     console.log(`final data: ${code}`);
   })
 
-}
+} */
 
 /* 
   Creation of main window with this function. the loading of first page starts on a html template that runs our framework
@@ -72,6 +72,7 @@ function createWindow() {
     mainWindow = null
   })
 }
+
 
 // Tray just let us have an icon saved in taskbar to do more easily to use the app and do it less heavy interface
 let tray = null
@@ -93,7 +94,8 @@ app.on('ready', () => {
   let contextMenu = Menu.buildFromTemplate(trayMenuTemplate)
   tray.setToolTip('This is my application.')
   tray.setContextMenu(contextMenu)
-
+  createWindow();
+  
   tray.on('click', () => {
     if (mainWindow == null) {
       createWindow()

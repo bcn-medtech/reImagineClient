@@ -18,7 +18,7 @@
   },
   "scripts": {
     "react-start": "cross-env BROWSER=none react-scripts start",
-    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000/ && electron .\"",
+    "start": "export XDG_CURRENT_DESKTOP=Unity && concurrently \"npm run react-start\" \"wait-on http://localhost:3000/ && electron .\"",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",

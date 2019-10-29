@@ -24,7 +24,8 @@ class LocalDB(object):
     #self._engine = create_engine('sqlite:///:memory:', echo=verbose)
     basedir = os.getcwd()
     sqlfile = os.path.join(basedir, "patients.sqlite")
-    self._engine = create_engine('sqlite:///:memory:', echo=verbose)    
+    #self._engine = create_engine('sqlite:///:memory:', echo=verbose)
+    self._engine = create_engine('sqlite:///%s'%sqlfile, echo=verbose)            
     self._sessionMaker = sessionmaker(bind=self._engine)    
     self._session = self._sessionMaker() 
 

@@ -168,7 +168,7 @@ ipcMain.on('Install_Request', (event, arg) => {
     exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
       if (err) throw err;
       console.log(stdout);
-      if (isNaN(stdout)) event.sender.send('InstallAnswer', stdout);
+      if (typeof stdout === 'string') event.sender.send('InstallAnswer', stdout);
       else event.sender.send('InstallAnswer', false);
     })
   }

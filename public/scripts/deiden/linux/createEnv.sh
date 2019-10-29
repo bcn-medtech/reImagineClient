@@ -10,8 +10,7 @@ if [ -z "$ENVS" ]; then
     echo "Create deiden env"
     conda create -n deid sqlalchemy -y
 
-    conda install --name deid -c conda-forge gdcm -y
-    conda install --name deid -c SimpleITK SimpleITK python=3.5 -y
+    conda install --name deid -c SimpleITK SimpleITK -y
     conda install --name deid -c conda-forge pydicom -y
     conda install --name deid -c conda-forge deid -y
     conda install --name deid -c https://services.simbiosys.upf.edu/conda/ -c conda-forge gdcm -y

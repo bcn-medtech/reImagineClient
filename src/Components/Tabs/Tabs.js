@@ -43,20 +43,20 @@ export default function FullWidthTabs() {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
-    var arr = [['conda', true], ['gdmscu', true], ['program', true]];
+    var arr = [['conda', true], ['gdmscu', false], ['program', false]];
     const [installed, setInstalled] = React.useState(arr);
 
 
     React.useEffect(() => {
 
         arr.map((el, idx) => {
-            console.log(el[0].toString());
+            //console.log(el[0].toString());
             ipcRenderer.send('Install_Request', el[0].toString());
             ipcRenderer.on('InstallAnswer', (event, arg) => {
                 if (arg === false) {
-                    console.log(installed[idx], 'bchange');
-                    setInstalled(installed[idx] = [el[0],false])
-                    console.log(installed[idx], 'achange');
+                    //console.log(installed[idx], 'bchange');
+                    setInstalled(installed[idx] = [el[0], false])
+                    //console.log(installed[idx], 'achange');
                 }
             })
         })
@@ -74,42 +74,43 @@ export default function FullWidthTabs() {
     }
 
     function imageRel(element) {
-        if (element === 'Miniconda') return MinicondaPng;
+        if (element === 'conda') return MinicondaPng;
     }
 
     function Install(program) {
         console.log(program);
-
-        new Promise(resolve => {
-
-            ipcRenderer.send('Install_Request', [program.toLowerCase()]);
-            ipcRenderer.on('InstallAnswer', (event, arg) => {
-                if (arg !== null) {
-                    resolve(arg);
-                    ipcRenderer.send('Program_Install', [program]);
-                }
-                ipcRenderer.send('Miniconda_Install', arg, localStorage.getItem('files'));
-                ipcRenderer.on('finished_deid', (event, arg) => {
-                    console.log(arg.toString());
+        function callAgent(program) {
+            return new Promise(resolve => {
+                ipcRenderer.send('Install_Request', [program.toLowerCase()]);
+                ipcRenderer.on('InstallAnswer', (event, arg) => {
+                    if (arg !== null) {
+                        resolve(arg);
+                        ipcRenderer.send('Program_Install', [program]);
+                    }
+                    ipcRenderer.send('Miniconda_Install', arg, localStorage.getItem('files'));
+                    ipcRenderer.on('finished_deid', (event, arg) => {
+                        console.log(arg.toString());
+                    })
                 })
             })
-        })
+        }
+        callAgent(program);
     }
 
     function NotInstalledList() {
-        console.log(installed, 'not');
+        //console.log(installed, 'not');
         var arr = [installed];
-        
+
         return (
             <div>
                 {
-                    arr.map((element, idx) => {
-                        console.log(element, 'before test');
-                        if (element[1] === false) {
-                            console.log(element), 'after test';
+                    installed.map((element, idx) => {
+                        //console.log(element, 'before test');
+                        if (element[1] == false) {
+                            //console.log(element), 'after test';
                             return (
                                 <div>
-                                    <Button key={idx} onClick={() => Install(element[0])}>{element}</Button>
+                                    <Button key={idx} onClick={Install(element[0])}>{element}</Button>
                                     <img className={classes.imgTam} src={imageRel(element[0])} />
                                 </div>
                             )
@@ -121,17 +122,17 @@ export default function FullWidthTabs() {
     }
 
     function InstalledList(arr) {
-        console.log(installed, 'not');
+        //console.log(installed, 'not');
         var arr = [installed];
         return (
             <div>
                 {
-                    arr.map((element, idx) => {
-                        if (element[1] === true) {
+                    installed.map((element, idx) => {
+                        if (element[1] == true) {
 
                             return (
                                 <div>
-                                    <Button key={idx}>{element}</Button>
+                                    <Button key={idx} onClick={() => Install(element[0])}>{element}</Button>
                                     <img className={classes.imgTam} src={imageRel(element[0])} />
                                 </div>
                             )
@@ -161,8 +162,8 @@ export default function FullWidthTabs() {
                 index={value}
                 onChangeIndex={handleChangeIndex}
             >
-                <TabContainer dir={theme.direction}>{InstalledList(arr)}</TabContainer>
-                <TabContainer dir={theme.direction}>{NotInstalledList(arr)}</TabContainer>
+                <TabContainer dir={theme.direction}>{InstalledList(installed)}</TabContainer>
+                <TabContainer dir={theme.direction}>{NotInstalledList(installed)}</TabContainer>
             </SwipeableViews>
         </div>
     );

@@ -1,4 +1,8 @@
 #!/bin/bash
+source ~/miniconda3/etc/profile.d/conda.sh
+
+conda activate deid
+echo $(ls)
 
 # This is the root folder of all the anonimized images
 ANON_DATA=$1

@@ -1,3 +1,4 @@
+//import {CONSTANTS} from './constants';
 /* 
 electron.js
 
@@ -8,7 +9,17 @@ electron.js
   ipcMain is for recieve and send calls from/to react. ipcRenderer has the same objective but implemented on react, to render responses of icpMain
 */
 
-import {CONSTANTS} from './constants';
+const CONSTANTS = {};
+
+CONSTANTS.INSTALLERS = {};
+
+CONSTANTS.INSTALLERS.WIN = 'installers\\Miniconda2-latest-Windows-x86_64.exe';
+CONSTANTS.INSTALLERS.LIN = 'installers/Miniconda3-latest-linux--x86_64.sh';
+CONSTANTS.INSTALLERS.MAC = 'installers/Miniconda3-latest-MacOSX-x86_64.sh';
+CONSTANTS.INSTALLERS.DEV_WIN = 'public\\resources\\win\\Miniconda2-latest-Windows-x86_64.exe';
+CONSTANTS.INSTALLERS.DEV_LIN = 'public/resources/linux/Miniconda3-latest-linux-x86_64.sh';
+CONSTANTS.INSTALLERS.DEV_MAC = 'public/resources/mac/Miniconda3-latest-MacOSX-x86_64.sh';
+
 
 const electron = require('electron');
 const { Menu, Tray } = require('electron')
@@ -202,7 +213,7 @@ ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
 
 // Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
 ipcMain.on('Conda_Script', (event, arg, arg1) => {
-  console.log(process.env.SHELL);
+  //console.log(process.env.SHELL);
   console.log('Conda_script');
   var ExecuteOs, PrepareConda;
 
@@ -215,12 +226,25 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
     PrepareConda = path.join('linux', 'createEnv.sh');
   }
 
+  var Promise = require('bluebird');
+  function promiseProcess(prog) {
+    return new Promise(function (resolve, reject) {
+      prepare.addListener('error',reject);
+      prepare.addListener('exit',resolve);
+    })
+  }
 
   var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
   var prepare_path = (isDev ? path.join('scripts', 'deiden', PrepareConda) : path.join('Scripts', 'deiden', PrepareConda));
   console.log(Script_Path);
 
   const prepare = require('child_process').execFile(__dirname + '/' + prepare_path, { env: 'bin/bash' });
+
+  promiseProcess(prepare).then(function (result) {
+    console.log('promise complete: ' +  result);
+  }, function(err) {
+    console.log('promise rejected: ' + err);
+  });
 
   prepare.stdout.on('data', (data) => {
     console.log(`data ${data}`)
@@ -236,7 +260,7 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
 
 
   const argv = [arg1, arg1 + 'output'];
-  console.log(argv);
+  //console.log(argv);
   const deploySh = require('child_process').execFile(`${__dirname}/${Script_Path}`, argv);
 
   deploySh.stdout.on('data', (data) => {
@@ -256,7 +280,7 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
 
 // uploading of images deidentificated for deid script
 ipcMain.on('CondaUpload', (event, arg) => {
-  function CondaUpload(event, arg) {
+  console.log('conda upload');
     if (process.platform === 'win32') {
       ExecuteOs = path.join('win', 'uploadImages.bat');
     }
@@ -265,10 +289,11 @@ ipcMain.on('CondaUpload', (event, arg) => {
     }
 
     console.log(__dirname);
+    console.log(arg);
 
     var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
 
-    const upload = require('child_process').execFile(`${__dirname}/${Script_Path}`, [arg]);
+    const upload = require('child_process').execFile(__dirname + '/' + Script_Path, [arg]);
 
     upload.stdout.on('data', (data) => {
       console.log(`stdout data: ${data}`);
@@ -281,5 +306,4 @@ ipcMain.on('CondaUpload', (event, arg) => {
     upload.on('exit', (data) => {
       console.log(`final data: ${data}`);
     });
-  }
-})
+});

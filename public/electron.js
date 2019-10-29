@@ -282,6 +282,7 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
 
 // uploading of images deidentificated for deid script
 ipcMain.on('CondaUpload', (event, arg) => {
+  /* horizontal bar, pacs selector before send orthanc button  */
   console.log('conda upload');
     if (process.platform === 'win32') {
       ExecuteOs = path.join('win', 'uploadImages.bat');

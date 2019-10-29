@@ -8,7 +8,7 @@ echo $(ls)
 ANON_DATA=$1
 
 # Those are hardcoded for now but in the future we should open them on ingress controller
-DICOMPORT=32713
+DICOMPORT=32713     
 IPS=10.55.0.115
 
 # This is the command to send the modalities to the PACS

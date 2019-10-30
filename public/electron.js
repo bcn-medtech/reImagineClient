@@ -80,6 +80,12 @@ app.on('ready', () => {
   tray = new Tray(isDev ? path.join('public', 'resources', 'icons', 'lung.png') : path.join('icons', 'lung.png'));
   const trayMenuTemplate = [
     {
+      label: 'open window',
+      click: function() {
+        createWindow();
+      }
+    },
+    {
       label: '3rdPart Installers',
       click: function () {
         mainWindow.loadURL(isDev ? 'http://localhost:3000/installers' : `file://${path.join(__dirname, '../build/index.html#/installers')}`);
@@ -282,6 +288,7 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
 
 // uploading of images deidentificated for deid script
 ipcMain.on('CondaUpload', (event, arg) => {
+  let port = arg[1];
   /* horizontal bar, pacs selector before send orthanc button  */
   console.log('conda upload');
     if (process.platform === 'win32') {
@@ -290,6 +297,18 @@ ipcMain.on('CondaUpload', (event, arg) => {
     else {
       ExecuteOs = path.join('linux', 'uploadImages.sh');
     }
+
+    switch (port) {
+      case 'deeprad':
+        port = 32713
+        break;
+      case 'usimage':
+        port = 30605
+      default:
+        port = 30605
+        break;
+    }
+
 
     console.log(__dirname);
     console.log(arg);

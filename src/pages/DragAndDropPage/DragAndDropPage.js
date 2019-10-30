@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 //import AppBar_Component from './../../Components/AppBar_Component/AppBar_Component';
+import Horizontal from '../../Components/horizBar/horizBar';
 import AppBar from '../../Components/AppBar/AppBar';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -14,6 +15,7 @@ export class DragAndDropPage extends Component {
         super();
         this.state = {
             files: false,
+            pacs: false,
         };
     }
 
@@ -39,7 +41,9 @@ export class DragAndDropPage extends Component {
         }
     }
 
+
     componentDidMount() {
+
 
         var holder = document.getElementById('dropbox');
 
@@ -107,17 +111,28 @@ export class DragAndDropPage extends Component {
     }
 
     sendOrthanc() {
-        ipcRenderer.send('CondaUpload', localStorage.getItem('files'));
-        ipcRenderer.on('uploaded', (event, arg) => {
-            console.log('uploaded');
-        })
-        localStorage.removeItem('files');
+        if (this.state.pacs === false) {
+            alert('select pacs');
+        }
+        else {
+            ipcRenderer.send('CondaUpload', localStorage.getItem('files'), this.state.pacs.toString());
+            ipcRenderer.on('uploaded', (event, arg) => {
+                console.log('uploaded');
+            })
+            localStorage.removeItem('files');
+        }
+    }
+
+    pacsValue(value) {
+            console.log(value);
+            console.log(this.state.pacs);
+            this.setState({ pacs: value })
     }
 
 
-
-
     render() {
+
+        console.log(this.state.pacs);
 
         const dragDropStyle = {
             position: 'relative',
@@ -142,6 +157,7 @@ export class DragAndDropPage extends Component {
                                 </Paper>
                             </div>
                         </Grid>
+                        <Horizontal pacsValue={this.pacsValue.bind(this)} />
                         <div style={{ margin: 'auto' }}>
                             <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('conda')}>Anonimize</Button>
                             <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.sendOrthanc()}>Send Orthanc</Button>
@@ -150,7 +166,7 @@ export class DragAndDropPage extends Component {
                             <Grid item xs={12} md={6}>
                                 <Typography style={{ textAlign: "left", marginTop: '5px' }}>
                                     Selected Files
-                                    </Typography>
+                                </Typography>
                                 <div>
                                     {this.mapper(this.state.files)}
                                 </div>

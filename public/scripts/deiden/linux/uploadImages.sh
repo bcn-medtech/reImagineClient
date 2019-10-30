@@ -6,9 +6,10 @@ echo $(ls)
 
 # This is the root folder of all the anonimized images
 ANON_DATA=$1
+PORT=$2
 
 # Those are hardcoded for now but in the future we should open them on ingress controller
-DICOMPORT=32713     
+DICOMPORT=PORT     
 IPS=10.55.0.115
 
 # This is the command to send the modalities to the PACS

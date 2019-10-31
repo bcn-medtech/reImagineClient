@@ -48,7 +48,7 @@ export default function ButtonAppBar(props) {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static" style={{"-webkit-app-region": "drag"}}>
+      <AppBar position="static">
         <Toolbar>
           <IconButton edge="start" className={classes.menuButton} color="inherit" onClick={() => Home('Anonimizer')} aria-label="Menu">
             <HomeIcon />

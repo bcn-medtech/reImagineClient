@@ -132,8 +132,6 @@ export class DragAndDropPage extends Component {
 
     render() {
 
-        console.log(this.state.pacs);
-
         const dragDropStyle = {
             position: 'relative',
             'margin-right': 'auto',

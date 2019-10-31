@@ -1,50 +1,77 @@
 import React from 'react';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import { makeStyles } from '@material-ui/core/styles';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import { makeStyles } from '@material-ui/styles';
+import Select from '@material-ui/core/Select';
+import constants from '../../conf/constants.json';
 
-export default function FormControlLabelPosition(props) {
-  const [value, setValue] = React.useState('DeepRad');
+const useStyles = makeStyles(theme => ({
+  button: {
+    display: 'block',
+    marginTop: theme.spacing(2),
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+}));
+
+export default function ControlledOpenSelect(props) {
+  const classes = useStyles();
+  const [age, setAge] = React.useState('');
+  const [open, setOpen] = React.useState(false);
+
+
+  React.useEffect(() => {
+    props.pacsValue(false);
+  }, [])
 
   const handleChange = event => {
-    setValue(event.target.value);
+    setAge(event.target.value);
+    props.pacsValue(event.target.value);
   };
 
-  const useStyles = makeStyles(theme => ({
-    root: {
-      marginLeft: '0px',
-      display: 'flex',
-    }
-  }));
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-  function passProp(value) { 
-    props.pacsValue(value)
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  function items() {
+    return (
+      Object.keys(constants.PORTS).map((key) => {
+        return (
+          <MenuItem value={constants.PORTS[key]}>{key}</MenuItem>
+        )  
+      })
+    )
   }
 
-
   return (
-    <div className={useStyles.root}>
-      <FormControl component="fieldset">
-        {/* <FormLabel component="legend">Pacs selector</FormLabel> */}
-        <RadioGroup aria-label="position" name="position" value={value} onChange={handleChange} row>
-          <FormControlLabel
-            value="USImage"
-            control={<Radio color="primary" />}
-            label="USImage"
-            labelPlacement="start"
-            onChange={() => passProp(value)}
-          />
-          <FormControlLabel
-            value="DeepRad"
-            control={<Radio color="secondary" />}
-            label="DeepRad"
-            labelPlacement="start"
-            onChange={() => passProp(value)}
-          />
-        </RadioGroup>
+
+    <div>
+      <FormControl className={classes.formControl}>
+        <InputLabel id="demo-controlled-open-select-label">PACS</InputLabel>
+        <Select
+          labelId="demo-controlled-open-select-label"
+          id="demo-controlled-open-select"
+          open={open}
+          onClose={handleClose}
+          onOpen={handleOpen}
+          value={age}
+          onChange={handleChange}
+        >
+          {items()}
+         {/*  <MenuItem value="">
+            <em>None</em>
+          </MenuItem>
+          <MenuItem value={10}>Ten</MenuItem>
+          <MenuItem value={20}>Twenty</MenuItem>
+          <MenuItem value={30}>Thirty</MenuItem> */}
+        </Select>
       </FormControl>
     </div>
   );

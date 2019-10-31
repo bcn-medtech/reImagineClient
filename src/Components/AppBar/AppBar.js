@@ -5,42 +5,91 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import HomeIcon from '@material-ui/icons/Home';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        flexGrow: 1,
-    },
-    menuButton: {
-        marginRight: theme.spacing(2),
-    },
-    title: {
-        flexGrow: 1,
-    },
+  root: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+  },
 }));
 
 export default function ButtonAppBar(props) {
-    const classes = useStyles();
+  const classes = useStyles();
+  const [auth, setAuth] = React.useState(true);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
 
-    function Home() {
+  const handleChange = event => {
+    setAuth(event.target.checked);
+  };
 
-        console.log(props.history);
-        var browserHistory = props.history;
-        browserHistory.push("/Anonimizer");
-    }
+  const handleMenu = event => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    return (
-        <div className={classes.root}>
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton edge="start" className={classes.menuButton} color="inherit" onClick={() => Home()} aria-label="Menu">
-                        <HomeIcon />
-                    </IconButton>
-                    <Typography variant="h6" className={classes.title}>
-                        {props.page}
-                    </Typography>
-                    {/* <Button color="inherit">Return to App Page</Button> */}
-                </Toolbar>
-            </AppBar>
-        </div>
-    );
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  function Home(where) {
+
+    console.log(props.history);
+    var browserHistory = props.history;
+    browserHistory.push("/"+where);
+  }
+
+  return (
+    <div className={classes.root}>
+      <AppBar position="static" style={{"-webkit-app-region": "drag"}}>
+        <Toolbar>
+          <IconButton edge="start" className={classes.menuButton} color="inherit" onClick={() => Home('Anonimizer')} aria-label="Menu">
+            <HomeIcon />
+          </IconButton>
+          <Typography variant="h6" className={classes.title}>
+            {props.page}
+          </Typography>
+          {/* <Button color="inherit">Return to App Page</Button> */}
+          {auth && (
+            <div>
+              <IconButton
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={open}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={() => Home('LogIn')}>LogIn</MenuItem>
+                <MenuItem onClick={handleClose}>LogOut</MenuItem>
+              </Menu>
+            </div>
+          )}
+        </Toolbar>
+      </AppBar>
+    </div>
+  );
 }

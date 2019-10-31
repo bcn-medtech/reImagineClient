@@ -40,32 +40,11 @@ let mainWindow;
 console.log(isDev, 'isDev');
 console.log(process.platform);
 
-// implement of linux startup extension for possible problems with platforms like fedora.
-/* if (process.platform === 'linux') {
-  console.log(__dirname);
-  const exec = require('child_process').execFile;
-  var exPath = (isDev ? 'scripts/fedora/fedora.sh' : 'Scripts/fedora/fedora.sh');
-  var Fedora = exec(exPath);
-  
-  Fedora.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  })
-
-  Fedora.stderr.on('data',(data) => {
-    console.log(`stderr: ${data}`);
-  })
-
-  Fedora.on('close',(code) => {
-    console.log(`final data: ${code}`);
-  })
-
-} */
-
 /* 
   Creation of main window with this function. the loading of first page starts on a html template that runs our framework
 */
 function createWindow() {
-  mainWindow = new BrowserWindow({ width: 800, height: 600, webPreferences: { webSecurity: false } });
+  mainWindow = new BrowserWindow({ width: 800, height: 600, frame: false, webPreferences: { webSecurity: false } });
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   // mainWindow.webContents.openDevTools();
   mainWindow.on('closed', function () {
@@ -81,7 +60,7 @@ app.on('ready', () => {
   const trayMenuTemplate = [
     {
       label: 'open window',
-      click: function() {
+      click: function () {
         createWindow();
       }
     },
@@ -101,7 +80,7 @@ app.on('ready', () => {
   tray.setToolTip('This is my application.')
   tray.setContextMenu(contextMenu)
   createWindow();
-  
+
   tray.on('click', () => {
     if (mainWindow == null) {
       createWindow()
@@ -111,6 +90,15 @@ app.on('ready', () => {
       mainWindow.show()
     }
   });
+
+  tray.on('double-click', () => {
+    if (mainWindow == null) {
+      createWindow();
+    }
+    else if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else mainWindow.show();
+  })
 
 })
 
@@ -237,8 +225,8 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
   var Promise = require('bluebird');
   function promiseProcess(prog) {
     return new Promise(function (resolve, reject) {
-      prepare.addListener('error',reject);
-      prepare.addListener('exit',resolve);
+      prepare.addListener('error', reject);
+      prepare.addListener('exit', resolve);
     })
   }
 
@@ -249,8 +237,8 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
   const prepare = require('child_process').execFile(__dirname + '/' + prepare_path, { env: 'bin/bash' });
 
   promiseProcess(prepare).then(function (result) {
-    console.log('promise complete: ' +  result);
-  }, function(err) {
+    console.log('promise complete: ' + result);
+  }, function (err) {
     console.log('promise rejected: ' + err);
   });
 
@@ -291,41 +279,68 @@ ipcMain.on('CondaUpload', (event, arg) => {
   let port = arg[1];
   /* horizontal bar, pacs selector before send orthanc button  */
   console.log('conda upload');
-    if (process.platform === 'win32') {
-      ExecuteOs = path.join('win', 'uploadImages.bat');
+  if (process.platform === 'win32') {
+    ExecuteOs = path.join('win', 'uploadImages.bat');
+  }
+  else {
+    ExecuteOs = path.join('linux', 'uploadImages.sh');
+  }
+
+  switch (port) {
+    case 'deeprad':
+      port = 32713
+      break;
+    case 'usimage':
+      port = 30605
+    default:
+      port = 30605
+      break;
+  }
+
+
+  console.log(__dirname);
+  console.log(arg);
+
+  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
+
+  const upload = require('child_process').execFile(__dirname + '/' + Script_Path, [arg]);
+
+  upload.stdout.on('data', (data) => {
+    console.log(`stdout data: ${data}`);
+  });
+
+  upload.stderr.on('data', (data) => {
+    console.log(`stderr data: ${data}`);
+  });
+
+  upload.on('exit', (data) => {
+    console.log(`final data: ${data}`);
+  });
+});
+
+ipcMain.on('Pacs_Request', (event, arg) => {
+  var uri = '';
+  var opts = {
+    // Put CRUD method needed → method: 'POST',
+    headers: myHeaders,
+    body: JSON.stringify(data),
+    // if have cors or no-cors → mode: ''
+    cache: 'default'
+
+  };
+  var data = {};
+  var myHeaders = new Headers();
+  myHeaders.append('Content-Type', 'application/json');
+  myHeaders.append('Authorization', token);
+
+  let request = new request(url, opts);
+
+  return fetch(request).then((response) => {
+    if (response.type === "json") {
+      return response.json;
     }
     else {
-      ExecuteOs = path.join('linux', 'uploadImages.sh');
+      throw new Error("Request error, Unsupported data " + arg);
     }
-
-    switch (port) {
-      case 'deeprad':
-        port = 32713
-        break;
-      case 'usimage':
-        port = 30605
-      default:
-        port = 30605
-        break;
-    }
-
-
-    console.log(__dirname);
-    console.log(arg);
-
-    var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
-
-    const upload = require('child_process').execFile(__dirname + '/' + Script_Path, [arg]);
-
-    upload.stdout.on('data', (data) => {
-      console.log(`stdout data: ${data}`);
-    });
-
-    upload.stderr.on('data', (data) => {
-      console.log(`stderr data: ${data}`);
-    });
-
-    upload.on('exit', (data) => {
-      console.log(`final data: ${data}`);
-    });
-});
+  })
+})

@@ -14,11 +14,12 @@ const CONSTANTS = {};
 CONSTANTS.INSTALLERS = {};
 
 CONSTANTS.INSTALLERS.WIN = 'installers\\Miniconda2-latest-Windows-x86_64.exe';
-CONSTANTS.INSTALLERS.LIN = 'installers/Miniconda3-latest-linux--x86_64.sh';
+CONSTANTS.INSTALLERS.LIN = 'installers/Miniconda3-latest-Linux--x86_64.sh';
 CONSTANTS.INSTALLERS.MAC = 'installers/Miniconda3-latest-MacOSX-x86_64.sh';
 CONSTANTS.INSTALLERS.DEV_WIN = 'public\\resources\\win\\Miniconda2-latest-Windows-x86_64.exe';
-CONSTANTS.INSTALLERS.DEV_LIN = 'public/resources/linux/Miniconda3-latest-linux-x86_64.sh';
+CONSTANTS.INSTALLERS.DEV_LIN = 'public/resources/linux/Miniconda3-latest-Linux-x86_64.sh';
 CONSTANTS.INSTALLERS.DEV_MAC = 'public/resources/mac/Miniconda3-latest-MacOSX-x86_64.sh';
+CONSTANTS.INSTALLERS.CONDAPATH = "$HOME/miniconda3";
 
 
 const electron = require('electron');
@@ -44,7 +45,7 @@ console.log(process.platform);
   Creation of main window with this function. the loading of first page starts on a html template that runs our framework
 */
 function createWindow() {
-  mainWindow = new BrowserWindow({ width: 800, height: 600, frame: false, webPreferences: { webSecurity: false } });
+  mainWindow = new BrowserWindow({ width: 800, height: 600, frame: true, webPreferences: { webSecurity: false } });
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   // mainWindow.webContents.openDevTools();
   mainWindow.on('closed', function () {
@@ -146,7 +147,6 @@ ipcMain.on('Install_Request', (event, arg) => {
 
       if (data === 1) event.sender.send('InstallAnswer', false);
       else {
-
         fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err, data) => {
           console.log(data);
           event.sender.send('InstallAnswer', data);
@@ -154,58 +154,65 @@ ipcMain.on('Install_Request', (event, arg) => {
       }
     })
 
-  }
-
-  else {
-    console.log('hola unix');
+  } else {
+    console.log('OS Unix');
+    console.log("Program to install: " + arg + "\n");
     var exec = require('child_process');
-    exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
-      if (err) throw err;
-      console.log(stdout);
-      if (typeof stdout === 'string') event.sender.send('InstallAnswer', stdout);
-      else event.sender.send('InstallAnswer', false);
-    })
+    if(arg == 'conda'){
+      installMiniconda();
+      event.sender.send('InstallAnswerButton', true);
+    }else{
+      exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
+        if (err) throw err;
+        //console.log("StdOut: ",stdout);
+        //console.log("StdErr: ",stderr);
+        if (typeof stdout === 'string'){
+          event.sender.send('InstallAnswerButton', stdout);
+        }else{
+          event.sender.send('InstallAnswerButton', false);
+        }
+      })
+    }
   }
 });
-
 
 // Script to isntall program requested for, like miniconda
-ipcMain.on('Miniconda_Install', (event, arg, arg1) => {
-
-
-  if (arg !== null) {
-    console.log(arg);
-    console.log('Miniconda has been installed');
-
-    var os = process.platform;
-    var executablePath;
-
-    if (os == "win32") {
-
-      executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
-    }
-    else if (os == 'MacOS') {
-
-      executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);
-    }
-
-    else if (os === 'linux') {
-      executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_LIN : CONSTANTS.INSTALLERS.LIN);
-    }
-
-    var child = require('child_process').execFile;
-    event.sender.send('execute_anonimizer_response', arg);
-
-    child(executablePath, function (err, data) {
-      if (err) {
-        console.error(err);
-        return;
+function installMiniconda(){
+  // Set the installation path, check if exists, else install
+  const fs = require("fs"); 
+  const homedir = require('os').homedir();
+  let path = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
+  if (fs.existsSync(path)) {
+    console.log("Conda already installed");
+  }else{
+    //if (arg !== null) {
+      //console.log("Args: ",arg);
+      var os = process.platform;
+      var executablePath;
+      if (os == "win32") {
+        executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
       }
-      console.log(data.toString());
-    });
-  }
-});
+      else if (os == 'MacOS') {
+        executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);
+      }
+      else if (os === 'linux') {
+        executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_LIN : CONSTANTS.INSTALLERS.LIN);
+      }
+      //event.sender.send('execute_anonimizer_response', arg);
 
+      var child = require('child_process').execFile;
+      child(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
+        if (err) {
+          console.error("Installation error", err);
+          return;
+        }
+        console.log("Installation Output", data.toString());
+      });
+      console.log('Miniconda has been installed');
+    //} 
+  }
+  return;
+}
 
 // Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
 ipcMain.on('Conda_Script', (event, arg, arg1) => {
@@ -272,7 +279,10 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
     event.sender.send('finished_deid', argv[0]);
   })
 });
-
+ipcMain.on('console-log', (event, arg) => {
+  console.log(arg);
+  event.returnValue = 'Done';
+})
 
 // uploading of images deidentificated for deid script
 ipcMain.on('CondaUpload', (event, arg) => {

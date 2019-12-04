@@ -13,6 +13,8 @@ import MinicondaPng from '../../assets/logo_anaconda.png';
 
 const { ipcRenderer } = window.require("electron");
 
+let componentMounted=false;
+
 
 function TabContainer({ children, dir }) {
     return (
@@ -43,24 +45,28 @@ export default function FullWidthTabs() {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
-    var arr = [['conda', true], ['gdmscu', false], ['program', false]];
+    var arr = {'conda': false,
+                'gdmscu': false,
+                'program': false};
     const [installed, setInstalled] = React.useState(arr);
 
-
-    React.useEffect(() => {
-
-        arr.map((el, idx) => {
-            //console.log(el[0].toString());
-            ipcRenderer.send('Install_Request', el[0].toString());
-            ipcRenderer.on('InstallAnswer', (event, arg) => {
-                if (arg === false) {
-                    //console.log(installed[idx], 'bchange');
-                    setInstalled(installed[idx] = [el[0], false])
-                    //console.log(installed[idx], 'achange');
-                }
-            })
-        })
-    }), 100;
+    // React.useEffect(() => {
+    //     if(!componentMounted){
+    //         arr.map((el, idx) => {
+    //             //console.log(el[0].toString());
+    //             ipcRenderer.send('Install_Request', el[0].toString());
+    //             ipcRenderer.on('InstallAnswer', (event, arg) => {
+    //                 console.log("Answer: ", event, arg)
+    //                 if (arg === false) {
+    //                     //console.log(installed[idx], 'bchange');
+    //                     setInstalled(installed[idx] = [el[0], false])
+    //                     //console.log(installed[idx], 'achange');
+    //                 }
+    //             })
+    //         })
+    //     }
+    //     componentMounted = true
+    // }), 100;
 
 
 
@@ -78,71 +84,62 @@ export default function FullWidthTabs() {
     }
 
     function Install(program) {
-        console.log(program);
-        function callAgent(program) {
-            return new Promise(resolve => {
-                ipcRenderer.send('Install_Request', [program.toLowerCase()]);
-                ipcRenderer.on('InstallAnswer', (event, arg) => {
-                    if (arg !== null) {
-                        resolve(arg);
-                        ipcRenderer.send('Program_Install', [program]);
-                    }
-                    ipcRenderer.send('Miniconda_Install', arg, localStorage.getItem('files'));
-                    ipcRenderer.on('finished_deid', (event, arg) => {
-                        console.log(arg.toString());
-                    })
-                })
+        ipcRenderer.send('Install_Request', [program.toLowerCase()]);
+        ipcRenderer.on('InstallAnswerButton', (event, arg) => {
+            //if (arg !== null) {
+                //resolve(arg);
+                //ipcRenderer.send('Program_Install', [program]);
+            //}
+            //ipcRenderer.send('Miniconda_Install', arg, localStorage.getItem('files'));
+            if(arg === false){
+                ipcRenderer.sendSync('console-log', "Installation failed, missing program argument");
+                installed[program] = false
+                setInstalled(installed);
+            } else{
+                ipcRenderer.sendSync('console-log', "Installed");
+                installed[program] = true
+                setInstalled(installed);
+                ipcRenderer.sendSync('console-log', installed);
+            }
+            ipcRenderer.on('finished_deid', (event, arg) => {
+                 console.log(arg.toString());
             })
-        }
-        callAgent(program);
+        });
     }
 
     function NotInstalledList() {
-        //console.log(installed, 'not');
-        var arr = [installed];
-
         return (
             <div>
-                {
-                    installed.map((element, idx) => {
-                        //console.log(element, 'before test');
-                        if (element[1] == false) {
-                            //console.log(element), 'after test';
-                            return (
-                                <div>
-                                    <Button key={idx} onClick={Install(element[0])}>{element}</Button>
-                                    <img className={classes.imgTam} src={imageRel(element[0])} />
-                                </div>
-                            )
-                        }
-                    })
-                }
+                {Object.keys(installed).map((key, idx) => {
+                    if (installed[key] == false) {
+                        return (
+                            <div>
+                                <Button key={idx} onClick={() => Install(key)}>{key}</Button>
+                                <img className={classes.imgTam} src={imageRel(key)} />
+                            </div>
+                        )
+                    }
+                })}
             </div>
         )
     }
 
     function InstalledList(arr) {
-        //console.log(installed, 'not');
-        var arr = [installed];
         return (
             <div>
-                {
-                    installed.map((element, idx) => {
-                        if (element[1] == true) {
-
-                            return (
-                                <div>
-                                    <Button key={idx} onClick={() => Install(element[0])}>{element}</Button>
-                                    <img className={classes.imgTam} src={imageRel(element[0])} />
-                                </div>
-                            )
-                        }
-                    })
-                }
+                {Object.keys(installed).map((key,idx) => {
+                    if (installed[key] == true) {
+                        return (
+                            <div>
+                                <Button key={idx} onClick={() => Install(key)}>{key}</Button>
+                                <img className={classes.imgTam} src={imageRel(key)} />
+                            </div>
+                        )
+                    }
+                })}
             </div>
         )
     }
-
     return (
         <div className={classes.root}>
             <AppBar position="static" color="default">
@@ -162,8 +159,8 @@ export default function FullWidthTabs() {
                 index={value}
                 onChangeIndex={handleChangeIndex}
             >
-                <TabContainer dir={theme.direction}>{InstalledList(installed)}</TabContainer>
-                <TabContainer dir={theme.direction}>{NotInstalledList(installed)}</TabContainer>
+                <TabContainer dir={theme.direction}>{InstalledList()}</TabContainer>
+                <TabContainer dir={theme.direction}>{NotInstalledList()}</TabContainer>
             </SwipeableViews>
         </div>
     );

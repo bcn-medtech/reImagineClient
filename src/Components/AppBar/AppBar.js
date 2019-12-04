@@ -5,6 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import HomeIcon from '@material-ui/icons/Home';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -19,6 +20,9 @@ const useStyles = makeStyles(theme => ({
   title: {
     flexGrow: 1,
   },
+  installResources: {
+    margin:2,
+  }
 }));
 
 export default function ButtonAppBar(props) {
@@ -88,6 +92,9 @@ export default function ButtonAppBar(props) {
               </Menu>
             </div>
           )}
+          <IconButton edge="start" className={classes.installResources} color="inherit" onClick={() => Home('installers/')} aria-label="Install Resources">
+            <GetAppIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
     </div>

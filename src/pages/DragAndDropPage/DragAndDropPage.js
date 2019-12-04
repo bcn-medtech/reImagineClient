@@ -89,7 +89,6 @@ export class DragAndDropPage extends Component {
 
     Anonimize(program) {
 
-
         ipcRenderer.send('Install_Request', [program.toLowerCase()]);
         ipcRenderer.on('InstallAnswer', (event, arg) => {
             console.log(arg);

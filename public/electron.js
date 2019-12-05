@@ -118,9 +118,8 @@ app.on('activate', function () {
   }
 });
 
-// Request to install a dependency. React asks to electron if a dependency needed to run a script exists in our pc.
-// If it exists, the script will run normally, if it does not, the app will advice you to install the dependencies needed
-// going to dependencies page.
+// Request to install a dependency. Returns boolean saying if it is installed or not.
+// Only work in linux, maybe in mac and not windows, pending...
 ipcMain.on('Install_Request', (event, arg) => {
 
   console.log('install request action');
@@ -129,7 +128,6 @@ ipcMain.on('Install_Request', (event, arg) => {
   var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('Scripts', ExecuteOs));
 
   // De momento cada SO tiene un modo de lectura de archivos, pero en principio no hace falta
-
   if (process.platform == 'win32') {
     console.log('hola windows');
     const searchProgram = require('child_process').execFile(SearchUbi, [arg]);
@@ -158,32 +156,67 @@ ipcMain.on('Install_Request', (event, arg) => {
     console.log('OS Unix');
     console.log("Program to install: " + arg + "\n");
     var exec = require('child_process');
-    if(arg == 'conda'){
-      installMiniconda();
-      event.sender.send('InstallAnswerButton', true);
-    }else{
-      exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
-        if (err) throw err;
-        //console.log("StdOut: ",stdout);
-        //console.log("StdErr: ",stderr);
-        if (typeof stdout === 'string'){
-          event.sender.send('InstallAnswerButton', stdout);
+    //Check if program is installed
+    exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
+      if (err){
+        console.log("err")
+        throw err;
+      }
+      console.log("StdOut: "+stdout.toString()+".");
+      //console.log("StdErr: ",stderr);
+      if (typeof stdout === 'string'){
+        //When program not found, stdout=\n
+        if(stdout.toString() !== '\n'){
+          event.returnValue = true; //Already installed
         }else{
-          event.sender.send('InstallAnswerButton', false);
+          //If not installed, install conda. Not prepared for others
+          if(arg == 'conda'){
+            installMiniconda()
+            event.returnValue = true;
+          }else{
+            event.returnValue = false;
+          }
         }
-      })
-    }
+      }
+    })
   }
+});
+
+//Call with sendSync and returns bool
+ipcMain.on('Install_Check', (event, arg) => {
+  var exec = require('child_process');
+  var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
+  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('Scripts', ExecuteOs));
+
+  exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
+    if (err){
+      console.log("err")
+      throw err;
+    }
+    console.log("StdOut: ",stdout.toString());
+    //console.log("StdErr: ",stderr);
+    if (typeof stdout === 'string'){
+      //When program not found, stdout=\n
+      if(stdout.toString() !== '\n'){
+        event.returnValue = true;
+      }else{
+        event.returnValue = false;
+      }
+    }else{
+      event.returnValue = false;
+    }
+  })
 });
 
 // Script to isntall program requested for, like miniconda
 function installMiniconda(){
-  // Set the installation path, check if exists, else install
+  // Set the installation path, check if exists, else install. THE RETURNS AREN'T IMPORTANT by now
   const fs = require("fs"); 
   const homedir = require('os').homedir();
   let path = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
   if (fs.existsSync(path)) {
     console.log("Conda already installed");
+    return true;
   }else{
     //if (arg !== null) {
       //console.log("Args: ",arg);
@@ -204,11 +237,12 @@ function installMiniconda(){
       child(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
         if (err) {
           console.error("Installation error", err);
-          return;
+          return false;
         }
-        console.log("Installation Output", data.toString());
+        console.log('Miniconda has been installed');
+        console.log("Installation Output: ", data.toString());
+        return true;
       });
-      console.log('Miniconda has been installed');
     //} 
   }
   return;
@@ -279,6 +313,7 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
     event.sender.send('finished_deid', argv[0]);
   })
 });
+
 ipcMain.on('console-log', (event, arg) => {
   console.log(arg);
   event.returnValue = 'Done';

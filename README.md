@@ -37,5 +37,5 @@ Your app will packaged as an .exe in the dist folder using the [electron-builder
 
 ## Issues
 
-Installing miniconda, add compatibility with windows and mac. Look at public/electron.js
-Running runDev, it has to accept spaces in paths. Look at public/scripts/src/deidTest_pyd
+- Installing miniconda, add compatibility with windows and mac. Look at public/electron.js
+- Running runDev, it has to accept spaces in paths. Look at public/scripts/src/deidTest_pyd

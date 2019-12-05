@@ -34,3 +34,8 @@ Your app will packaged as an .exe in the dist folder using the [electron-builder
 * [Create React App](https://github.com/facebookincubator/create-react-app)
 * [Electron](https://electronjs.org/docs/tutorial/quick-start)
 * [electron-builder](https://github.com/electron-userland/electron-builder)
+
+## Issues
+
+Installing miniconda, add compatibility with windows and mac. Look at public/electron.js
+Running runDev, it has to accept spaces in paths. Look at public/scripts/src/deidTest_pyd

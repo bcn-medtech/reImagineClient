@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import SwipeableViews from 'react-swipeable-views';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -44,32 +44,29 @@ const useStyles = makeStyles(theme => ({
 export default function FullWidthTabs() {
     const classes = useStyles();
     const theme = useTheme();
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = useState(0);
     var arr = {'conda': false,
                 'gdmscu': false,
                 'program': false};
-    const [installed, setInstalled] = React.useState(arr);
-
-    // React.useEffect(() => {
-    //     if(!componentMounted){
-    //         arr.map((el, idx) => {
-    //             //console.log(el[0].toString());
-    //             ipcRenderer.send('Install_Request', el[0].toString());
-    //             ipcRenderer.on('InstallAnswer', (event, arg) => {
-    //                 console.log("Answer: ", event, arg)
-    //                 if (arg === false) {
-    //                     //console.log(installed[idx], 'bchange');
-    //                     setInstalled(installed[idx] = [el[0], false])
-    //                     //console.log(installed[idx], 'achange');
-    //                 }
-    //             })
-    //         })
-    //     }
-    //     componentMounted = true
-    // }), 100;
+    const [installed, setInstalled] = useState(arr);
+    const [logText, setLogText] = useState('');
 
 
-
+    useEffect(() => {
+        if(!componentMounted){
+            console.log("DidMount");
+            Object.keys(installed).map((key,idx) => {
+                let flag = ipcRenderer.sendSync('Install_Check', [key.toLowerCase()]);
+                ipcRenderer.sendSync('console-log', "Flag: "+flag);
+                installed[key] = flag;
+                if(flag){
+                    setLogText(key.toUpperCase() + ' already installed.');
+                }
+            });
+        }
+        setInstalled(installed);
+        componentMounted = true
+    });
 
     function handleChange(event, newValue) {
         setValue(newValue);
@@ -84,27 +81,23 @@ export default function FullWidthTabs() {
     }
 
     function Install(program) {
-        ipcRenderer.send('Install_Request', [program.toLowerCase()]);
-        ipcRenderer.on('InstallAnswerButton', (event, arg) => {
-            //if (arg !== null) {
-                //resolve(arg);
-                //ipcRenderer.send('Program_Install', [program]);
-            //}
-            //ipcRenderer.send('Miniconda_Install', arg, localStorage.getItem('files'));
-            if(arg === false){
-                ipcRenderer.sendSync('console-log', "Installation failed, missing program argument");
-                installed[program] = false
-                setInstalled(installed);
-            } else{
-                ipcRenderer.sendSync('console-log', "Installed");
-                installed[program] = true
-                setInstalled(installed);
-                ipcRenderer.sendSync('console-log', installed);
-            }
-            ipcRenderer.on('finished_deid', (event, arg) => {
-                 console.log(arg.toString());
-            })
-        });
+        let arg = ipcRenderer.sendSync('Install_Request', [program.toLowerCase()]);
+        if(arg === false){
+            ipcRenderer.sendSync('console-log', "Installation failed");
+            installed[program] = false
+            setInstalled(installed);
+            setLogText(program.toUpperCase() + ' not installed.');
+
+        } else{
+            ipcRenderer.sendSync('console-log', "Installed");
+            installed[program] = true
+            setInstalled(installed);
+            ipcRenderer.sendSync('console-log', installed);
+            setLogText(program.toUpperCase() + ' installed.');
+        }
+        ipcRenderer.on('finished_deid', (event, arg) => {
+             console.log(arg.toString());
+        })
     }
 
     function NotInstalledList() {
@@ -114,7 +107,7 @@ export default function FullWidthTabs() {
                     if (installed[key] == false) {
                         return (
                             <div>
-                                <Button key={idx} onClick={() => Install(key)}>{key}</Button>
+                                <Button key={"Yep"+idx} onClick={() => Install(key)}>{key}</Button>
                                 <img className={classes.imgTam} src={imageRel(key)} />
                             </div>
                         )
@@ -131,7 +124,7 @@ export default function FullWidthTabs() {
                     if (installed[key] == true) {
                         return (
                             <div>
-                                <Button key={idx} onClick={() => Install(key)}>{key}</Button>
+                                <Button key={"Not"+idx} onClick={() => Install(key)}>{key}</Button>
                                 <img className={classes.imgTam} src={imageRel(key)} />
                             </div>
                         )
@@ -162,6 +155,7 @@ export default function FullWidthTabs() {
                 <TabContainer dir={theme.direction}>{InstalledList()}</TabContainer>
                 <TabContainer dir={theme.direction}>{NotInstalledList()}</TabContainer>
             </SwipeableViews>
+            <p>Info: {logText}</p>
         </div>
     );
 }

@@ -85,28 +85,17 @@ export class DragAndDropPage extends Component {
             return false;
         };
     }
-
-
+    
     Anonimize(program) {
-
-        ipcRenderer.send('Install_Request', [program.toLowerCase()]);
-        ipcRenderer.on('InstallAnswer', (event, arg) => {
-            console.log(arg);
-            if (arg === false) {
-                alert(`Must install ${program} needed`);
-            }
-            else {
-                console.log(arg);
-                ipcRenderer.send('Conda_Script', arg, localStorage.getItem('files'));
-                ipcRenderer.on('finished_deid', (event, arg) => {
-                    console.log('finished');
-                });
-            }
-            ipcRenderer.send('Conda_Script', arg, localStorage.getItem('files'));
+        let flag = ipcRenderer.sendSync('Install_Check', [program.toLowerCase()]);
+        if (!flag){
+            alert(`Must install ${program} needed`);
+        }else{
+            ipcRenderer.send('Conda_Script', flag, localStorage.getItem('files'));
             ipcRenderer.on('finished_deid', (event, arg) => {
                 console.log('finished');
-            })
-        });
+            });
+        }
     }
 
     sendOrthanc() {
@@ -143,7 +132,6 @@ export class DragAndDropPage extends Component {
         }
         return (
             <CssBaseline>
-
                 <AppBar page="Anonimizer" history={this.props.history} />
                 <Container fixed>
                     <Container container maxWidth="sm" >

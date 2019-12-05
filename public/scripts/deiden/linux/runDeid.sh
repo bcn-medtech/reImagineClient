@@ -10,8 +10,8 @@ basedir="$1"
 outdir="$2"
 
 rm -rf $outdir
-echo "Running:" python src/deidTest_pyd.py $basedir --outdir $outdir
-python src/deidTest_pyd.py $basedir --outdir $outdir
+echo "Running:" python src/deidTest_pyd.py --basedir $basedir --outdir $outdir
+python src/deidTest_pyd.py --basedir $basedir --outdir $outdir
 
 
 

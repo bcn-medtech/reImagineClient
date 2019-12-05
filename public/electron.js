@@ -154,7 +154,7 @@ ipcMain.on('Install_Request', (event, arg) => {
 
   } else {
     console.log('OS Unix');
-    console.log("Program to install: " + arg + "\n");
+    console.log("Program to install: " + arg);
     var exec = require('child_process');
     //Check if program is installed
     exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
@@ -162,7 +162,7 @@ ipcMain.on('Install_Request', (event, arg) => {
         console.log("err")
         throw err;
       }
-      console.log("StdOut: "+stdout.toString()+".");
+      //console.log("StdOut: "+stdout.toString()+".");
       //console.log("StdErr: ",stderr);
       if (typeof stdout === 'string'){
         //When program not found, stdout=\n
@@ -193,7 +193,7 @@ ipcMain.on('Install_Check', (event, arg) => {
       console.log("err")
       throw err;
     }
-    console.log("StdOut: ",stdout.toString());
+    //console.log("StdOut: ",stdout.toString());
     //console.log("StdErr: ",stderr);
     if (typeof stdout === 'string'){
       //When program not found, stdout=\n

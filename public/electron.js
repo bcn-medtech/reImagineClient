@@ -213,8 +213,10 @@ function installMiniconda(){
   // Set the installation path, check if exists, else install. THE RETURNS AREN'T IMPORTANT by now
   const fs = require("fs"); 
   const homedir = require('os').homedir();
-  let path = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
-  if (fs.existsSync(path)) {
+  var child = require('child_process').execFile;
+  let condaPath = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
+  let PrepareConda;
+  if (fs.existsSync(condaPath)) {
     console.log("Conda already installed");
     return true;
   }else{
@@ -224,16 +226,17 @@ function installMiniconda(){
       var executablePath;
       if (os == "win32") {
         executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
+        PrepareConda = path.join('win', 'createEnv.bat');
       }
       else if (os == 'MacOS') {
         executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);
       }
       else if (os === 'linux') {
         executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_LIN : CONSTANTS.INSTALLERS.LIN);
+        PrepareConda = path.join('linux', 'createEnv.sh');
       }
       //event.sender.send('execute_anonimizer_response', arg);
 
-      var child = require('child_process').execFile;
       child(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
         if (err) {
           console.error("Installation error", err);
@@ -241,48 +244,33 @@ function installMiniconda(){
         }
         console.log('Miniconda has been installed');
         console.log("Installation Output: ", data.toString());
+        createEnvExecute(PrepareConda);
         return true;
       });
+      
     //} 
   }
   return;
 }
 
-// Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
-ipcMain.on('Conda_Script', (event, arg, arg1) => {
-  //console.log(process.env.SHELL);
-  console.log('Conda_script');
-  var ExecuteOs, PrepareConda;
-
-  if (process.platform === 'win32') {
-    ExecuteOs = path.join('win', 'runDeid.bat');
-    PrepareConda = path.join('win', 'createEnv.bat');
-  }
-  else {
-    ExecuteOs = path.join('linux', 'runDeid.sh');
-    PrepareConda = path.join('linux', 'createEnv.sh');
-  }
-
+function createEnvExecute(PrepareConda){
+  var child = require('child_process').execFile;
   var Promise = require('bluebird');
   function promiseProcess(prog) {
     return new Promise(function (resolve, reject) {
-      prepare.addListener('error', reject);
-      prepare.addListener('exit', resolve);
+      prog.addListener('error', reject);
+      prog.addListener('exit', resolve);
     })
   }
 
-  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
   var prepare_path = (isDev ? path.join('scripts', 'deiden', PrepareConda) : path.join('Scripts', 'deiden', PrepareConda));
-  console.log(Script_Path);
-
-  const prepare = require('child_process').execFile(__dirname + '/' + prepare_path, { env: 'bin/bash' });
+  const prepare = child(__dirname + '/' + prepare_path, { env: 'bin/bash' });
 
   promiseProcess(prepare).then(function (result) {
     console.log('promise complete: ' + result);
   }, function (err) {
     console.log('promise rejected: ' + err);
   });
-
   prepare.stdout.on('data', (data) => {
     console.log(`data ${data}`)
   });
@@ -294,14 +282,28 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
   prepare.on('exit', (data) => {
     console.log(`final data = ${data}`);
   })
+}
 
+// Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
+ipcMain.on('Conda_Script', (event, arg, arg1) => {
+  //console.log(process.env.SHELL);
+  console.log('Conda_script');
+  var ExecuteOs;
+
+  if (process.platform === 'win32') {
+    ExecuteOs = path.join('win', 'runDeid.bat');
+  } else {
+    ExecuteOs = path.join('linux', 'runDeid.sh');
+  }
+  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
+  console.log(Script_Path);
 
   const argv = [arg1, arg1 + 'output'];
   //console.log(argv);
   const deploySh = require('child_process').execFile(`${__dirname}/${Script_Path}`, argv);
 
   deploySh.stdout.on('data', (data) => {
-    console.log(`data for script: ${data}`);
+    console.log(`Output: ${data}`);
   });
 
   deploySh.stderr.on('data', (data) => {

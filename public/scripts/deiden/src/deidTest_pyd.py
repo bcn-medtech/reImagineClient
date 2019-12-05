@@ -104,17 +104,19 @@ def main(args):
     _saveHeaders(cleaned_files, hdirpost)
   print(list(patients.getAllPatients()))
 
+def dir_path(string):
+  return string
 
+#Paths no accept spaces, pending
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='Process some integers.')
-  parser.add_argument('basedir', type=str, 
-                    help='data dir')
-  parser.add_argument('--outdir', type=str, default="outdir",
-                    help='Output data')
-  parser.add_argument('--recipe', type=str, default="public/scripts/deiden/src/deid_light.dicom",
-                    help='Location of deid recipe file')                    
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--basedir', type=dir_path, help='data dir', action='store')
+  parser.add_argument('--outdir',  type=dir_path, default="outdir", help='Output data', action='store')
+  parser.add_argument('--recipe', default="public/scripts/deiden/src/deid_light.dicom", help='Location of deid recipe file')                    
 
   args = parser.parse_args()
+  print("args: ", args)
+  
   main(args)
 
 

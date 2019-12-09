@@ -21,7 +21,6 @@ export class DragAndDropPage extends Component {
 
     mapper(files) {
         if (files !== false) {
-
             console.log(files);
             return (
                 <List dense={true}>

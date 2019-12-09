@@ -22,14 +22,12 @@ export class InitialPage extends Component {
         console.log(this.props.history);
         return (
             <CssBaseline>
-
                 <AppBar page="Deid App" history={this.props.history} />
                 <Container fixed>
                     <Container container maxWidth="sm">
                         <ReactReveal history={this.props.history}/>
                     </Container>
                 </Container>
-
             </CssBaseline>
         )
     }

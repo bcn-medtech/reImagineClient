@@ -9,8 +9,8 @@ ANON_DATA=$1
 PORT=$2
 
 # Those are hardcoded for now but in the future we should open them on ingress controller
-DICOMPORT=PORT     
-IPS=10.55.0.115
+DICOMPORT=PORT
+IPS=10.55.0.229
 
 # This is the command to send the modalities to the PACS
 gdcmscu --store $IPS $DICOMPORT --call ORTHANC -r "$ANON_DATA"

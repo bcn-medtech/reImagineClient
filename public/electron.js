@@ -143,11 +143,12 @@ ipcMain.on('Install_Request', (event, arg) => {
     searchProgram.on('exit', (data) => {
       console.log(`final data ${data}`);
 
-      if (data === 1) event.sender.send('InstallAnswer', false);
+      if (data === 1) event.returnValue = false;
       else {
         fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err, data) => {
           console.log(data);
-          event.sender.send('InstallAnswer', data);
+          //event.sender.send('InstallAnswer', data);
+          event.returnValue = true;
         })
       }
     })
@@ -322,35 +323,35 @@ ipcMain.on('console-log', (event, arg) => {
 })
 
 // uploading of images deidentificated for deid script
-ipcMain.on('CondaUpload', (event, arg) => {
-  let port = arg[1];
-  /* horizontal bar, pacs selector before send orthanc button  */
+ipcMain.on('CondaUpload', (event, arg, arg1) => {
+  let port = arg1;
+  let file = arg;
   console.log('conda upload');
+  console.log("Port", port)
+  console.log("file: ",arg);
+  /* horizontal bar, pacs selector before send orthanc button  */
   if (process.platform === 'win32') {
     ExecuteOs = path.join('win', 'uploadImages.bat');
-  }
-  else {
+  } else {
     ExecuteOs = path.join('linux', 'uploadImages.sh');
   }
+  //Constants in constants.json
+  // switch (port) {
+  //   case 'deeprad':
+  //     port = 32713
+  //     break;
+  //   case 'usimage':
+  //     port = 30605
+  //   default:
+  //     port = 30605
+  //     break;
+  // }
 
-  switch (port) {
-    case 'deeprad':
-      port = 32713
-      break;
-    case 'usimage':
-      port = 30605
-    default:
-      port = 30605
-      break;
-  }
-
-
-  console.log(__dirname);
-  console.log(arg);
+  // console.log(__dirname);
 
   var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
 
-  const upload = require('child_process').execFile(__dirname + '/' + Script_Path, [arg]);
+  const upload = require('child_process').execFile(__dirname + '/' + Script_Path, [file, port]);
 
   upload.stdout.on('data', (data) => {
     console.log(`stdout data: ${data}`);

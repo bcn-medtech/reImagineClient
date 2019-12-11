@@ -1,9 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import {Select, Typography, FormControl, MenuItem, InputLabel} from '@material-ui/core';
 import constants from '../../conf/constants.json';
 
 const useStyles = makeStyles(theme => ({
@@ -19,12 +16,12 @@ const useStyles = makeStyles(theme => ({
 
 export default function ControlledOpenSelect(props) {
   const classes = useStyles();
-  const [age, setAge] = React.useState('');
+  const [age, setAge] = React.useState('32713');
   const [open, setOpen] = React.useState(false);
 
 
   React.useEffect(() => {
-    props.pacsValue(false);
+    props.pacsValue('32713');
   }, [])
 
   const handleChange = event => {
@@ -53,6 +50,9 @@ export default function ControlledOpenSelect(props) {
   return (
 
     <div>
+      <Typography style={{ textAlign: "left", marginTop: '5px' }}>
+          Select destination (Default: DEEPRAD)
+      </Typography>
       <FormControl className={classes.formControl}>
         <InputLabel id="demo-controlled-open-select-label">PACS</InputLabel>
         <Select
@@ -62,15 +62,8 @@ export default function ControlledOpenSelect(props) {
           onClose={handleClose}
           onOpen={handleOpen}
           value={age}
-          onChange={handleChange}
-        >
+          onChange={handleChange}>
           {items()}
-         {/*  <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem> */}
         </Select>
       </FormControl>
     </div>

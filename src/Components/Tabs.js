@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { Button } from '@material-ui/core';
 
 // import logos
-import MinicondaPng from '../../assets/logo_anaconda.png';
+import MinicondaPng from '../assets/logo_anaconda.png';
 
 const { ipcRenderer } = window.require("electron");
 

@@ -1,24 +1,22 @@
 {
-  "author": "Iñigo Moreno <imr.aem2526@gmail.com>",
-  "description": "An app to deidentificate patients data of dicom",
-  "name": "deid-app",
+  "author": "Zach Toben <zach.toben@gmail.com>",
+  "description": "A boilerplate electron and create-react-app setup",
+  "name": "PACS-Uploader",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^4.2.0",
-    "@material-ui/icons": "^4.2.1",
+    "@material-ui/core": "^4.0.0-rc.0",
+    "@material-ui/icons": "^4.0.0-rc.0",
     "electron-is-dev": "^0.3.0",
-    "electron-prebuilt": "^1.4.13",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-reveal": "^1.2.2",
-    "react-router-dom": "^5.0.1",
+    "react-router-dom": "^5.0.2",
     "react-scripts": "1.1.1",
     "react-swipeable-views": "^0.13.3"
   },
   "scripts": {
     "react-start": "cross-env BROWSER=none react-scripts start",
-    "start": "export XDG_CURRENT_DESKTOP=Unity && concurrently \"npm run react-start\" \"wait-on http://localhost:3000/ && electron .\"",
+    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000/ && electron .\"",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
@@ -29,23 +27,15 @@
   "devDependencies": {
     "concurrently": "^3.5.1",
     "cross-env": "^5.1.3",
-    "electron": "^1.8.8",
-    "electron-builder": "^21.2.0",
-    "electron-packager": "^14.0.1",
+    "electron": "^7.1.6",
+    "electron-builder": "^20.0.8",
     "wait-on": "^2.1.0"
   },
   "homepage": "./",
   "main": "public/electron.js",
   "build": {
-    "appId": "workflows_electron",
     "win": {
       "target": "NSIS"
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ]
     },
     "extraFiles": [
       {

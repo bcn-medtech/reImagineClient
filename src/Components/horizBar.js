@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {Select, Typography, FormControl, MenuItem, InputLabel} from '@material-ui/core';
-import constants from '../../conf/constants.json';
+import constants from '../conf/constants.json';
 
 const useStyles = makeStyles(theme => ({
   button: {

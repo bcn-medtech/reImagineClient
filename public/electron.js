@@ -1,14 +1,3 @@
-//import {CONSTANTS} from './constants';
-/* 
-electron.js
-
-  "Server side" file. electron have to play with stuff react cannot play, like interactions with os,file searching and so long.
-
-  we use two basic imports: ipcMain and ipcRenderer.
-
-  ipcMain is for recieve and send calls from/to react. ipcRenderer has the same objective but implemented on react, to render responses of icpMain
-*/
-
 const CONSTANTS = {};
 
 CONSTANTS.INSTALLERS = {};
@@ -21,111 +10,55 @@ CONSTANTS.INSTALLERS.DEV_LIN = 'public/resources/linux/Miniconda3-latest-Linux-x
 CONSTANTS.INSTALLERS.DEV_MAC = 'public/resources/mac/Miniconda3-latest-MacOSX-x86_64.sh';
 CONSTANTS.INSTALLERS.CONDAPATH = "$HOME/miniconda3";
 
-
 const electron = require('electron');
-const { Menu, Tray } = require('electron')
-
-
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
+
 const isDev = require('electron-is-dev');
-//const os = require('os');
 
 const path = require('path');
-//const url = require('url');
+const url = require('url');
 const fs = require('fs');
 
 const { ipcMain } = require('electron');
 
 let mainWindow;
-console.log(isDev, 'isDev');
-console.log(process.platform);
 
-/* 
-  Creation of main window with this function. the loading of first page starts on a html template that runs our framework
-*/
 function createWindow() {
-  mainWindow = new BrowserWindow({ width: 800, height: 600, frame: true, webPreferences: { webSecurity: false } });
-  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
-  // mainWindow.webContents.openDevTools();
-  mainWindow.on('closed', function () {
-    mainWindow = null
-  })
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true,
+        }
+    });
+    mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+    // mainWindow.webContents.openDevTools();
+    mainWindow.on('closed', function () {
+        mainWindow = null
+    })
 }
 
-
-// Tray just let us have an icon saved in taskbar to do more easily to use the app and do it less heavy interface
-let tray = null
-app.on('ready', () => {
-  tray = new Tray(isDev ? path.join('public', 'resources', 'icons', 'lung.png') : path.join('icons', 'lung.png'));
-  const trayMenuTemplate = [
-    {
-      label: 'open window',
-      click: function () {
-        createWindow();
-      }
-    },
-    {
-      label: '3rdPart Installers',
-      click: function () {
-        mainWindow.loadURL(isDev ? 'http://localhost:3000/installers' : `file://${path.join(__dirname, '../build/index.html#/installers')}`);
-      }
-    }, {
-      label: 'Quit',
-      click: function () {
-        app.quit()
-      }
-    }
-  ]
-  let contextMenu = Menu.buildFromTemplate(trayMenuTemplate)
-  tray.setToolTip('This is my application.')
-  tray.setContextMenu(contextMenu)
-  createWindow();
-
-  tray.on('click', () => {
-    if (mainWindow == null) {
-      createWindow()
-    } else if (mainWindow.isVisible()) {
-      mainWindow.hide()
-    } else {
-      mainWindow.show()
-    }
-  });
-
-  tray.on('double-click', () => {
-    if (mainWindow == null) {
-      createWindow();
-    }
-    else if (mainWindow.isVisible()) {
-      mainWindow.hide();
-    } else mainWindow.show();
-  })
-
-})
-
-
-
+app.on('ready', createWindow);
 
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') {
-    console.log("Close the taskbar icon if you really want to call app.quit()")
-  }
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 });
 
 app.on('activate', function () {
-  if (mainWindow === null) {
-    createWindow();
-  }
+    if (mainWindow === null) {
+        createWindow()
+    }
 });
 
-// Request to install a dependency. Returns boolean saying if it is installed or not.
-// Only work in linux, maybe in mac and not windows, pending...
 ipcMain.on('Install_Request', (event, arg) => {
 
   console.log('install request action');
 
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
-  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('Scripts', ExecuteOs));
+  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
 
   // De momento cada SO tiene un modo de lectura de archivos, pero en principio no hace falta
   if (process.platform == 'win32') {
@@ -187,7 +120,7 @@ ipcMain.on('Install_Request', (event, arg) => {
 ipcMain.on('Install_Check', (event, arg) => {
   var exec = require('child_process');
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
-  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('Scripts', ExecuteOs));
+  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
 
   exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
     if (err){
@@ -264,7 +197,7 @@ function createEnvExecute(PrepareConda){
     })
   }
 
-  var prepare_path = (isDev ? path.join('scripts', 'deiden', PrepareConda) : path.join('Scripts', 'deiden', PrepareConda));
+  var prepare_path = (isDev ? path.join('scripts', 'deiden', PrepareConda) : path.join('scripts', 'deiden', PrepareConda));
   const prepare = child(__dirname + '/' + prepare_path, { env: 'bin/bash' });
 
   promiseProcess(prepare).then(function (result) {
@@ -296,7 +229,7 @@ ipcMain.on('Conda_Script', (event, arg, arg1) => {
   } else {
     ExecuteOs = path.join('linux', 'runDeid.sh');
   }
-  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
+  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('scripts', 'deiden', ExecuteOs));
   console.log(Script_Path);
 
   const argv = [arg1, arg1 + 'output'];
@@ -349,7 +282,7 @@ ipcMain.on('CondaUpload', (event, arg, arg1) => {
 
   // console.log(__dirname);
 
-  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('Scripts', 'deiden', ExecuteOs));
+  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('scripts', 'deiden', ExecuteOs));
 
   const upload = require('child_process').execFile(__dirname + '/' + Script_Path, [file, port]);
 

@@ -1,9 +1,9 @@
 {
-  "short_name": "Deid App",
-  "name": "Deidentification app for DICOM",
+  "short_name": "PACS Uploader",
+  "name": "PACS Uploader",
   "icons": [
     {
-      "src": "resources/icons/lung.png",
+      "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     }

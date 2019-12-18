@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 
 //import AppBar_Component from './../../Components/AppBar_Component/AppBar_Component';
-import Horizontal from '../../Components/horizBar/horizBar';
-import AppBar from '../../Components/AppBar/AppBar';
+import Horizontal from '../Components/horizBar';
+import AppBar from '../Components/AppBar';
 import {CssBaseline, Container, Grid, ListItem, Typography, Paper, Button } from '@material-ui/core';
 import {List, ListItemText, Avatar, ListItemAvatar, ListItemSecondaryAction} from '@material-ui/core';
 

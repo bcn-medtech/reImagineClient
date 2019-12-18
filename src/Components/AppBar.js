@@ -5,8 +5,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import HomeIcon from '@material-ui/icons/Home';
-import GetAppIcon from '@material-ui/icons/GetApp';
 import MenuItem from '@material-ui/core/MenuItem';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import Menu from '@material-ui/core/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
@@ -54,7 +54,7 @@ export default function ButtonAppBar(props) {
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" onClick={() => Home('Anonimizer')} aria-label="Menu">
+          <IconButton edge="start" className={classes.menuButton} color="inherit" onClick={() => Home('')} aria-label="Menu">
             <HomeIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>

@@ -56,7 +56,7 @@ function createWindow() {
 // Tray just let us have an icon saved in taskbar to do more easily to use the app and do it less heavy interface
 let tray = null
 app.on('ready', () => {
-  tray = new Tray(isDev ? path.join('public', 'resources', 'icons', 'lung.png') : path.join('icons', 'lung.png'));
+  tray = new Tray(isDev ? path.join('public', 'resources', 'icons', 'lung.png') : path.join('resources', 'icons', 'lung.png'));
   const trayMenuTemplate = [
     {
       label: 'open window',

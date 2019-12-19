@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 //import Store from './../../../models/store';
 import { isUserTokenInClient, saveUser } from '../assets/Auth';
+import AppBar from '../Components/AppBar'
 
 export class PlPageLogin extends Component {
 
@@ -43,6 +44,7 @@ export class PlPageLogin extends Component {
 
         return (
             <div className="background">
+                <AppBar page="Deid App" history={this.props.history} />
                 <div>
                     <div className="button" onClick={this.onClickLoginButton.bind(this)}>
                         <div>

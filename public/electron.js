@@ -614,35 +614,45 @@ function createEnvExecute(PrepareConda){
 }
 
 // Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
-ipcMain.on('Conda_Script', (event, arg, arg1) => {
+ipcMain.on('Conda_Script', (event, arg, arg1, arg2) => {
   //console.log(process.env.SHELL);
+  console.log("Arg2", arg2)
   console.log('Conda_script');
   var ExecuteOs;
-
-  if (process.platform === 'win32') {
-    ExecuteOs = path.join('win', 'runDeid.bat');
+  if(!arg){
+    event.returnValue = "Conda not installed. Go to Installers page to install it."
+    return;
   } else {
-    ExecuteOs = path.join('linux', 'runDeid.sh');
+    if (process.platform === 'win32') {
+      ExecuteOs = path.join('win', 'runDeid.bat');
+    } else {
+      ExecuteOs = path.join('linux', 'runDeid.sh');
+    }
+    var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('scripts', 'deiden', ExecuteOs));
+    console.log(Script_Path);
+
+    let argv;
+    if(fs.existsSync(arg2)){
+      argv = [arg1, arg2];
+    }else{
+      argv = [arg1, arg1 + 'output'];
+    }
+    console.log(argv);
+    const deploySh = require('child_process').execFile(`${__dirname}/${Script_Path}`, argv);
+
+    deploySh.stdout.on('data', (data) => {
+      console.log(`Output: ${data}`);
+    });
+
+    deploySh.stderr.on('data', (data) => {
+      console.log(`stderr: ${data}`)
+    })
+
+    deploySh.on('exit', (data) => {
+      console.log(`final data ${data}`);
+      event.returnValue = "Anonimized succesfully.";
+    })
   }
-  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('scripts', 'deiden', ExecuteOs));
-  console.log(Script_Path);
-
-  const argv = [arg1, arg1 + 'output'];
-  //console.log(argv);
-  const deploySh = require('child_process').execFile(`${__dirname}/${Script_Path}`, argv);
-
-  deploySh.stdout.on('data', (data) => {
-    console.log(`Output: ${data}`);
-  });
-
-  deploySh.stderr.on('data', (data) => {
-    console.log(`stderr: ${data}`)
-  })
-
-  deploySh.on('exit', (data) => {
-    console.log(`final data ${data}`);
-    event.sender.send('finished_deid', argv[0]);
-  })
 });
 
 ipcMain.on('console-log', (event, arg) => {

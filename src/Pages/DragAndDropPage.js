@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 //import AppBar_Component from './../../Components/AppBar_Component/AppBar_Component';
 import Horizontal from '../Components/horizBar';
 import AppBar from '../Components/AppBar';
-import {CssBaseline, Container, Grid, ListItem, Typography, Paper, Button } from '@material-ui/core';
+import {CssBaseline, Container, Grid, ListItem, Typography, Paper, Button, Input } from '@material-ui/core';
 import {List, ListItemText, Avatar, ListItemAvatar, ListItemSecondaryAction} from '@material-ui/core';
 
 import FolderIcon from '@material-ui/icons/Folder';
@@ -19,6 +19,7 @@ export class DragAndDropPage extends Component {
         this.state = {
             files: false,
             pacs: '',
+            output: "",
         };
     }
 
@@ -100,14 +101,13 @@ export class DragAndDropPage extends Component {
     }
     
     Anonimize(program) {
+        let msg
         let flag = ipcRenderer.sendSync('Install_Check', [program.toLowerCase()]);
         if (!flag){
-            alert(`Must install ${program} needed`);
+            alert(`Must install, ${program} needed`);
         }else{
-            ipcRenderer.send('Conda_Script', flag, localStorage.getItem('files'));
-            ipcRenderer.on('finished_deid', (event, arg) => {
-                console.log('finished');
-            });
+            msg = ipcRenderer.sendSync('Conda_Script', flag, localStorage.getItem('files'), this.state.output);
+            alert(msg);
         }
     }
 
@@ -131,6 +131,11 @@ export class DragAndDropPage extends Component {
             this.setState({ pacs: value })
     }
 
+    outputValue(event) {
+        console.log("On fill",event.target.value );
+        this.setState({ output: event.target.value })
+}
+
     render() {
         return (
             <CssBaseline>
@@ -139,19 +144,25 @@ export class DragAndDropPage extends Component {
                     <Container container maxWidth="sm" >
                         <Grid container id="dropbox" >
                             <div style={styles.dragDropStyle} className="draggable">
-                                <Paper elevation={4} /* className={classes.paperClone} */ style={{ height: '200px', textAlign: 'center' }}>
-                                    drag files here
+                                <Paper elevation={4} /* className={classes.paperClone} */ style={{ height: '200px', textAlign: 'center', paddingTop: '80px'}}>
+                                    DRAG .dcm FILES HERE
                                 </Paper>
                             </div>
                         </Grid>
-                        <Horizontal pacsValue={this.pacsValue.bind(this)} />
-                        <div style={{ margin: 'auto', marginTop: '20px' }}>
-                            <Button variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('conda')}>Anonimize</Button>
+                        <Grid>
+                            <Typography style={{fontWeight:"bold"}}>Step 1</Typography>
+                            <Typography>Choose a path to store the anonimized files:</Typography>
+                            <Input placeholder="Output path..." fullWidth="true" onChange={(event) => this.outputValue(event)}/>
+                            <Button disabled={this.state.output.length === 0}variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('conda')}>Anonimize</Button>
+                        </Grid>
+                        <br/>
+                        <Grid fullWidth="true" style={{borderTop:"2px"}}>
+                            <Typography style={{fontWeight:"bold"}}>Step 2</Typography>
+                            <Horizontal pacsValue={this.pacsValue.bind(this)} />
                             <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.sendOrthanc()}>Send Orthanc</Button>
-                        </div>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <Typography style={{ textAlign: "left", marginTop: '5px' }}>
+                            
+                            <Grid style={{marginTop: '30px' }} item xs={12} md={6}>
+                                <Typography style={{ textAlign: "left"}}>
                                     Selected Files
                                 </Typography>
                                 <div>
@@ -173,6 +184,5 @@ const styles = {
         width: '100%',
         'margin-bottom': '20px',
         'margin-top': '15px',
-
     },
 }

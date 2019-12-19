@@ -50,11 +50,8 @@ export default function ControlledOpenSelect(props) {
   return (
 
     <div>
-      <Typography style={{ textAlign: "left", marginTop: '5px' }}>
-          Select destination (Default: DEEPRAD)
-      </Typography>
-      <FormControl className={classes.formControl}>
-        <InputLabel id="demo-controlled-open-select-label">PACS</InputLabel>
+      <FormControl style={{width:"100%"}} className={classes.formControl}>
+        <InputLabel id="demo-controlled-open-select-label">Select destination (Default: DEEPRAD)</InputLabel>
         <Select
           labelId="demo-controlled-open-select-label"
           id="demo-controlled-open-select"

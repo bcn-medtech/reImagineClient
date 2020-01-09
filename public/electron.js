@@ -21,7 +21,6 @@ const url = require('url');
 const fs = require('fs');
 const exec = require('child_process');
 const { ipcMain } = require('electron');
-const fixPath = require('fix-path');
 let mainWindow;
 
 function createWindow() {
@@ -37,7 +36,6 @@ function createWindow() {
     mainWindow.on('closed', function () {
         mainWindow = null
     })
-    fixPath();
 }
 
 app.on('ready', createWindow);

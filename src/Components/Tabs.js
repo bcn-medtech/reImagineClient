@@ -56,9 +56,10 @@ export default function FullWidthTabs() {
         if(!componentMounted){
             ipcRenderer.sendSync('console-log',"DidMount");
             Object.keys(installed).map((key,idx) => {
-                let flag = ipcRenderer.sendSync('Install_Check', [key.toLowerCase()]);
+                let [flag, out] = ipcRenderer.sendSync('Install_Check', [key.toLowerCase()]);
                 //ipcRenderer.sendSync('console-log', "Flag: "+flag);
                 console.log("Flag " + key +": ", flag)
+                console.log("Check output: ", out)
                 installed[key] = flag;
                 if(flag){
                     setLogText(key.toUpperCase() + ' already installed.');
@@ -90,7 +91,7 @@ export default function FullWidthTabs() {
             setLogText(program.toUpperCase() + ' not installed.');
 
         } else{
-            ipcRenderer.sendSync('console-log', "Installed");
+            ipcRenderer.sendSync('console-log', "Installing");
             installed[program] = true
             setInstalled(installed);
             //ipcRenderer.sendSync('console-log', installed);

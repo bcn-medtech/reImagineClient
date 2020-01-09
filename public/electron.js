@@ -495,8 +495,13 @@ ipcMain.on('Install_Request', (event, arg) => {
         }else{
           //If not installed, install conda. Not prepared for others
           if(arg == 'conda'){
-            installMiniconda()
-            event.returnValue = true;
+            let flag = installMiniconda()
+            if(flag){
+              event.returnValue = true;
+            }else{
+              event.returnValue = false;
+            }
+            
           }else{
             event.returnValue = false;
           }
@@ -513,20 +518,19 @@ ipcMain.on('Install_Check', (event, arg) => {
   exec.execFile("which", [arg], (err, stdout, stderr) => {
     if (err){
       console.log("err")
-      event.returnValue = false
+      event.returnValue = [false, err]
     }else{
       console.log("StdOut: ",stdout);
-      //console.log("StdErr: ",stderr);
+      console.log("StdErr: ",stderr);
       if (typeof stdout === 'string'){
         //When program not found, stdout=\n
-        stdout = stdout.replace(arg+":", "");
         if(stdout.toString() !== '\n'){
-          event.returnValue = true;
+          event.returnValue = [true,stdout];
         }else{
-          event.returnValue = false;
+          event.returnValue = [false,stdout];
         }
       }else{
-        event.returnValue = false;
+        event.returnValue = [false,stderr];
 
       }
     }
@@ -538,7 +542,6 @@ function installMiniconda(){
   // Set the installation path, check if exists, else install. THE RETURNS AREN'T IMPORTANT by now
   const fs = require("fs"); 
   const homedir = require('os').homedir();
-  var child = exec.execFile;
   let condaPath = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
   let PrepareConda;
   if (fs.existsSync(condaPath)) {
@@ -562,7 +565,7 @@ function installMiniconda(){
       }
       //event.sender.send('execute_anonimizer_response', arg);
 
-      child(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
+      exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
         if (err) {
           console.error("Installation error", err);
           return false;

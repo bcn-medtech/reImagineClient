@@ -414,9 +414,9 @@ const isDev = require('electron-is-dev');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
-
+const exec = require('child_process');
 const { ipcMain } = require('electron');
-
+const fixPath = require('fix-path');
 let mainWindow;
 
 function createWindow() {
@@ -432,6 +432,7 @@ function createWindow() {
     mainWindow.on('closed', function () {
         mainWindow = null
     })
+    fixPath();
 }
 
 app.on('ready', createWindow);
@@ -458,19 +459,16 @@ ipcMain.on('Install_Request', (event, arg) => {
   // De momento cada SO tiene un modo de lectura de archivos, pero en principio no hace falta
   if (process.platform == 'win32') {
     console.log('hola windows');
-    const searchProgram = require('child_process').execFile(SearchUbi, [arg]);
+    const searchProgram = exec.execFile(SearchUbi, [arg]);
 
     searchProgram.stdout.on('data', (data) => {
       console.log(`stdout: ${data}`);
     });
-
     searchProgram.stderr.on('dataerr', (data) => {
       console.log(`dataerr: ${data}`);
     });
-
     searchProgram.on('exit', (data) => {
       console.log(`final data ${data}`);
-
       if (data === 1) event.returnValue = false;
       else {
         fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err, data) => {
@@ -479,12 +477,11 @@ ipcMain.on('Install_Request', (event, arg) => {
           event.returnValue = true;
         })
       }
-    })
+    });
 
   } else {
     console.log('OS Unix');
     console.log("Program to install: " + arg);
-    var exec = require('child_process');
     //Check if program is installed
     exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
       if (err){
@@ -513,26 +510,27 @@ ipcMain.on('Install_Request', (event, arg) => {
 
 //Call with sendSync and returns bool
 ipcMain.on('Install_Check', (event, arg) => {
-  var exec = require('child_process');
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
   var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
-
-  exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
+  exec.execFile("which", [arg], (err, stdout, stderr) => {
     if (err){
       console.log("err")
-      throw err;
-    }
-    //console.log("StdOut: ",stdout.toString());
-    //console.log("StdErr: ",stderr);
-    if (typeof stdout === 'string'){
-      //When program not found, stdout=\n
-      if(stdout.toString() !== '\n'){
-        event.returnValue = true;
+      event.returnValue = false
+    }else{
+      console.log("StdOut: ",stdout);
+      //console.log("StdErr: ",stderr);
+      if (typeof stdout === 'string'){
+        //When program not found, stdout=\n
+        stdout = stdout.replace(arg+":", "");
+        if(stdout.toString() !== '\n'){
+          event.returnValue = true;
+        }else{
+          event.returnValue = false;
+        }
       }else{
         event.returnValue = false;
+
       }
-    }else{
-      event.returnValue = false;
     }
   })
 });
@@ -542,7 +540,7 @@ function installMiniconda(){
   // Set the installation path, check if exists, else install. THE RETURNS AREN'T IMPORTANT by now
   const fs = require("fs"); 
   const homedir = require('os').homedir();
-  var child = require('child_process').execFile;
+  var child = exec.execFile;
   let condaPath = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
   let PrepareConda;
   if (fs.existsSync(condaPath)) {
@@ -583,7 +581,7 @@ function installMiniconda(){
 }
 
 function createEnvExecute(PrepareConda){
-  var child = require('child_process').execFile;
+  var child = exec.execFile;
   var Promise = require('bluebird');
   function promiseProcess(prog) {
     return new Promise(function (resolve, reject) {
@@ -638,7 +636,7 @@ ipcMain.on('Conda_Script', (event, arg, arg1, arg2) => {
       argv = [arg1, arg1 + 'output'];
     }
     console.log(argv);
-    const deploySh = require('child_process').execFile(`${__dirname}/${Script_Path}`, argv);
+    const deploySh = exec.execFile(`${__dirname}/${Script_Path}`, argv);
 
     deploySh.stdout.on('data', (data) => {
       console.log(`Output: ${data}`);
@@ -689,7 +687,7 @@ ipcMain.on('CondaUpload', (event, arg, arg1) => {
 
   var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('scripts', 'deiden', ExecuteOs));
 
-  const upload = require('child_process').execFile(__dirname + '/' + Script_Path, [file, port]);
+  const upload = exec.execFile(__dirname + '/' + Script_Path, [file, port]);
 
   upload.stdout.on('data', (data) => {
     console.log(`stdout data: ${data}`);

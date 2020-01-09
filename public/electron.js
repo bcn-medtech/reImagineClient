@@ -120,7 +120,7 @@ ipcMain.on('Install_Request', (event, arg) => {
 ipcMain.on('Install_Check', (event, arg) => {
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
   var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
-  exec.execFile("which", [arg], (err, stdout, stderr) => {
+  exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
     if (err){
       console.log("err")
       event.returnValue = [false, err]

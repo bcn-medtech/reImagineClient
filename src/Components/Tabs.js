@@ -58,6 +58,7 @@ export default function FullWidthTabs() {
             Object.keys(installed).map((key,idx) => {
                 let flag = ipcRenderer.sendSync('Install_Check', [key.toLowerCase()]);
                 //ipcRenderer.sendSync('console-log', "Flag: "+flag);
+                console.log("Flag " + key +": ", flag)
                 installed[key] = flag;
                 if(flag){
                     setLogText(key.toUpperCase() + ' already installed.');
@@ -95,9 +96,7 @@ export default function FullWidthTabs() {
             //ipcRenderer.sendSync('console-log', installed);
             setLogText(program.toUpperCase() + ' installed.');
         }
-        ipcRenderer.on('finished_deid', (event, arg) => {
-             console.log(arg.toString());
-        })
+        console.log("Install")
     }
 
     function NotInstalledList() {
@@ -117,7 +116,7 @@ export default function FullWidthTabs() {
         )
     }
 
-    function InstalledList(arr) {
+    function InstalledList() {
         return (
             <div>
                 {Object.keys(installed).map((key,idx) => {

@@ -3,5 +3,6 @@
 
 
 pname="$1"
+comand="$(whereis $pname)"
 
-echo $(which $pname)
+echo $comand

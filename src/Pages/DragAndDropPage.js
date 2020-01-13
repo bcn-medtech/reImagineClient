@@ -17,7 +17,7 @@ export class DragAndDropPage extends Component {
     constructor() {
         super();
         this.state = {
-            files: false,
+            files: [],
             pacs: '',
             output: "",
         };
@@ -141,7 +141,7 @@ export class DragAndDropPage extends Component {
     }
     removePendingFiles(){
         localStorage.removeItem('files');
-        this.setState({files: false})
+        this.setState({files: []})
     }
     pacsValue(value) {
             console.log("On drag",value);
@@ -171,7 +171,7 @@ export class DragAndDropPage extends Component {
                             <Typography style={{fontWeight:"bold"}}>Step 1</Typography>
                             <Typography>Choose a path to store the anonimized files:</Typography>
                             <Input placeholder="Output path..." fullWidth="true" onChange={(event) => this.outputValue(event)}/>
-                            <Button disabled={this.state.output.length === 0 && this.state.files === false} variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('conda')}>Anonimize</Button>
+                            <Button disabled={this.state.output.length === 0 || this.state.files.length === 0} variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('conda')}>Anonimize</Button>
                         </Grid>
                         <br/>
                         <Grid fullWidth="true" style={{borderTop:"2px"}}>

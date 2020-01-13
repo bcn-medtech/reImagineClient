@@ -50,16 +50,16 @@ export default function FullWidthTabs() {
                 'program': false};
     const [installed, setInstalled] = useState(arr);
     const [logText, setLogText] = useState('');
+    const exec = require('child_process');
 
 
     useEffect(() => {
         if(!componentMounted){
             ipcRenderer.sendSync('console-log',"DidMount");
             Object.keys(installed).map((key,idx) => {
-                let [flag, out] = ipcRenderer.sendSync('Install_Check', [key.toLowerCase()]);
+                let flag = ipcRenderer.sendSync('Install_Check', [key.toLowerCase()]);
                 //ipcRenderer.sendSync('console-log', "Flag: "+flag);
                 console.log("Flag " + key +": ", flag)
-                console.log("Check output: ", out)
                 installed[key] = flag;
                 if(flag){
                     setLogText(key.toUpperCase() + ' already installed.');

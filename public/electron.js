@@ -120,7 +120,19 @@ ipcMain.on('Install_Request', (event, arg) => {
 ipcMain.on('Install_Check', (event, arg) => {
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
   var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
-  exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
+  if(arg[0] === "conda"){
+    const homedir = require('os').homedir();
+    let condaPath = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
+    if (fs.existsSync(condaPath)) {
+      console.log("Conda already installed");
+      event.returnValue = true;
+    }else{
+      event.returnValue = false;
+    }
+  }else {
+    event.returnValue = false;
+  }
+  /*exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
     if (err){
       console.log("err")
       event.returnValue = [false, err]
@@ -139,13 +151,12 @@ ipcMain.on('Install_Check', (event, arg) => {
 
       }
     }
-  })
+  })*/
 });
 
 // Script to isntall program requested for, like miniconda
 function installMiniconda(){
   // Set the installation path, check if exists, else install. THE RETURNS AREN'T IMPORTANT by now
-  const fs = require("fs"); 
   const homedir = require('os').homedir();
   let condaPath = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
   let PrepareConda;
@@ -170,7 +181,7 @@ function installMiniconda(){
       }
       //event.sender.send('execute_anonimizer_response', arg);
 
-      exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
+      return exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
         if (err) {
           console.error("Installation error", err);
           return false;

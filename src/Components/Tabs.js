@@ -13,8 +13,6 @@ import MinicondaPng from '../assets/logo_anaconda.png';
 
 const { ipcRenderer } = window.require("electron");
 
-let componentMounted=false;
-
 
 function TabContainer({ children, dir }) {
     return (
@@ -41,17 +39,19 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+
+let componentMounted=false;
+var arr = {'conda': false,
+                'gdmscu': false,
+                'program': false};
+
 export default function FullWidthTabs() {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = useState(0);
-    var arr = {'conda': false,
-                'gdmscu': false,
-                'program': false};
     const [installed, setInstalled] = useState(arr);
     const [logText, setLogText] = useState('');
     const exec = require('child_process');
-
 
     useEffect(() => {
         if(!componentMounted){
@@ -101,6 +101,8 @@ export default function FullWidthTabs() {
         }else{
             ipcRenderer.sendSync('console-log', "Already installed");
             setLogText(program.toUpperCase() + ' already installed.');
+            installed[program] = true
+            setInstalled(installed);
         }
         console.log("Install")
     }

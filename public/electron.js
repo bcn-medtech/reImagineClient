@@ -5,7 +5,7 @@ CONSTANTS.INSTALLERS = {};
 CONSTANTS.INSTALLERS.WIN = 'installers\\Miniconda2-latest-Windows-x86_64.exe';
 CONSTANTS.INSTALLERS.LIN = 'installers/Miniconda3-latest-Linux--x86_64.sh';
 CONSTANTS.INSTALLERS.MAC = 'installers/Miniconda3-latest-MacOSX-x86_64.sh';
-CONSTANTS.INSTALLERS.DEV_WIN = 'public\\resources\\win32\\Miniconda2-latest-Windows-x86_64.exe';
+CONSTANTS.INSTALLERS.DEV_WIN = 'resources\\win32\\Miniconda2-latest-Windows-x86_64.exe';
 CONSTANTS.INSTALLERS.DEV_LIN = 'public/resources/linux/Miniconda3-latest-Linux-x86_64.sh';
 CONSTANTS.INSTALLERS.DEV_MAC = 'public/resources/mac/Miniconda3-latest-MacOSX-x86_64.sh';
 CONSTANTS.INSTALLERS.CONDAPATH = "$HOME/miniconda3";
@@ -53,38 +53,17 @@ app.on('activate', function () {
 });
 
 ipcMain.on('Install_Request', (event, arg) => {
-
   console.log('install request action');
-
-  
-
   // De momento cada SO tiene un modo de lectura de archivos, pero en principio no hace falta
   if (process.platform == 'win32') {
     console.log('hola windows');
-    var SearchUbi = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
+    let flag
     if(arg[0] === "conda"){
-      exec.execFile(__dirname + "/" + SearchUbi, [arg])
+      flag = installMiniconda()
+      event.returnValue = flag
+    }else{
+      event.returnValue = false;
     }
-    // const searchProgram = exec.execFile(SearchUbi, [arg]);
-
-    // searchProgram.stdout.on('data', (data) => {
-    //   console.log(`stdout: ${data}`);
-    // });
-    // searchProgram.stderr.on('dataerr', (data) => {
-    //   console.log(`dataerr: ${data}`);
-    // });
-    // searchProgram.on('exit', (data) => {
-    //   console.log(`final data ${data}`);
-    //   if (data === 1) event.returnValue = false;
-    //   else {
-    //     fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err, data) => {
-    //       console.log(data);
-    //       //event.sender.send('InstallAnswer', data);
-    //       event.returnValue = true;
-    //     })
-    //   }
-    // });
-
   } else {
     console.log('OS Unix');
     console.log("Program to install: " + arg);
@@ -106,11 +85,7 @@ ipcMain.on('Install_Request', (event, arg) => {
           //If not installed, install conda. Not prepared for others
           if(arg == 'conda'){
             let flag = installMiniconda()
-            if(flag){
-              event.returnValue = true;
-            }else{
-              event.returnValue = false;
-            }
+            event.returnValue = flag
           }else{
             event.returnValue = false;
           }
@@ -188,30 +163,47 @@ function installMiniconda(){
       if (os == "win32") {
         executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
         PrepareConda = path.join('win', 'createEnv.bat');
+        return exec.execFile(__dirname + "/" + executablePath, [arg], (err, stdout, stderr) => {
+          if (err){
+            console.log("err")
+            throw err;
+          }
+          console.log("StdOut: "+stdout.toString()+".");
+          console.log("StdErr: ",stderr);
+          createEnvExecute(PrepareConda);
+          alert("Reboot your PC to complete the installation.")
+          return true;
+        })
       }
       else if (os == 'MacOS') {
         executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);
+        return exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
+          if (err) {
+            console.error("Installation error", err);
+            return false;
+          }
+          console.log('Miniconda has been installed');
+          console.log("Installation Output: ", data.toString());
+          createEnvExecute(PrepareConda);
+          return true;
+        });
       }
       else if (os === 'linux') {
         executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_LIN : CONSTANTS.INSTALLERS.LIN);
         PrepareConda = path.join('linux', 'createEnv.sh');
+        return exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
+          if (err) {
+            console.error("Installation error", err);
+            return false;
+          }
+          console.log('Miniconda has been installed');
+          console.log("Installation Output: ", data.toString());
+          createEnvExecute(PrepareConda);
+          return true;
+        });
       }
-      //event.sender.send('execute_anonimizer_response', arg);
 
-      return exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
-        if (err) {
-          console.error("Installation error", err);
-          return false;
-        }
-        console.log('Miniconda has been installed');
-        console.log("Installation Output: ", data.toString());
-        createEnvExecute(PrepareConda);
-        return true;
-      });
-      
-    //} 
   }
-  return;
 }
 
 function createEnvExecute(PrepareConda){

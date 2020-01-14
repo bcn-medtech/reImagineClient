@@ -83,19 +83,24 @@ export default function FullWidthTabs() {
     }
 
     function Install(program) {
-        let arg = ipcRenderer.sendSync('Install_Request', [program.toLowerCase()]);
+        let arg = ipcRenderer.sendSync('Install_Check', [program.toLowerCase()]);
         if(arg === false){
-            ipcRenderer.sendSync('console-log', "Installation failed");
-            installed[program] = false
-            setInstalled(installed);
-            setLogText(program.toUpperCase() + ' not installed.');
-
-        } else{
-            ipcRenderer.sendSync('console-log', "Installing");
-            installed[program] = true
-            setInstalled(installed);
-            //ipcRenderer.sendSync('console-log', installed);
-            setLogText(program.toUpperCase() + ' installed.');
+            let arg2 = ipcRenderer.sendSync('Install_Request', [program.toLowerCase()]);
+            if(arg2 === false){
+                ipcRenderer.sendSync('console-log', "Installation failed");
+                installed[program] = false
+                setInstalled(installed);
+                setLogText(program.toUpperCase() + ' not installed.');
+            } else{
+                ipcRenderer.sendSync('console-log', "Installing");
+                installed[program] = true
+                setInstalled(installed);
+                //ipcRenderer.sendSync('console-log', installed);
+                setLogText(program.toUpperCase() + ' installing in background.');
+            }
+        }else{
+            ipcRenderer.sendSync('console-log', "Already installed");
+            setLogText(program.toUpperCase() + ' already installed.');
         }
         console.log("Install")
     }

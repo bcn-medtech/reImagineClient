@@ -5,7 +5,7 @@ CONSTANTS.INSTALLERS = {};
 CONSTANTS.INSTALLERS.WIN = 'installers\\Miniconda2-latest-Windows-x86_64.exe';
 CONSTANTS.INSTALLERS.LIN = 'installers/Miniconda3-latest-Linux--x86_64.sh';
 CONSTANTS.INSTALLERS.MAC = 'installers/Miniconda3-latest-MacOSX-x86_64.sh';
-CONSTANTS.INSTALLERS.DEV_WIN = 'public\\resources\\win\\Miniconda2-latest-Windows-x86_64.exe';
+CONSTANTS.INSTALLERS.DEV_WIN = 'public\\resources\\win32\\Miniconda2-latest-Windows-x86_64.exe';
 CONSTANTS.INSTALLERS.DEV_LIN = 'public/resources/linux/Miniconda3-latest-Linux-x86_64.sh';
 CONSTANTS.INSTALLERS.DEV_MAC = 'public/resources/mac/Miniconda3-latest-MacOSX-x86_64.sh';
 CONSTANTS.INSTALLERS.CONDAPATH = "$HOME/miniconda3";
@@ -56,35 +56,40 @@ ipcMain.on('Install_Request', (event, arg) => {
 
   console.log('install request action');
 
-  var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
-  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
+  
 
   // De momento cada SO tiene un modo de lectura de archivos, pero en principio no hace falta
   if (process.platform == 'win32') {
     console.log('hola windows');
-    const searchProgram = exec.execFile(SearchUbi, [arg]);
+    var SearchUbi = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
+    if(arg[0] === "conda"){
+      exec.execFile(__dirname + "/" + SearchUbi, [arg])
+    }
+    // const searchProgram = exec.execFile(SearchUbi, [arg]);
 
-    searchProgram.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-    });
-    searchProgram.stderr.on('dataerr', (data) => {
-      console.log(`dataerr: ${data}`);
-    });
-    searchProgram.on('exit', (data) => {
-      console.log(`final data ${data}`);
-      if (data === 1) event.returnValue = false;
-      else {
-        fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err, data) => {
-          console.log(data);
-          //event.sender.send('InstallAnswer', data);
-          event.returnValue = true;
-        })
-      }
-    });
+    // searchProgram.stdout.on('data', (data) => {
+    //   console.log(`stdout: ${data}`);
+    // });
+    // searchProgram.stderr.on('dataerr', (data) => {
+    //   console.log(`dataerr: ${data}`);
+    // });
+    // searchProgram.on('exit', (data) => {
+    //   console.log(`final data ${data}`);
+    //   if (data === 1) event.returnValue = false;
+    //   else {
+    //     fs.readFile(`public\\scripts\\tmp\\${arg}.txt`, 'utf-8', (err, data) => {
+    //       console.log(data);
+    //       //event.sender.send('InstallAnswer', data);
+    //       event.returnValue = true;
+    //     })
+    //   }
+    // });
 
   } else {
     console.log('OS Unix');
     console.log("Program to install: " + arg);
+    var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
+    var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
     //Check if program is installed
     exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
       if (err){
@@ -106,7 +111,6 @@ ipcMain.on('Install_Request', (event, arg) => {
             }else{
               event.returnValue = false;
             }
-            
           }else{
             event.returnValue = false;
           }

@@ -120,17 +120,30 @@ ipcMain.on('Install_Request', (event, arg) => {
 ipcMain.on('Install_Check', (event, arg) => {
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
   var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
-  if(arg[0] === "conda"){
-    const homedir = require('os').homedir();
-    let condaPath = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
-    if (fs.existsSync(condaPath)) {
-      console.log("Conda already installed");
-      event.returnValue = true;
-    }else{
+  if (process.platform == 'win32') {
+    exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
+      if (err){
+        console.log("ERR" + err)
+        event.returnValue = false
+      }else{
+        console.log("StdOut: ",stdout);
+        console.log("StdErr: ",stderr);
+        event.returnValue = true
+      }
+    });
+  }else{
+    if(arg[0] === "conda"){
+      const homedir = require('os').homedir();
+      let condaPath = CONSTANTS.INSTALLERS.CONDAPATH.replace("$HOME", homedir);
+      if (fs.existsSync(condaPath)) {
+        console.log("Conda already installed");
+        event.returnValue = true;
+      }else{
+        event.returnValue = false;
+      }
+    }else {
       event.returnValue = false;
     }
-  }else {
-    event.returnValue = false;
   }
   /*exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
     if (err){

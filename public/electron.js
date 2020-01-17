@@ -217,26 +217,21 @@ ipcMain.on('Conda_Script', (event, arg1, arg2) => {
   console.log("Arg2", arg2)
   console.log("Arg1", arg1)
   console.log('Conda_script');
-  var dir = __dirname
-  var ExecuteOs;
-  if (process.platform === 'win32') {
-    ExecuteOs = path.join('win32', 'runDeid.bat');
-  } else {
-    ExecuteOs = path.join('linux', 'runDeid.sh');
-  }
-  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('scripts', 'deiden', ExecuteOs));
-  var PythonScript_Path = (isDev ? path.join('scripts', 'deiden', 'src', 'deidTest_pyd.py') : path.join('Scripts', 'deiden', 'src', 'deidTest_pyd.py'));
+  
+  var Script_Path = getRunDeidPath()
+  var PythonScript_Path = getDeidTestPath()
   let argv;
   let files = arg1.split(",")
   for( elem in files){
     if(fs.existsSync(arg2)){
-      argv = [files[elem], arg2, `${dir}/${PythonScript_Path}`];
+      argv = [files[elem], arg2, PythonScript_Path];
     }else{
-      argv = [files[elem], files[elem] + 'output', `${dir}/${PythonScript_Path}`];
+      argv = [files[elem], files[elem] + 'output', PythonScript_Path];
     }
     console.log(argv);
-    const deploySh = exec.execFile(`${dir}/${Script_Path}`, argv);
-    let ret = `${__dirname}/${Script_Path}\n`;
+    
+    let ret = Script_Path;
+    const deploySh = exec.execFile(Script_Path, argv);
     deploySh.stdout.on('data', (data) => {
       ret += "Data: " + data + "\n"
       console.log(`Output: ${data}`);
@@ -250,21 +245,6 @@ ipcMain.on('Conda_Script', (event, arg1, arg2) => {
     deploySh.on('exit', (data) => {
       console.log(`final data ${data}`);
       ret += "Data: " + data + "\n"
-      // const py = exec.spawn('python',[`${dir}/${PythonScript_Path}`, argv[0], "--outdir "+argv[1]]);
-      // py.stdout.on('data', (data) => {
-      //   ret += "Data out(P): " + data + "\n"
-      //   console.log(`Output: ${data}`);
-      // });
-      // py.stderr.on('data', (data) => {
-      //   ret += "Data err(P): " + data + "\n"
-      //   console.log(`stderr: ${data}`)
-      // })
-    
-      // py.on('exit', (data) => {
-      //   ret += "Data(P): " + data + "\n"
-      //   console.log(`final data ${data}`);
-      //   event.returnValue = ret;
-      // }) 
       event.returnValue = ret;
     })
   }
@@ -345,3 +325,19 @@ ipcMain.on('Pacs_Request', (event, arg) => {
     }
   })
 })
+
+function getRunDeidPath(){
+  var ExecuteOs;
+  if (process.platform === 'win32') {
+    ExecuteOs = path.join('win32', 'runDeid.bat');
+  } else {
+    ExecuteOs = path.join('linux', 'runDeid.sh');
+  }
+  var Script_Path = (isDev ? path.join(__dirname, 'scripts', 'deiden', ExecuteOs) : path.join(__dirname, 'scripts', 'deiden', ExecuteOs));
+  return Script_Path
+}
+
+function getDeidTestPath(){
+  let file = (isDev ? path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py') : path.join(__dirname,"..", "..", "..", 'Scripts', 'deiden', 'src', 'deidTest_pyd.py'));
+  return file;
+}

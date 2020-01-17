@@ -138,7 +138,7 @@ function installMiniconda(){
     if (os == "win32") {
       executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
       PrepareConda = path.join('win32', 'createEnv.bat');
-      return exec.execFile(__dirname + "/" + executablePath, [arg], (err, stdout, stderr) => {
+      exec.execFile(__dirname + "/" + executablePath, (err, stdout, stderr) => {
         if (err){
           console.log("err")
           throw err;
@@ -146,9 +146,9 @@ function installMiniconda(){
         console.log("StdOut: "+stdout.toString()+".");
         console.log("StdErr: ",stderr);
         createEnvExecute(PrepareConda);
-        alert("Reboot your PC to complete the installation.")
-        return true;
+        //alert("Reboot your PC to complete the installation.")
       })
+      return true;
     }
     else if (os == 'MacOS') {
       executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);

@@ -8,9 +8,10 @@ echo $(pwd)
 export PYTHONPATH=$PYTHONPATH:$(pwd)/src
 basedir="$1"
 outdir="$2"
+scriptdir="$3"
 
 rm -rf $outdir
-python src/deidTest_pyd.py $basedir --outdir $outdir
+python $scriptdir $basedir --outdir $outdir
 
 
 

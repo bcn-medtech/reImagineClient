@@ -66,7 +66,6 @@ ipcMain.on('Install_Request', (event, arg) => {
     }
   } else {
     console.log('OS Unix');
-    console.log("Program to install: " + arg);
     var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
     var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
     //Check if program is installed
@@ -75,8 +74,6 @@ ipcMain.on('Install_Request', (event, arg) => {
         console.log("err")
         throw err;
       }
-      //console.log("StdOut: "+stdout.toString()+".");
-      //console.log("StdErr: ",stderr);
       if (typeof stdout === 'string'){
         //When program not found, stdout=\n
         if(stdout.toString() !== '\n'){
@@ -124,26 +121,6 @@ ipcMain.on('Install_Check', (event, arg) => {
       event.returnValue = false;
     }
   }
-  /*exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
-    if (err){
-      console.log("err")
-      event.returnValue = [false, err]
-    }else{
-      console.log("StdOut: ",stdout);
-      console.log("StdErr: ",stderr);
-      if (typeof stdout === 'string'){
-        //When program not found, stdout=\n
-        if(stdout.toString() !== '\n'){
-          event.returnValue = [true,stdout];
-        }else{
-          event.returnValue = [false,stdout];
-        }
-      }else{
-        event.returnValue = [false,stderr];
-
-      }
-    }
-  })*/
 });
 
 // Script to isntall program requested for, like miniconda
@@ -156,53 +133,50 @@ function installMiniconda(){
     console.log("Conda already installed");
     return true;
   }else{
-    //if (arg !== null) {
-      //console.log("Args: ",arg);
-      var os = process.platform;
-      var executablePath;
-      if (os == "win32") {
-        executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
-        PrepareConda = path.join('win', 'createEnv.bat');
-        return exec.execFile(__dirname + "/" + executablePath, [arg], (err, stdout, stderr) => {
-          if (err){
-            console.log("err")
-            throw err;
-          }
-          console.log("StdOut: "+stdout.toString()+".");
-          console.log("StdErr: ",stderr);
-          createEnvExecute(PrepareConda);
-          alert("Reboot your PC to complete the installation.")
-          return true;
-        })
-      }
-      else if (os == 'MacOS') {
-        executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);
-        return exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
-          if (err) {
-            console.error("Installation error", err);
-            return false;
-          }
-          console.log('Miniconda has been installed');
-          console.log("Installation Output: ", data.toString());
-          createEnvExecute(PrepareConda);
-          return true;
-        });
-      }
-      else if (os === 'linux') {
-        executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_LIN : CONSTANTS.INSTALLERS.LIN);
-        PrepareConda = path.join('linux', 'createEnv.sh');
-        return exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
-          if (err) {
-            console.error("Installation error", err);
-            return false;
-          }
-          console.log('Miniconda has been installed');
-          console.log("Installation Output: ", data.toString());
-          createEnvExecute(PrepareConda);
-          return true;
-        });
-      }
-
+    var os = process.platform;
+    var executablePath;
+    if (os == "win32") {
+      executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
+      PrepareConda = path.join('win32', 'createEnv.bat');
+      return exec.execFile(__dirname + "/" + executablePath, [arg], (err, stdout, stderr) => {
+        if (err){
+          console.log("err")
+          throw err;
+        }
+        console.log("StdOut: "+stdout.toString()+".");
+        console.log("StdErr: ",stderr);
+        createEnvExecute(PrepareConda);
+        alert("Reboot your PC to complete the installation.")
+        return true;
+      })
+    }
+    else if (os == 'MacOS') {
+      executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);
+      return exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
+        if (err) {
+          console.error("Installation error", err);
+          return false;
+        }
+        console.log('Miniconda has been installed');
+        console.log("Installation Output: ", data.toString());
+        createEnvExecute(PrepareConda);
+        return true;
+      });
+    }
+    else if (os === 'linux') {
+      executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_LIN : CONSTANTS.INSTALLERS.LIN);
+      PrepareConda = path.join('linux', 'createEnv.sh');
+      return exec.execFile(executablePath, ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH], function (err, data) {
+        if (err) {
+          console.error("Installation error", err);
+          return false;
+        }
+        console.log('Miniconda has been installed');
+        console.log("Installation Output: ", data.toString());
+        createEnvExecute(PrepareConda);
+        return true;
+      });
+    }
   }
 }
 
@@ -238,47 +212,64 @@ function createEnvExecute(PrepareConda){
 }
 
 // Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
-ipcMain.on('Conda_Script', (event, arg, arg1, arg2) => {
+ipcMain.on('Conda_Script', (event, arg1, arg2) => {
   //console.log(process.env.SHELL);
   console.log("Arg2", arg2)
+  console.log("Arg1", arg1)
   console.log('Conda_script');
+  var dir = __dirname
   var ExecuteOs;
-  if(!arg){
-    event.returnValue = "Conda not installed. Go to Installers page to install it."
-    return;
+  if (process.platform === 'win32') {
+    ExecuteOs = path.join('win32', 'runDeid.bat');
   } else {
-    if (process.platform === 'win32') {
-      ExecuteOs = path.join('win', 'runDeid.bat');
-    } else {
-      ExecuteOs = path.join('linux', 'runDeid.sh');
-    }
-    var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('scripts', 'deiden', ExecuteOs));
-    console.log(Script_Path);
-
-    let argv;
+    ExecuteOs = path.join('linux', 'runDeid.sh');
+  }
+  var Script_Path = (isDev ? path.join('scripts', 'deiden', ExecuteOs) : path.join('scripts', 'deiden', ExecuteOs));
+  var PythonScript_Path = (isDev ? path.join('scripts', 'deiden', 'src', 'deidTest_pyd.py') : path.join('Scripts', 'deiden', 'src', 'deidTest_pyd.py'));
+  let argv;
+  let files = arg1.split(",")
+  for( elem in files){
     if(fs.existsSync(arg2)){
-      argv = [arg1, arg2];
+      argv = [files[elem], arg2, `${dir}/${PythonScript_Path}`];
     }else{
-      argv = [arg1, arg1 + 'output'];
+      argv = [files[elem], files[elem] + 'output', `${dir}/${PythonScript_Path}`];
     }
     console.log(argv);
-    const deploySh = exec.execFile(`${__dirname}/${Script_Path}`, argv);
-
+    const deploySh = exec.execFile(`${dir}/${Script_Path}`, argv);
+    let ret = `${__dirname}/${Script_Path}\n`;
     deploySh.stdout.on('data', (data) => {
+      ret += "Data: " + data + "\n"
       console.log(`Output: ${data}`);
     });
 
     deploySh.stderr.on('data', (data) => {
+      ret += "Data: " + data + "\n"
       console.log(`stderr: ${data}`)
     })
 
     deploySh.on('exit', (data) => {
       console.log(`final data ${data}`);
-      event.returnValue = "Anonimized succesfully.";
+      ret += "Data: " + data + "\n"
+      // const py = exec.spawn('python',[`${dir}/${PythonScript_Path}`, argv[0], "--outdir "+argv[1]]);
+      // py.stdout.on('data', (data) => {
+      //   ret += "Data out(P): " + data + "\n"
+      //   console.log(`Output: ${data}`);
+      // });
+      // py.stderr.on('data', (data) => {
+      //   ret += "Data err(P): " + data + "\n"
+      //   console.log(`stderr: ${data}`)
+      // })
+    
+      // py.on('exit', (data) => {
+      //   ret += "Data(P): " + data + "\n"
+      //   console.log(`final data ${data}`);
+      //   event.returnValue = ret;
+      // }) 
+      event.returnValue = ret;
     })
   }
 });
-
+//python src/deidTest_pyd.py $basedir --outdir $outdir
 ipcMain.on('console-log', (event, arg) => {
   console.log(arg);
   event.returnValue = 'Done';
@@ -293,7 +284,7 @@ ipcMain.on('CondaUpload', (event, arg, arg1) => {
   console.log("file: ",arg);
   /* horizontal bar, pacs selector before send orthanc button  */
   if (process.platform === 'win32') {
-    ExecuteOs = path.join('win', 'uploadImages.bat');
+    ExecuteOs = path.join('win32', 'uploadImages.bat');
   } else {
     ExecuteOs = path.join('linux', 'uploadImages.sh');
   }

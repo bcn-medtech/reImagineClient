@@ -121,7 +121,7 @@ export class DragAndDropPage extends Component {
         if (!flag){
             alert(`Must install, ${program} needed`);
         }else{
-            msg = ipcRenderer.sendSync('Conda_Script', flag, localStorage.getItem('files'), this.state.output);
+            msg = ipcRenderer.sendSync('Conda_Script', localStorage.getItem('files'), this.state.output);
             alert(msg);
         }
     }
@@ -171,7 +171,7 @@ export class DragAndDropPage extends Component {
                             <Typography style={{fontWeight:"bold"}}>Step 1</Typography>
                             <Typography>Choose a path to store the anonimized files:</Typography>
                             <Input placeholder="Output path..." fullWidth="true" onChange={(event) => this.outputValue(event)}/>
-                            <Button disabled={this.state.output.length === 0 || this.state.files.length === 0} variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('conda')}>Anonimize</Button>
+                            <Button disabled={this.state.files.length === 0} variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('conda')}>Anonimize</Button>
                         </Grid>
                         <br/>
                         <Grid fullWidth="true" style={{borderTop:"2px"}}>

@@ -77,34 +77,31 @@ export default function FullWidthTabs() {
     function handleChangeIndex(index) {
         setValue(index);
     }
-
     function imageRel(element) {
         if (element === 'conda') return MinicondaPng;
     }
-
     function Install(program) {
         let arg = ipcRenderer.sendSync('Install_Check', [program.toLowerCase()]);
         if(arg === false){
             let arg2 = ipcRenderer.sendSync('Install_Request', [program.toLowerCase()]);
             if(arg2 === false){
-                ipcRenderer.sendSync('console-log', "Installation failed");
                 installed[program] = false
                 setInstalled(installed);
+                ipcRenderer.sendSync('console-log', "Installation failed");
                 setLogText(program.toUpperCase() + ' not installed.');
             } else{
-                ipcRenderer.sendSync('console-log', "Installing");
+                
                 installed[program] = true
                 setInstalled(installed);
-                //ipcRenderer.sendSync('console-log', installed);
+                ipcRenderer.sendSync('console-log', "Installing");
                 setLogText(program.toUpperCase() + ' installing in background.');
             }
         }else{
-            ipcRenderer.sendSync('console-log', "Already installed");
-            setLogText(program.toUpperCase() + ' already installed.');
             installed[program] = true
             setInstalled(installed);
+            ipcRenderer.sendSync('console-log', "Already installed");
+            setLogText(program.toUpperCase() + ' already installed.');
         }
-        console.log("Install")
     }
 
     function NotInstalledList() {

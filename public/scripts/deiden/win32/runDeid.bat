@@ -17,8 +17,3 @@ SET outdir=%2
 RMDIR /Q  $outdir
 echo %cd% "hi bro"
 python src/deidTest_pyd.py %basedir% --outdir %outdir%
-
-
-
-
-

@@ -13,7 +13,8 @@ call conda activate deid
 SET PYTHONPATH=$PYTHONPATH:$(%cd%)/src
 SET basedir=%1
 SET outdir=%2
+SET scriptpath=%3
 
 RMDIR /Q  $outdir
 echo %cd% "hi bro"
-python src/deidTest_pyd.py %basedir% --outdir %outdir%
+python %scriptpath% %basedir% --outdir %outdir%

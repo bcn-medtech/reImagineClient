@@ -11,6 +11,8 @@ CONSTANTS.INSTALLERS.DEV_MAC = 'public/resources/mac/Miniconda3-latest-MacOSX-x8
 CONSTANTS.INSTALLERS.CONDAPATH = "$HOME/miniconda3";
 
 const electron = require('electron');
+const { Menu, Tray } = require('electron')
+
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
@@ -38,7 +40,57 @@ function createWindow() {
     })
 }
 
-app.on('ready', createWindow);
+// Tray just let us have an icon saved in taskbar to do more easily to use the app and do it less heavy interface
+let tray = null
+app.on('ready', () => {
+  tray = new Tray(isDev ? path.join('public', 'resources', 'icons', 'lung.png') : path.join('icons', 'lung.png'));
+  const trayMenuTemplate = [
+    {
+      label: 'open window',
+      click: function () {
+        createWindow();
+      }
+    },
+    {
+      label: '3rdPart Installers',
+      click: function () {
+        mainWindow.loadURL(isDev ? 'http://localhost:3000/installers' : `file://${path.join(__dirname, '../build/index.html#/installers')}`);
+      }
+    }, {
+      label: 'Quit',
+      click: function () {
+        app.quit()
+      }
+    }
+  ]
+  let contextMenu = Menu.buildFromTemplate(trayMenuTemplate)
+  tray.setToolTip('This is my application.')
+  tray.setContextMenu(contextMenu)
+  createWindow();
+
+  tray.on('click', () => {
+    if (mainWindow == null) {
+      createWindow()
+    } else if (mainWindow.isVisible()) {
+      mainWindow.hide()
+    } else {
+      mainWindow.show()
+    }
+  });
+
+  tray.on('double-click', () => {
+    if (mainWindow == null) {
+      createWindow();
+    }
+    else if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else mainWindow.show();
+  })
+
+})
+
+
+//app.on('ready', createWindow);
 
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
@@ -138,7 +190,7 @@ function installMiniconda(){
     if (os == "win32") {
       executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
       PrepareConda = path.join('win32', 'createEnv.bat');
-      return exec.execFile(__dirname + "/" + executablePath, [arg], (err, stdout, stderr) => {
+      exec.execFile(__dirname + "/" + executablePath, (err, stdout, stderr) => {
         if (err){
           console.log("err")
           throw err;
@@ -146,9 +198,9 @@ function installMiniconda(){
         console.log("StdOut: "+stdout.toString()+".");
         console.log("StdErr: ",stderr);
         createEnvExecute(PrepareConda);
-        alert("Reboot your PC to complete the installation.")
-        return true;
+        //alert("Reboot your PC to complete the installation.")
       })
+      return true;
     }
     else if (os == 'MacOS') {
       executablePath = (isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);

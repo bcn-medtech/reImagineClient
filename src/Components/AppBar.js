@@ -27,14 +27,16 @@ const useStyles = makeStyles(theme => ({
 
 export default function ButtonAppBar(props) {
   const classes = useStyles();
-  const [auth, setAuth] = React.useState(true);
+//  const [auth, setAuth] = React.useState(true);
+  const [auth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
+/*
   const handleChange = event => {
     setAuth(event.target.checked);
   };
-
+*/
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
   };

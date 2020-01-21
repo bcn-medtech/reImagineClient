@@ -51,7 +51,7 @@ export default function FullWidthTabs() {
     const [value, setValue] = useState(0);
     const [installed, setInstalled] = useState(arr);
     const [logText, setLogText] = useState('');
-    const exec = require('child_process');
+    //const exec = require('child_process');
 
     useEffect(() => {
         if(!componentMounted){
@@ -64,6 +64,7 @@ export default function FullWidthTabs() {
                 if(flag){
                     setLogText(key.toUpperCase() + ' already installed.');
                 }
+                return null
             });
         }
         setInstalled(installed);
@@ -108,14 +109,15 @@ export default function FullWidthTabs() {
         return (
             <div>
                 {Object.keys(installed).map((key, idx) => {
-                    if (installed[key] == false) {
+                    if (installed[key] === false) {
                         return (
                             <div>
                                 <Button key={"Yep"+idx} onClick={() => Install(key)}>{key}</Button>
-                                <img className={classes.imgTam} src={imageRel(key)} />
+                                <img className={classes.imgTam} src={imageRel(key)} alt="Installed"/>
                             </div>
                         )
                     }
+                  return null
                 })}
             </div>
         )
@@ -125,14 +127,15 @@ export default function FullWidthTabs() {
         return (
             <div>
                 {Object.keys(installed).map((key,idx) => {
-                    if (installed[key] == true) {
+                    if (installed[key] === true) {
                         return (
                             <div>
                                 <Button key={"Not"+idx} onClick={() => Install(key)}>{key}</Button>
-                                <img className={classes.imgTam} src={imageRel(key)} />
+                                <img className={classes.imgTam} src={imageRel(key)} alt="Not installed" />
                             </div>
                         )
                     }
+                    return null
                 })}
             </div>
         )

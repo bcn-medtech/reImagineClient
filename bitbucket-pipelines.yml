@@ -12,8 +12,8 @@ pipelines:
           - node
         script: # build the repository.
           - npm install
-          - npm build
-          - npm dist
+          - npm run-script build
+          - npm run-script dist
     - step:
         name: Deploy to S3
         deployment: test

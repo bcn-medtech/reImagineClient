@@ -221,12 +221,12 @@ ipcMain.on('Conda_Script', (event, arg1, arg2) => {
   var Script_Path = getRunDeidPath()
   var PythonScript_Path = getDeidTestPath()
   let argv;
-  let files = arg1.split(",")
-  for( elem in files){
+  let files = arg1
+  for( elem in files ){
     if(fs.existsSync(arg2)){
       argv = [files[elem], arg2, PythonScript_Path];
     }else{
-      argv = [files[elem], files[elem] + 'output', PythonScript_Path];
+      argv = [files[elem], getOutputPath() , PythonScript_Path];
     }
     console.log(argv);
     
@@ -340,4 +340,13 @@ function getRunDeidPath(){
 function getDeidTestPath(){
   let file = (isDev ? path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py') : path.join(__dirname,"..", "..", "..", 'Scripts', 'deiden', 'src', 'deidTest_pyd.py'));
   return file;
+}
+
+function getOutputPath(){
+  const home = require('os').homedir();
+  let outPath = path.join(home,'Documents','Anonimized_Files')
+  if(!fs.existsSync(outPath)){
+    fs.mkdirSync(outPath);
+  }
+  return outPath;
 }

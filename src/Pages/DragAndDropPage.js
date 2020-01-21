@@ -40,7 +40,7 @@ export class DragAndDropPage extends Component {
                                     </ListItemAvatar>
                                     <ListItemText
                                         primary={<Typography>{idx+1}:&nbsp;{value}</Typography>}
-                                        style={{'word-break': 'break-all'}}
+                                        style={{wordBreak: 'break-all'}}
                                     />
                                     <ListItemSecondaryAction>
                                         <IconButton edge="end" aria-label="delete" onClick={() => this.deleteItemFromFiles(idx)}>
@@ -56,25 +56,15 @@ export class DragAndDropPage extends Component {
         }
     }
 
-    deleteItemFromFiles(idx){
-        let list = this.state.files;
-        list.splice(idx, 1);
-        this.setState({files: list})
-        localStorage.setItem('files', list);
-    }
+    
     componentDidMount() {
         //Load files stored in past
-        let storage = localStorage.getItem('files');
-        console.log("Storage", storage)
+        let storage = this.getFilePaths();
         if(storage === null){
-            localStorage.setItem('files', "");
+            this.saveFilePaths([])
             this.setState({files: false})
         }else{
-            let arr = storage.split(",");
-            if(arr[0] === ""){
-                arr.splice(0,1);
-            }
-            this.setState({files: arr})
+            this.setState({files: storage})
         }
         
         var holder = document.getElementById('dropbox');
@@ -99,29 +89,58 @@ export class DragAndDropPage extends Component {
             
             if (this.state.files !== false) {
                 let auxArr = this.state.files;
-                auxArr.push(files);
+                files.map((file)=>{
+                    auxArr.push(file);
+                })
                 this.setState({ files: auxArr });
-                localStorage.setItem('files', auxArr.toString());
-            }
-            else {
+                this.saveFilePaths(auxArr)
+            } else {
                 this.setState({ files: files });
-                localStorage.setItem('files', files.toString());
+                this.saveFilePaths(files)
             }
             
-            console.log("On Storage",localStorage.getItem('files'));
+            console.log("On Storage",this.getFilePaths());
             ipcRenderer.send('Files_to_Anonimize', this.state.files);
 
             return false;
         };
     }
-    
+    saveFilePaths(array){
+        let result = ""
+        array.map((path)=>{
+            if(path !== "") result += path + "//"
+        })
+        localStorage.setItem('files', result);
+        console.log("Result",result)
+    }
+    getFilePaths(){
+        let arr = [];
+        let storage = localStorage.getItem('files');
+        if(storage!==null){
+            arr = storage.split("//")
+            arr.splice(arr.indexOf(""), 1)
+        }
+        console.log("Retrieved: ",arr)
+        return arr;
+    }
+    removePendingFiles(){
+        localStorage.removeItem('files');
+        this.setState({files: []})
+    }
+    deleteItemFromFiles(idx){
+        let list = this.state.files;
+        list.splice(idx, 1);
+        this.setState({files: list})
+        this.saveFilePaths(list)
+    }
+
     Anonimize(program) {
         let msg
         let flag = ipcRenderer.sendSync('Install_Check', [program.toLowerCase()]);
         if (!flag){
             alert(`Must install, ${program} needed`);
         }else{
-            msg = ipcRenderer.sendSync('Conda_Script', localStorage.getItem('files'), this.state.output);
+            msg = ipcRenderer.sendSync('Conda_Script', this.getFilePaths(), this.state.output);
             alert(msg);
         }
     }
@@ -139,10 +158,6 @@ export class DragAndDropPage extends Component {
             localStorage.removeItem('files');
         }
     }
-    removePendingFiles(){
-        localStorage.removeItem('files');
-        this.setState({files: []})
-    }
     pacsValue(value) {
             console.log("On drag",value);
             //console.log(this.state.pacs);
@@ -152,7 +167,7 @@ export class DragAndDropPage extends Component {
     outputValue(event) {
         console.log("On fill",event.target.value );
         this.setState({ output: event.target.value })
-}
+    }
 
     render() {
         return (
@@ -169,8 +184,8 @@ export class DragAndDropPage extends Component {
                         </Grid>
                         <Grid>
                             <Typography style={{fontWeight:"bold"}}>Step 1</Typography>
-                            <Typography>Choose a path to store the anonimized files:</Typography>
-                            <Input placeholder="Output path..." fullWidth="true" onChange={(event) => this.outputValue(event)}/>
+                            <Typography>Choose a path to store the anonimized files: (else will be stored at Documents/Anonimized_Files)</Typography>
+                            <Input placeholder="Output path..." value={this.state.output} fullWidth="true" onChange={(event) => this.outputValue(event)}/>
                             <Button disabled={this.state.files.length === 0} variant="contained" color="primary" className="buttonPrimary" onClick={() => this.Anonimize('conda')}>Anonimize</Button>
                         </Grid>
                         <br/>

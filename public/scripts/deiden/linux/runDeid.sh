@@ -12,9 +12,3 @@ scriptdir="$3"
 echo $scriptdir
 rm -rf $outdir
 python $scriptdir $basedir --outdir $outdir
-
-
-
-
-
-

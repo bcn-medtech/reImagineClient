@@ -151,11 +151,8 @@ export class DragAndDropPage extends Component {
         }
         else {
             console.log("PreUpload:",this.state.pacs)
-            ipcRenderer.send('CondaUpload', localStorage.getItem('files')+"output", this.state.pacs);
-            ipcRenderer.on('uploaded', (event, arg) => {
-                console.log('uploaded');
-            })
-            localStorage.removeItem('files');
+            ipcRenderer.send('CondaUpload', this.state.output, this.state.pacs);
+            //localStorage.removeItem('files');
         }
     }
     pacsValue(value) {

@@ -1,3 +1,5 @@
+# Funcionalidad api
+Esta implementada con express y has 2 endpoints declarados en el archivo things.js dentro de src. Funciona en desarrollo ya que se ejecuta el localhost pero en produccion no.
 
 # electron-create-react-app-boilerplate
 

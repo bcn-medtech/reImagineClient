@@ -13,8 +13,6 @@ import MinicondaPng from '../assets/logo_anaconda.png';
 
 const { ipcRenderer } = window.require("electron");
 
-let componentMounted=false;
-
 
 function TabContainer({ children, dir }) {
     return (
@@ -41,29 +39,32 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+
+let componentMounted=false;
+var arr = {'conda': false,
+                'gdmscu': false,
+                'program': false};
+
 export default function FullWidthTabs() {
     const classes = useStyles();
     const theme = useTheme();
     const [value, setValue] = useState(0);
-    var arr = {'conda': false,
-                'gdmscu': false,
-                'program': false};
     const [installed, setInstalled] = useState(arr);
     const [logText, setLogText] = useState('');
-
+    //const exec = require('child_process');
 
     useEffect(() => {
         if(!componentMounted){
             ipcRenderer.sendSync('console-log',"DidMount");
             Object.keys(installed).map((key,idx) => {
-                let [flag, out] = ipcRenderer.sendSync('Install_Check', [key.toLowerCase()]);
+                let flag = ipcRenderer.sendSync('Install_Check', [key.toLowerCase()]);
                 //ipcRenderer.sendSync('console-log', "Flag: "+flag);
                 console.log("Flag " + key +": ", flag)
-                console.log("Check output: ", out)
                 installed[key] = flag;
                 if(flag){
                     setLogText(key.toUpperCase() + ' already installed.');
                 }
+                return null
             });
         }
         setInstalled(installed);
@@ -77,41 +78,46 @@ export default function FullWidthTabs() {
     function handleChangeIndex(index) {
         setValue(index);
     }
-
     function imageRel(element) {
         if (element === 'conda') return MinicondaPng;
     }
-
     function Install(program) {
-        let arg = ipcRenderer.sendSync('Install_Request', [program.toLowerCase()]);
+        let arg = ipcRenderer.sendSync('Install_Check', [program.toLowerCase()]);
         if(arg === false){
-            ipcRenderer.sendSync('console-log', "Installation failed");
-            installed[program] = false
-            setInstalled(installed);
-            setLogText(program.toUpperCase() + ' not installed.');
-
-        } else{
-            ipcRenderer.sendSync('console-log', "Installing");
+            let arg2 = ipcRenderer.sendSync('Install_Request', [program.toLowerCase()]);
+            if(arg2 === false){
+                installed[program] = false
+                setInstalled(installed);
+                ipcRenderer.sendSync('console-log', "Installation failed");
+                setLogText(program.toUpperCase() + ' not installed.');
+            } else{
+                
+                installed[program] = true
+                setInstalled(installed);
+                ipcRenderer.sendSync('console-log', "Installing");
+                setLogText(program.toUpperCase() + ' installing in background.');
+            }
+        }else{
             installed[program] = true
             setInstalled(installed);
-            //ipcRenderer.sendSync('console-log', installed);
-            setLogText(program.toUpperCase() + ' installed.');
+            ipcRenderer.sendSync('console-log', "Already installed");
+            setLogText(program.toUpperCase() + ' already installed.');
         }
-        console.log("Install")
     }
 
     function NotInstalledList() {
         return (
             <div>
                 {Object.keys(installed).map((key, idx) => {
-                    if (installed[key] == false) {
+                    if (installed[key] === false) {
                         return (
                             <div>
                                 <Button key={"Yep"+idx} onClick={() => Install(key)}>{key}</Button>
-                                <img className={classes.imgTam} src={imageRel(key)} />
+                                <img className={classes.imgTam} src={imageRel(key)} alt="Installed"/>
                             </div>
                         )
                     }
+                  return null
                 })}
             </div>
         )
@@ -121,14 +127,15 @@ export default function FullWidthTabs() {
         return (
             <div>
                 {Object.keys(installed).map((key,idx) => {
-                    if (installed[key] == true) {
+                    if (installed[key] === true) {
                         return (
                             <div>
                                 <Button key={"Not"+idx} onClick={() => Install(key)}>{key}</Button>
-                                <img className={classes.imgTam} src={imageRel(key)} />
+                                <img className={classes.imgTam} src={imageRel(key)} alt="Not installed" />
                             </div>
                         )
                     }
+                    return null
                 })}
             </div>
         )

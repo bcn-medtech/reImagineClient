@@ -40,34 +40,39 @@ export  function isObjectEmpty(obj) {
 
 
  export  function isUserTokenInClient(){
-        return !isObjectEmpty(localStorage.getItem("token"));
-    }
+    return !isObjectEmpty(localStorage.getItem("token"));
+}
 
-    export  function saveUser(token,name,family_names,email){
-        localStorage.setItem('token',token);
-        localStorage.setItem("name",name);
-        localStorage.setItem("family_names",family_names)
-        localStorage.setItem("email",email)
-    }
+export  function saveUser(token,name,family_names,email){
+    localStorage.setItem('token',token);
+    localStorage.setItem("name",name);
+    localStorage.setItem("family_names",family_names)
+    localStorage.setItem("email",email)
+}
 
-    export  function removeUser(){
-        localStorage.removeItem("token");
-        localStorage.removeItem("name");
-        localStorage.removeItem("family_names");
-        localStorage.removeItem("email")
-    }
+export  function removeUser(){
+    localStorage.removeItem("token");
+    localStorage.removeItem("name");
+    localStorage.removeItem("family_names");
+    localStorage.removeItem("email")
+}
 
-    export  function getUser(){
-        return {user_token:localStorage.getItem("token"),user_name:localStorage.getItem("name"),user_family_names:localStorage.getItem("family_names"),user_email:localStorage.getItem("email")}
+export  function getUser(){
+    return {
+        user_token:localStorage.getItem("token"),
+        user_name:localStorage.getItem("name"),
+        user_family_names:localStorage.getItem("family_names"),
+        user_email:localStorage.getItem("email")
     }
+}
 
-    export  function userAuthenticate(){
-        if(window.location.href.indexOf("token")===-1 && this.isUserTokenInClient()===false){
-            window.location="https://services.simbiosys.upf.edu/api-auth2/auth/google"
-        }else{
-          if(window.location.href.indexOf("token")!==-1){
-            let token=window.location.search.split("=")[1];
-            this.saveUserToken(token);
-          }
+export  function userAuthenticate(){
+    if(window.location.href.indexOf("token")===-1 && this.isUserTokenInClient()===false){
+        window.location="https://services.simbiosys.upf.edu/api-auth2/auth/google"
+    }else{
+        if(window.location.href.indexOf("token")!==-1){
+        let token=window.location.search.split("=")[1];
+        this.saveUserToken(token);
         }
     }
+}

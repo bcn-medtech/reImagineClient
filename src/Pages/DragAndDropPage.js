@@ -58,6 +58,7 @@ export class DragAndDropPage extends Component {
 
     
     componentDidMount() {
+        console.log("Component did mount");
         //Load files stored in past
         let storage = this.getFilePaths();
         if(storage === null){
@@ -69,15 +70,19 @@ export class DragAndDropPage extends Component {
         
         var holder = document.getElementById('dropbox');
         holder.ondragover = () => {
+            console.log("On drag over!");
             return false;
         };
         holder.ondragleave = () => {
+            console.log("On drag leave!");
             return false;
         };
         holder.ondragend = () => {
+            console.log("On drag end!");
             return false;
         };
         holder.ondrop = (e) => {
+            console.log("On Drop!");
             e.preventDefault();
             
             let files = [];
@@ -91,6 +96,7 @@ export class DragAndDropPage extends Component {
                 let auxArr = this.state.files;
                 files.map((file)=>{
                     auxArr.push(file);
+                    return true;
                 })
                 this.setState({ files: auxArr });
                 this.saveFilePaths(auxArr)
@@ -109,6 +115,7 @@ export class DragAndDropPage extends Component {
         let result = ""
         array.map((path)=>{
             if(path !== "") result += path + "//"
+            return true;
         })
         localStorage.setItem('files', result);
         console.log("Result",result)
@@ -161,8 +168,9 @@ export class DragAndDropPage extends Component {
             alert('Drag files.');
         }
         else {
-            console.log("S3 PreUpload:",this.state.pacs)
-            ipcRenderer.send('MinioUpload', this.state.output, this.state.pacs);
+            var files = '/home/gerardgarcia/Documents/Medic_Files/1.2.124.113532.159.237.137.76.20020826.93757.32838/1.3.12.2.1107.5.1.4.24550.2.0.810657717422047';
+            console.log("S3 PreUpload:",this.state.files)
+            ipcRenderer.send('MinioUpload', files, this.state.output);
             //localStorage.removeItem('files');
         }
     }

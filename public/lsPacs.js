@@ -66,3 +66,44 @@ function doPacsUpload(event, arg, arg1) {
 module.exports.pacsRequest = doPacsRequest;
 module.exports.pacsUpload = doPacsUpload;
 
+function getFilesFromDir(dir, fileTypes) {
+  var filesToReturn = [];
+  function walkDir(currentPath) {
+    var files = fs.readdirSync(currentPath);
+    for (var i in files) {
+      var curFile = path.join(currentPath, files[i]);      
+      if (fs.statSync(curFile).isFile() && fileTypes.indexOf(path.extname(curFile)) != -1) {
+        filesToReturn.push(curFile);
+      } else if (fs.statSync(curFile).isDirectory()) {
+       walkDir(curFile);
+      }
+    }
+  };
+  walkDir(dir);
+  return filesToReturn; 
+}
+
+function getRunDeidPath(){
+  var ExecuteOs;
+  if (process.platform === 'win32') {
+    ExecuteOs = path.join('win32', 'runDeid.bat');
+  } else {
+    ExecuteOs = path.join('linux', 'runDeid.sh');
+  }
+  var Script_Path = (isDev ? path.join(__dirname, 'scripts', 'deiden', ExecuteOs) : path.join(__dirname, 'scripts', 'deiden', ExecuteOs));
+  return Script_Path
+}
+
+function getDeidTestPath(){
+  let file = (isDev ? path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py') : path.join(__dirname,"..", "..", "..", 'Scripts', 'deiden', 'src', 'deidTest_pyd.py'));
+  return file;
+}
+
+function getOutputPath(){
+  const home = require('os').homedir();
+  let outPath = path.join(home,'Documents','Anonimized_Files')
+  if(!fs.existsSync(outPath)){
+    fs.mkdirSync(outPath);
+  }
+  return outPath;
+}

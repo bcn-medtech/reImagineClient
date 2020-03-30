@@ -169,3 +169,33 @@ module.exports.installRequest = doInstallRequest;
 module.exports.installCheck = doInstallCheck;
 module.exports.condaScript = doCondaScript;
 
+function createEnvExecute(PrepareConda){
+  var child = exec.execFile;
+  var Promise = require('bluebird');
+  function promiseProcess(prog) {
+    return new Promise(function (resolve, reject) {
+      prog.addListener('error', reject);
+      prog.addListener('exit', resolve);
+    })
+  }
+
+  var prepare_path = (isDev ? path.join('scripts', 'deiden', PrepareConda) : path.join('scripts', 'deiden', PrepareConda));
+  const prepare = child(__dirname + '/' + prepare_path, { env: 'bin/bash' });
+
+  promiseProcess(prepare).then(function (result) {
+    console.log('promise complete: ' + result);
+  }, function (err) {
+    console.log('promise rejected: ' + err);
+  });
+  prepare.stdout.on('data', (data) => {
+    console.log(`data ${data}`)
+  });
+
+  prepare.stderr.on('data', (data) => {
+    console.log('errdata', data);
+  });
+
+  prepare.on('exit', (data) => {
+    console.log(`final data = ${data}`);
+  })
+}

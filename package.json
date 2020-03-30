@@ -1,7 +1,7 @@
 {
-  "author": "Zach Toben <zach.toben@gmail.com>",
-  "description": "A boilerplate electron and create-react-app setup",
-  "name": "PACS-Uploader",
+  "author": "Mario Ceresa <mario.ceresa@upf.edu>",
+  "description": "Client for the reimagine analysis platform",
+  "name": "ReImagineClient",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

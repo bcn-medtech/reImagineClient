@@ -150,11 +150,23 @@ export class DragAndDropPage extends Component {
             alert('Drag files.');
         }
         else {
-            console.log("PreUpload:",this.state.pacs)
+            console.log("PACS PreUpload:",this.state.pacs)
             ipcRenderer.send('CondaUpload', this.state.output, this.state.pacs);
             //localStorage.removeItem('files');
         }
     }
+
+    sendMinio() {
+        if (this.state.files === false) {
+            alert('Drag files.');
+        }
+        else {
+            console.log("S3 PreUpload:",this.state.pacs)
+            ipcRenderer.send('MinioUpload', this.state.output, this.state.pacs);
+            //localStorage.removeItem('files');
+        }
+    }
+
     pacsValue(value) {
             console.log("On drag",value);
             //console.log(this.state.pacs);
@@ -190,6 +202,7 @@ export class DragAndDropPage extends Component {
                             <Typography style={{fontWeight:"bold"}}>Step 2</Typography>
                             <Horizontal pacsValue={this.pacsValue.bind(this)} />
                             <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.sendOrthanc()}>Send Orthanc</Button>
+                            <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.sendMinio()}>Send to S3 bucket</Button>
                             
                             <Grid style={{marginTop: '30px' }} item xs={12} md={6}>
                                 <Typography style={{ textAlign: "left"}}>

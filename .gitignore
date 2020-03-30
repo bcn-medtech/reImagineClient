@@ -1,6 +1,8 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
 minio.json
+patients.sqlite
+*dcm
 
 # dependencies
 /node_modules

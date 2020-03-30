@@ -1,9 +1,7 @@
 
-# electron-create-react-app-boilerplate
+# ReImagine client
 
-A simple electron app boilerplate powered by create-react-app.
-
-![screenshot_1](https://imgur.com/aJAGmfE.jpg)
+A simple electron app to anonimize and upload medical data
 
 ## Requirements
  * Node >= 8.2.0
@@ -11,14 +9,9 @@ A simple electron app boilerplate powered by create-react-app.
 ## Installing
 Clone the repo:
 
-```bash
-git clone --depth=1 https://github.com/ztoben/electron-create-react-app-boilerplate.git your-project-name
-```
-
 Then install dependencies and run the project
 
 ```bash
-$ cd your-project-name
 $ npm i
 $ npm start
 ```
@@ -30,7 +23,8 @@ $ npm start
 
 Your app will packaged as an .exe in the dist folder using the [electron-builder](https://github.com/electron-userland/electron-builder) package. Edit the build section of the package.json to build on additional platforms.
 
-## Resources
-* [Create React App](https://github.com/facebookincubator/create-react-app)
-* [Electron](https://electronjs.org/docs/tutorial/quick-start)
-* [electron-builder](https://github.com/electron-userland/electron-builder)
+
+
+# Funcionalidad api
+Esta implementada con express y has 2 endpoints declarados en el archivo things.js dentro de src. Funciona en desarrollo ya que se ejecuta el localhost pero en produccion no.
+

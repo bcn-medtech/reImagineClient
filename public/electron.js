@@ -23,6 +23,12 @@ let lsConda = require("./lsConda");
 const log = require("electron-log");
 Object.assign(console, log.functions);
 
+var appStatus = {
+  thirdparty_installed: false,
+  logged_in: false,  
+  creds: false,       
+}
+
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
@@ -31,7 +37,20 @@ function createWindow() {
             nodeIntegration: true,
         }
     });
-    mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+    var urlLoc = url.format({
+        pathname: path.join(__dirname, '../build/index.html'),
+        protocol: 'file:',
+        slashes: true
+      })
+    
+    if (isDev) {
+      urlLoc = 'http://localhost:3000';
+      mainWindow.webContents.openDevTools();      
+    }
+    
+
+    console.log("Loading version from:"+urlLoc);
+    mainWindow.loadURL(urlLoc);
     // mainWindow.webContents.openDevTools();
     mainWindow.on('closed', function () {
         mainWindow = null
@@ -123,5 +142,7 @@ ipcMain.on('MinioUpload', (event, arg, arg1) => { lsMinio.minioUpload(event, arg
 ipcMain.on('CondaUpload', (event, arg, arg1) => { lsPacs.pacsUpload(event, arg, arg1); });
 ipcMain.on('Pacs_Request', (event, arg) => { lsPacs.pacsRequest(event, arg); });
 
-
+ipcMain.on('checkStatus', (event) => {
+  event.returnValue = appStatus
+})
 

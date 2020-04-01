@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 
 import AppBar from '../Components/AppBar';
 import {CssBaseline, Grid, Paper, Typography, Input, Button} from '@material-ui/core';
+import {List, ListItem, ListItemText, ListItemSecondaryAction} from '@material-ui/core';
+
+import DeleteIcon from '@material-ui/icons/Delete';
+import IconButton from '@material-ui/core/IconButton';
 
 const { ipcRenderer } = window.require("electron");
 
@@ -13,17 +17,42 @@ export class HomePage extends Component {
             appStatusDescr: [],
             files: []
         };
+        this._userSelectedDirListener = this._userSelectedDirListener.bind(this)
+        this._changeStatusListener = this._changeStatusListener.bind(this)        
+        this._changeFilesListener = this._changeFilesListener.bind(this)
     }
     
     componentDidMount() {
         console.log("Home page mounted");
+        ipcRenderer.on('onDirSelection', this._userSelectedDirListener)
+        ipcRenderer.on('onStatusUpdate', this._changeStatusListener)        
+        ipcRenderer.on('onFilesChanged', this._changeFilesListener)                
+        
         //Update status
-        this.checkStatus()
+        ipcRenderer.send('checkStatus')
+        ipcRenderer.send('getFiles')        
+    }
+
+    componentWillUnmount() {
+        ipcRenderer.removeListener('onDirSelection', this._userSelectedDirListener)
+        ipcRenderer.removeListener('onStatusUpdate', this._changeStatusListener)
+        ipcRenderer.removeListener('onFilesChanged', this._changeFilesListener)        
 
     }
 
-    checkStatus() {
-        this.setState({appStatus: ipcRenderer.sendSync('checkStatus')})
+    _changeFilesListener(event, arg) {
+        this.setState({files: arg})
+    }
+
+
+    _userSelectedDirListener(event, arg) {
+        this.setState({files: this.state.files.concat([arg])})
+    }
+
+    _changeStatusListener(event, arg) {
+        
+        this.setState({appStatus: arg})
+
         var data = []
         var clean = true
 
@@ -40,10 +69,12 @@ export class HomePage extends Component {
             data.push("Please install 3rd party applications!");
         }
         this.setState({appStatusDescr: data})
+        
     }
 
     isStatusOk() {
-        return this.state.thirdparty_installed && this.state.logged_in && this.state.creds
+        //return this.state.appStatus.thirdparty_installed && this.state.appStatus.logged_in && this.state.appStatus.creds
+        return true
     }
 
     renderStatus() {
@@ -71,9 +102,10 @@ export class HomePage extends Component {
         if (this.isStatusOk()) {
             filer = (
                 <Grid>
-                    <Typography style={{fontWeight:"bold"}}>Add files for processing</Typography>
-                    <Typography>Choose a directory to load</Typography>
-                    <Input webkitdirectory="true" type="file"/>
+                    <Typography>Choose a directory to load from...</Typography>
+                    <Button variant="contained" color="secondary" className="buttonSecondary" onClick={
+                            () => ipcRenderer.send("select-dirs")
+                            }>Add directory</Button>
                 </Grid>
             );
         }
@@ -82,26 +114,35 @@ export class HomePage extends Component {
         
     }
 
-    renderSelectedFiled() {
-        return null;
-        /*
+    deleteItemFromFiles(idx){
+        let list = this.state.files;
+        list.splice(idx, 1);
+        this.setState({files: list})
+    }
+
+    renderSelectedFiles() {
+
         return (
-            <Grid fullWidth="true" style={{borderTop:"2px"}}>
-            <Typography style={{fontWeight:"bold"}}>Step 2</Typography>
-            <Horizontal pacsValue={this.pacsValue.bind(this)} />
-            <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.sendOrthanc()}>Send Orthanc</Button>
-            <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.sendMinio()}>Send to S3 bucket</Button>
-        
-            <Grid style={{marginTop: '30px' }} item xs={12} md={6}>
-                <Typography style={{ textAlign: "left"}}>
-                    Selected Files
-                </Typography>
-                <div>
-                    {this.mapper(this.state.files)}
-                </div>
-            </Grid>
-            </Grid>                
-        );*/
+            <List dense={true}>
+            {
+                this.state.files.map((value, idx) => {
+                    return (
+                        <ListItem key={idx}>
+                            <ListItemText
+                                primary={<Typography>{idx+1}:&nbsp;{value}</Typography>}
+                                style={{wordBreak: 'break-all'}}
+                            />
+                            <ListItemSecondaryAction>
+                                <IconButton edge="end" aria-label="delete" onClick={() => this.deleteItemFromFiles(idx)}>
+                                <DeleteIcon />
+                                </IconButton>
+                            </ListItemSecondaryAction>
+                        </ListItem>
+                    )
+                })
+            }
+        </List>
+        );
     }
 
     render() {
@@ -119,8 +160,15 @@ export class HomePage extends Component {
                     {this.renderFiler()}
                 </Grid>
                 <Grid container id="file_list">
-                    {this.renderSelectedFiled()}
-                </Grid>                
+                    <Typography style={{fontWeight:"bold"}}>Selected files</Typography>                            
+                    {this.renderSelectedFiles()}
+                </Grid>
+                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => {
+                                    ipcRenderer.send("onFilesUpdate", this.state.files)
+                                    this.props.history.push('/Uploader')
+                                    }
+                    }>
+                    NEXT>></Button>                                
                     
                                         
             </CssBaseline>                    

@@ -13,12 +13,14 @@ const path = require('path');
 const url = require('url');
 const fs = require('fs');
 const exec = require('child_process');
-const { ipcMain } = require('electron');
+const { ipcMain, dialog } = require('electron');
 let mainWindow;
 
 let lsPacs = require("./lsPacs");
 let lsMinio = require("./lsMinio");
 let lsConda = require("./lsConda");
+
+
 
 const log = require("electron-log");
 Object.assign(console, log.functions);
@@ -28,6 +30,8 @@ var appStatus = {
   logged_in: false,  
   creds: false,       
 }
+
+var filesToProcess = []
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -143,6 +147,24 @@ ipcMain.on('CondaUpload', (event, arg, arg1) => { lsPacs.pacsUpload(event, arg, 
 ipcMain.on('Pacs_Request', (event, arg) => { lsPacs.pacsRequest(event, arg); });
 
 ipcMain.on('checkStatus', (event) => {
-  event.returnValue = appStatus
+  // Run internal checks or wait for other to fire the event?
+  event.reply("onStatusUpdate", appStatus)
 })
+
+ipcMain.on('onFilesUpdate', (event, args) => {
+  filesToProcess = args
+  event.reply("onFilesChanged", filesToProcess)
+})
+
+ipcMain.on('getFiles', (event) => {
+  event.reply("onFilesChanged", filesToProcess)
+})
+
+ipcMain.on('select-dirs', async (event, args) => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory']
+  })
+  event.reply("onDirSelection",result.filePaths)
+})
+
 

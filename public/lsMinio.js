@@ -40,13 +40,14 @@ function nex(fname) {
 }
 
 // uploading of images deidentificated for deid script
-function doMinioUpload(event, baseName, tmpDir) {
+function doMinioUpload(baseName, tmpDir) {
 
   if (!tmpDir) tmpDir = tmp.dirSync();
   console.log('Temporary dir: '+tmpDir.name);  
   if (nex(tmpDir.name)) return false;
 
   console.log('Selected for upload: '+baseName);
+  console.log(typeof baseName);
   if (nex(baseName)) return false;
 
   var cwd = path.dirname(baseName);

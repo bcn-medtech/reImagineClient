@@ -1,64 +1,187 @@
 import React, { Component } from 'react';
 
-//import AppBar_Component from './../../Components/AppBar_Component/AppBar_Component';
-import Horizontal from '../Components/horizBar';
 import AppBar from '../Components/AppBar';
-import {CssBaseline, Container, Grid, ListItem, Typography, Paper, Button, Input } from '@material-ui/core';
-import {List, ListItemText, Avatar, ListItemAvatar, ListItemSecondaryAction} from '@material-ui/core';
+import {CssBaseline, Container, Typography, Button} from '@material-ui/core';
+import {Card, CardActions, CardContent} from '@material-ui/core';
 
-import FolderIcon from '@material-ui/icons/Folder';
-import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
-
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
+import PublishIcon from '@material-ui/icons/Publish';
 
 const { ipcRenderer } = window.require("electron");
 
+const styles = {
+    fxb: {
+      display: "flex",
+      flex_direction: "row",
+    },
+    root: {
+      minWidth: 275,
+    },
+    bullet: {
+      display: 'inline-block',
+      margin: '0 2px',
+      transform: 'scale(0.8)',
+    },
+    title: {
+      fontSize: 14,
+    },
+    pos: {
+      marginBottom: 12,
+    },
+  }; 
 
 export class UploaderPage extends Component {
     constructor() {
         super();
         this.state = {
             files: [],
-            serverType: "minio"
+            lastUploadInfo: {
+                method: "",
+                status: ""
+            }
         };
-        this._changeFilesListener = this._changeFilesListener.bind(this)        
     }
 
     componentWillUnmount() {
-        ipcRenderer.removeListener('onFilesChanged', this._changeFilesListener)  
+        ipcRenderer.removeAllListeners()
     }
 
     componentDidMount() {
-        ipcRenderer.on('onFilesChanged', this._changeFilesListener)                
-        ipcRenderer.send('getFiles')                
-    }
+        //Register handler to receive files from main process
+        ipcRenderer.on('onFilesChanged', (event, result) => {
+            this.setState({files: result})
+        })
+        
+        //Ask main process to send files
+        ipcRenderer.send('getFiles')
 
-    _changeFilesListener(event, arg) {
-        console.log("Files changed!"+arg)
+        //Store last upload results
+        ipcRenderer.on("uploadResult", (event, result) => {
+            var upStatus = this.state.lastUploadInfo
+            upStatus.status = result
+            this.setState({lastUploadInfo: upStatus})
+        })
     }
-
 
     onServerTypeChanged(event) {
         this.setState({serverType: event.target.value})
+    }
+
+    selectServer(name) {
+
+        if (!this.state.files) return;
+        
+        var upInfo = this.state.lastUploadInfo
+        upInfo.method = name
+        upInfo.status = "Pending"
+        this.setState({lastUploadInfo: upInfo})
+        ipcRenderer.send('MinioUpload', this.state.files, null);
+        
+    }
+
+    renderServers() {
+        var servers = [{name: "pacs-upf", endpoints: "orthanc"}, {name: "S3-upf", endpoints: "minio"}, {name: "S3-aws", endpoints: "aws"}]
+        return (
+            <div style={styles.fxb}>
+            { 
+                servers.map((server, idx) => {
+                return (
+                <div key={idx}>
+                <Card style={styles.root}>
+                    <CardContent>
+                        <Typography style={styles.title} color="textSecondary" gutterBottom>
+                            {server.name}
+                        </Typography>
+                        <Typography style={styles.pos} color="textSecondary">
+                            {server.endpoints}
+                        </Typography>
+                    </CardContent>
+                    <CardActions>
+                        <IconButton onClick={() => this.selectServer(server.name)}><PublishIcon/></IconButton>
+                    </CardActions>                        
+                </Card>
+                </div>
+                )
+            })
+            }
+            </div>                     
+        )
+    }
+
+    renderStatus() {
+        if (!this.state.lastUploadInfo.method) {
+            return <Typography>No upload pending</Typography>
+        }
+
+        if ((this.state.lastUploadInfo.method) && (this.state.lastUploadInfo.status === "Pending")) {
+            return <Typography>Uploading...</Typography>
+        }
+            
+        return <Typography>Upload on {this.state.lastUploadInfo.method} is: {this.state.lastUploadInfo.status}</Typography>
+        
+    }
+
+    renderFiles() {
+        if (!this.state.files) {
+            return null
+        }
+
+        return (
+            <div>
+                <Typography>Files to upload:</Typography>
+                {
+                this.state.files.map((value, idx) => {
+                    return <Typography key={idx}>{value}</Typography>
+                })
+                }        
+            </div>                    
+        )
+                
+    }    
+
+    saveAndTransition(newRoute) {
+        this.props.history.push(newRoute)
+    }
+
+    renderNavigationButtons() {
+        let nav = {
+            next: null,
+            prev: "/Anonimizer"
+        }
+        let prevB = null
+        let nextB = null
+        if (nav.next) {
+            nextB = (
+                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.saveAndTransition(nav.next) }>
+                NEXT
+                </Button>
+            )
+        }
+        if (nav.prev) {
+            prevB = (
+                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.saveAndTransition(nav.prev) }>
+                PREV
+                </Button>
+            )
+        }        
+        return (
+            <div style={styles.fxb}>
+            <div>{prevB}</div>
+            <div>{nextB}</div>
+            </div>                            
+        )
     }
 
     render() {
         return (
             <CssBaseline>
                 <AppBar page="Uploader" history={this.props.history} />
-                <FormControl component="fieldset">
-                    <FormLabel component="legend"> Select server type for upload </FormLabel>
-                    <RadioGroup value={this.state.serverType} onChange={(event) => this.onServerTypeChanged(event)}>
-                        <FormControlLabel value="pacs" control={<Radio/>} label="PACS" />
-                        <FormControlLabel value="minio" control={<Radio/>} label="MINIO" />
-                    </RadioGroup>
-                </FormControl>   
-                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.props.history.push('/')}>  HOME </Button>                                                      
+                <Container>
+                    {this.renderFiles()}
+                    {this.renderServers()}
+                </Container>
+                {this.renderStatus()}
+                {this.renderNavigationButtons()}
             </CssBaseline >
         )
     }

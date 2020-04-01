@@ -140,7 +140,25 @@ ipcMain.on('console-log', (event, arg) => {
 })
 
 // uploading of images deidentificated for deid script
-ipcMain.on('MinioUpload', (event, arg, arg1) => { lsMinio.minioUpload(event, arg, arg1)});
+ipcMain.on('MinioUpload', (event, files, tmpDir) => { 
+
+  new Promise(resolve => {
+    let res = false
+    for (let file of files) {
+      fname = file[0]
+      res = lsMinio.minioUpload(fname, tmpDir)    
+    }
+    resolve("success")
+  })
+  .then((value) => {
+    event.reply("uploadResult",value);
+  })
+  .catch(e => {
+    event.reply("uploadResult",e);
+  })
+  
+
+});
 
 // uploading of images deidentificated for deid script
 ipcMain.on('CondaUpload', (event, arg, arg1) => { lsPacs.pacsUpload(event, arg, arg1); });

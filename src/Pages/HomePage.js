@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
 
 import AppBar from '../Components/AppBar';
-import {CssBaseline, Grid, Paper, Typography, Input, Button} from '@material-ui/core';
+import {CssBaseline, Grid, Paper, Typography, Container, Button} from '@material-ui/core';
 import {List, ListItem, ListItemText, ListItemSecondaryAction} from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 
 const { ipcRenderer } = window.require("electron");
+
+const styles = {
+    fxb: {
+      display: "flex",
+      flex_direction: "row",
+    }
+}
 
 export class HomePage extends Component {
     constructor() {
@@ -17,16 +24,12 @@ export class HomePage extends Component {
             appStatusDescr: [],
             files: []
         };
-        this._userSelectedDirListener = this._userSelectedDirListener.bind(this)
-        this._changeStatusListener = this._changeStatusListener.bind(this)        
-        this._changeFilesListener = this._changeFilesListener.bind(this)
     }
     
     componentDidMount() {
-        console.log("Home page mounted");
-        ipcRenderer.on('onDirSelection', this._userSelectedDirListener)
-        ipcRenderer.on('onStatusUpdate', this._changeStatusListener)        
-        ipcRenderer.on('onFilesChanged', this._changeFilesListener)                
+        ipcRenderer.on('onDirSelection', (event, arg) => this.setState({files: this.state.files.concat([arg])}))
+        ipcRenderer.on('onStatusUpdate', (event, arg) => this._changeStatusListener(arg))
+        ipcRenderer.on('onFilesChanged', (event, arg) => this.setState({files: arg}))
         
         //Update status
         ipcRenderer.send('checkStatus')
@@ -34,38 +37,22 @@ export class HomePage extends Component {
     }
 
     componentWillUnmount() {
-        ipcRenderer.removeListener('onDirSelection', this._userSelectedDirListener)
-        ipcRenderer.removeListener('onStatusUpdate', this._changeStatusListener)
-        ipcRenderer.removeListener('onFilesChanged', this._changeFilesListener)        
-
+        ipcRenderer.removeAllListeners()
     }
 
-    _changeFilesListener(event, arg) {
-        this.setState({files: arg})
-    }
-
-
-    _userSelectedDirListener(event, arg) {
-        this.setState({files: this.state.files.concat([arg])})
-    }
-
-    _changeStatusListener(event, arg) {
+    _changeStatusListener(arg) {
         
         this.setState({appStatus: arg})
 
         var data = []
-        var clean = true
 
         if (!this.state.appStatus.creds) {
-            clean = false; 
             data.push("No credentials to upload files!");
         }
         if (!this.state.appStatus.logged_in) {
-            clean = false;
             data.push("Use has not logon on the platform!");
         }
         if (!this.state.appStatus.thirdparty_installed) {
-            clean = false; 
             data.push("Please install 3rd party applications!");
         }
         this.setState({appStatusDescr: data})
@@ -145,32 +132,61 @@ export class HomePage extends Component {
         );
     }
 
+    saveAndTransition(newRoute) {
+        ipcRenderer.send("onFilesUpdate", this.state.files)
+        this.props.history.push(newRoute)
+    }
+
+    renderNavigationButtons() {
+        let nav = {
+            next: "/Anonimizer",
+            prev: null
+        }
+        let prevB = null
+        let nextB = null
+        if (nav.next) {
+            nextB = (
+                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.saveAndTransition(nav.next) }>
+                NEXT
+                </Button>
+            )
+        }
+        if (nav.prev) {
+            prevB = (
+                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.saveAndTransition(nav.prev) }>
+                PREV
+                </Button>
+            )
+        }        
+        return (
+            <div style={styles.fxb}>
+            <div>{prevB}</div>
+            <div>{nextB}</div>
+            </div>                            
+        )
+    }
+
     render() {
         return (
             <CssBaseline>
                 <AppBar page="Data selection" history={this.props.history} />
-                <h1>Welcome to ReImagine client!</h1> 
-                <Grid container id="status_board">                
-                    <Grid item key={0} xs={12} sm={3}>
-                        <Typography style={{fontWeight:"bold", color: "black"}}> STATUS: </Typography> 
-                    </Grid> 
-                        {this.renderStatus()}
-                </Grid>                
-                <Grid container id="select_files">
-                    {this.renderFiler()}
-                </Grid>
-                <Grid container id="file_list">
-                    <Typography style={{fontWeight:"bold"}}>Selected files</Typography>                            
-                    {this.renderSelectedFiles()}
-                </Grid>
-                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => {
-                                    ipcRenderer.send("onFilesUpdate", this.state.files)
-                                    this.props.history.push('/Uploader')
-                                    }
-                    }>
-                    NEXT>></Button>                                
-                    
-                                        
+                <Container>
+                    <Grid container id="status_board">                
+                        <Grid item key={0} xs={12} sm={3}>
+                            <Typography style={{fontWeight:"bold", color: "black"}}> STATUS: </Typography> 
+                        </Grid> 
+                            {this.renderStatus()}
+                    </Grid>                
+                    <Grid container id="select_files">
+                        {this.renderFiler()}
+                    </Grid>
+                    <Grid container id="file_list">
+                        <Typography style={{fontWeight:"bold"}}>Selected files</Typography>                            
+                        {this.renderSelectedFiles()}
+                    </Grid>
+                    {this.renderNavigationButtons()}
+               
+                </Container>                                        
             </CssBaseline>                    
         )
        

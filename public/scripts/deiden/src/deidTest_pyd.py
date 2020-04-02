@@ -50,8 +50,9 @@ def _prepare(args, sid):
   try:
     # Create target Directory
     os.makedirs(outdir)
-    os.makedirs(hdirpre)        
-    os.makedirs(hdirpost)
+    if (args.save_headers):    
+      os.makedirs(hdirpre)        
+      os.makedirs(hdirpost)
   except FileExistsError:
     pass        
     
@@ -86,8 +87,9 @@ def main(args):
     ids = get_identifiers(dicom_files)      
 
     sid = ids[list(ids.keys())[0]]["SeriesInstanceUID"]
-    outdir, hdirpre, hdirpost = _prepare(args, sid)    
-    _saveHeaders(dicom_files, hdirpre)
+    outdir, hdirpre, hdirpost = _prepare(args, sid)
+    if (args.save_headers):
+      _saveHeaders(dicom_files, hdirpre)
     
     updated_ids = dict()
     for image, fields in ids.items():  
@@ -101,7 +103,10 @@ def main(args):
                                 ids=updated_ids,
                                 output_folder=outdir,
                                 remove_private=True)           
-    _saveHeaders(cleaned_files, hdirpost)
+    
+    if (args.save_headers):    
+      _saveHeaders(cleaned_files, hdirpost)
+
   print(list(patients.getAllPatients()))
 
 
@@ -112,7 +117,9 @@ if __name__ == '__main__':
   parser.add_argument('--outdir', type=str, default="outdir",
                     help='Output data')
   parser.add_argument('--recipe', type=str, default="public/scripts/deiden/src/deid_light.dicom",
-                    help='Location of deid recipe file')                    
+                    help='Location of deid recipe file')
+  parser.add_argument('--save-headers', action="store_true",
+                    help='Save headers pre y post anonimization for debug purpose')
 
   args = parser.parse_args()
   main(args)

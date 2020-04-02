@@ -31,10 +31,11 @@ const styles = {
   }; 
 
 export class UploaderPage extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
+
         this.state = {
-            files: [],
+            anonResultDir: null,
             lastUploadInfo: {
                 method: "",
                 status: ""
@@ -48,13 +49,9 @@ export class UploaderPage extends Component {
 
     componentDidMount() {
         //Register handler to receive files from main process
-        ipcRenderer.on('onFilesChanged', (event, result) => {
-            this.setState({files: result})
-        })
-        
-        //Ask main process to send files
-        ipcRenderer.send('getFiles')
 
+        this.setState({anonResultDir: this.props.location.state.anonResultDir})
+        
         //Store last upload results
         ipcRenderer.on("uploadResult", (event, result) => {
             var upStatus = this.state.lastUploadInfo
@@ -69,13 +66,13 @@ export class UploaderPage extends Component {
 
     selectServer(name) {
 
-        if (!this.state.files) return;
+        if (!this.state.anonResultDir) return;
         
         var upInfo = this.state.lastUploadInfo
         upInfo.method = name
         upInfo.status = "Pending"
         this.setState({lastUploadInfo: upInfo})
-        ipcRenderer.send('MinioUpload', this.state.files, null);
+        ipcRenderer.send('MinioUpload', this.state.anonResultDir, null);
         
     }
 
@@ -121,24 +118,6 @@ export class UploaderPage extends Component {
         
     }
 
-    renderFiles() {
-        if (!this.state.files) {
-            return null
-        }
-
-        return (
-            <div>
-                <Typography>Files to upload:</Typography>
-                {
-                this.state.files.map((value, idx) => {
-                    return <Typography key={idx}>{value}</Typography>
-                })
-                }        
-            </div>                    
-        )
-                
-    }    
-
     saveAndTransition(newRoute) {
         this.props.history.push(newRoute)
     }
@@ -177,8 +156,8 @@ export class UploaderPage extends Component {
             <CssBaseline>
                 <AppBar page="Uploader" history={this.props.history} />
                 <Container>
-                    {this.renderFiles()}
                     {this.renderServers()}
+                    <Typography>Files to upload are in: {this.state.anonResultDir}</Typography>
                 </Container>
                 {this.renderStatus()}
                 {this.renderNavigationButtons()}

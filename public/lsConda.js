@@ -1,3 +1,11 @@
+const path = require('path'); 
+const fs = require('fs');
+const os = require("os");
+const exec = require('child_process'); 
+const uuid = require("uuid")
+//const shell = require("shelljs") 
+let config = require("./config");
+const CONSTANTS = config.CONSTANTS;
 
 function doInstallRequest(event, arg) {
   console.log('install request action');
@@ -14,7 +22,7 @@ function doInstallRequest(event, arg) {
   } else {
     console.log('OS Unix');
     var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
-    var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
+    var SearchUbi = path.join('scripts', ExecuteOs);
     //Check if program is installed
     exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
       if (err){
@@ -39,9 +47,12 @@ function doInstallRequest(event, arg) {
   }
 }
 
+/*
+  Instead of checking in the entire fs, just let the user configure the path
+*/
 function doInstallCheck(event, arg) {
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
-  var SearchUbi = (isDev ? path.join('scripts', ExecuteOs) : path.join('scripts', ExecuteOs));
+  var SearchUbi = path.join('scripts', ExecuteOs)
   if (process.platform == 'win32') {
     exec.execFile(__dirname + '/' + SearchUbi, [arg], (err, stdout, stderr) => {
       if (err){
@@ -68,44 +79,66 @@ function doInstallCheck(event, arg) {
     }
   }
 }
-
-
-function doCondaScript(event, arg1, arg2) {
-  //console.log(process.env.SHELL);
-  console.log("Arg2", arg2)
-  console.log("Arg1", arg1)
-  console.log('Conda_script');
+/*
+function _execShellCommand(cmd, argv) {
   
+  exec.execFile(cmd, argv)
+
+
+}
+*/
+function runCondaAnonimizer(files, outDir) {
+
+  if (!outDir) {
+    outDir = path.join(os.homedir(), "Documents/reimagine/an")
+  }
+
+  //Add a unique uuid for run
+  outDir = path.join(outDir, uuid.v4());
+
+  console.log("Starting anonimization process");  
+  console.log("Files", files)
+  console.log("outDir", outDir)
+
+  if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir, {recursive: true})
+  }
+    
   var Script_Path = getRunDeidPath()
   var PythonScript_Path = getDeidTestPath()
   let argv;
-  let files = arg1
+  
+  let res = false;
+  let resOut = "";
+
   for( elem in files ){
-    if(fs.existsSync(arg2)){
-      argv = [files[elem], arg2, PythonScript_Path];
-    }else{
-      argv = [files[elem], getOutputPath() , PythonScript_Path];
-    }
-    console.log(argv);
+    argv = [files[elem], outDir, PythonScript_Path];
+
+    console.log("About to run:",Script_Path, argv);
     
-    let ret = Script_Path;
+    //const deploySh = _execShellCommand(Script_Path, argv)
     const deploySh = exec.execFile(Script_Path, argv);
+
     deploySh.stdout.on('data', (data) => {
-      ret += "Data: " + data + "\n"
+      resOut += "Data: " + data + "\n"
       console.log(`Output: ${data}`);
     });
-
+  
     deploySh.stderr.on('data', (data) => {
-      ret += "Data: " + data + "\n"
+      resOut += "Data: " + data + "\n"
       console.log(`stderr: ${data}`)
     })
-
+  
     deploySh.on('exit', (data) => {
       console.log(`final data ${data}`);
-      ret += "Data: " + data + "\n"
-      event.returnValue = ret;
-    })
+      resOut += "Data: " + data + "\n"
+    })      
+
+
+    return [res, resOut, outDir]
+    
   }
+  
 }
 
 // Script to isntall program requested for, like miniconda
@@ -167,7 +200,7 @@ function installMiniconda(){
 
 module.exports.installRequest = doInstallRequest;
 module.exports.installCheck = doInstallCheck;
-module.exports.condaScript = doCondaScript;
+module.exports.runCondaAnonimizer = runCondaAnonimizer;
 
 function createEnvExecute(PrepareConda){
   var child = exec.execFile;
@@ -179,7 +212,7 @@ function createEnvExecute(PrepareConda){
     })
   }
 
-  var prepare_path = (isDev ? path.join('scripts', 'deiden', PrepareConda) : path.join('scripts', 'deiden', PrepareConda));
+  var prepare_path = path.join('scripts', 'deiden', PrepareConda);
   const prepare = child(__dirname + '/' + prepare_path, { env: 'bin/bash' });
 
   promiseProcess(prepare).then(function (result) {
@@ -198,4 +231,21 @@ function createEnvExecute(PrepareConda){
   prepare.on('exit', (data) => {
     console.log(`final data = ${data}`);
   })
+}
+
+function getRunDeidPath(){
+  var ExecuteOs;
+  if (process.platform === 'win32') {
+    ExecuteOs = path.join('win32', 'runDeid.bat');
+  } else {
+    ExecuteOs = path.join('linux', 'runDeid.sh');
+  }
+  var Script_Path = path.join(__dirname, 'scripts', 'deiden', ExecuteOs);
+  return Script_Path
+}
+
+function getDeidTestPath(){
+  //let file = (isDev ? path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py') : path.join(__dirname,"..", "..", "..", 'Scripts', 'deiden', 'src', 'deidTest_pyd.py'));
+  let file = path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py');  
+  return file;
 }

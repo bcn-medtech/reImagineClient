@@ -1,20 +1,12 @@
 import React, { Component } from 'react';
 
-import AppBar from '../Components/AppBar';
-import {CssBaseline, Grid, Typography, Container, Button} from '@material-ui/core';
+import {Grid, Typography, Container, Button} from '@material-ui/core';
 import {List, ListItem, ListItemText, ListItemSecondaryAction} from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 
 const { ipcRenderer } = window.require("electron");
-
-const styles = {
-    fxb: {
-      display: "flex",
-      flex_direction: "row",
-    }
-}
 
 const statusMessages = [
     ["No credentials to upload files!","Credentials are ok"],
@@ -25,24 +17,24 @@ const statusMessages = [
 const messageColors = [
     ["red","green"],["red","green"],["red","green"]]
 
-export class HomePage extends Component {
+export class Filer extends Component {
     constructor(props) {
         super(props);
         this.state = {
             appStatus: [],
-            statusCodes: [],
-            files: []
+            statusCodes: []
         };
     }
     
     componentDidMount() {
-        ipcRenderer.on('onDirSelection', (event, arg) => this.setState({files: this.state.files.concat([arg])}))
+        //ipcRenderer.on('onDirSelection', (event, arg) => this.setState({files: this.state.files.concat([arg])}))
+        ipcRenderer.on('onDirSelection', (event, arg) => this.props.onFilesChange(this.props.files.concat([arg])))
         ipcRenderer.on('onStatusUpdate', (event, arg) => this._changeStatusListener(arg))
         
         //Update status
         ipcRenderer.send('checkStatus')
         let testProcess = ["/home/gerardgarcia/Documents/toAnonimize/1.2.124.113532.159.237.137.76.20020826.93757.32838/1.3.12.2.1107.5.1.4.24550.2.0.810657717422047"]
-        this.setState({files: testProcess})
+        this.props.onFilesChange(testProcess)
 
     }
 
@@ -95,17 +87,19 @@ export class HomePage extends Component {
     }
 
     deleteItemFromFiles(idx){
-        let list = this.state.files;
+        let list = this.props.files;
         list.splice(idx, 1);
-        this.setState({files: list})
+        this.props.onFilesChange(list)
     }
 
     renderSelectedFiles() {
+        const files = this.props.files
+        if (!files) return null
 
         return (
             <List dense={true}>
             {
-                this.state.files.map((value, idx) => {
+                files.map((value, idx) => {
                     return (
                         <ListItem key={idx}>
                             <ListItemText
@@ -125,63 +119,26 @@ export class HomePage extends Component {
         );
     }
 
-    saveAndTransition(newRoute) {
-        //ipcRenderer.send("onFilesUpdate", this.state.files)
-        this.props.history.push(newRoute, {selectedFiles: this.state.files})
-    }
-
-    renderNavigationButtons() {
-        let nav = {
-            next: "/Anonimizer",
-            prev: null
-        }
-        let prevB = null
-        let nextB = null
-        if (nav.next) {
-            nextB = (
-                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.saveAndTransition(nav.next) }>
-                NEXT
-                </Button>
-            )
-        }
-        if (nav.prev) {
-            prevB = (
-                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.saveAndTransition(nav.prev) }>
-                PREV
-                </Button>
-            )
-        }        
-        return (
-            <div style={styles.fxb}>
-            <div>{prevB}</div>
-            <div>{nextB}</div>
-            </div>                            
-        )
-    }
-
     render() {
         return (
-            <CssBaseline>
-                <AppBar page="Data selection" history={this.props.history} />
-                <Container>
-                    <Grid container id="status_board">                
-                        <Grid item key={0} xs={12} sm={3}>
-                            <Typography style={{fontWeight:"bold", color: "black"}}> STATUS: </Typography> 
-                        </Grid> 
-                            {this.renderStatus()}
-                    </Grid>                
-                    <Grid container id="select_files">
-                        {this.renderFiler()}
-                    </Grid>
-                    <Grid container id="file_list">
-                        <Typography style={{fontWeight:"bold"}}>Selected files</Typography>                            
-                        {this.renderSelectedFiles()}
-                    </Grid>
-                    {this.renderNavigationButtons()}
-               
-                </Container>                                        
-            </CssBaseline>                    
-        )
+        <Container>
+            <Grid container id="status_board">                
+                <Grid item key={0} xs={12} sm={3}>
+                    <Typography style={{fontWeight:"bold", color: "black"}}> STATUS: </Typography> 
+                </Grid> 
+                    {this.renderStatus()}
+            </Grid>                
+            <Grid container id="select_files">
+                {this.renderFiler()}
+            </Grid>
+            <Grid container id="file_list">
+                <Typography style={{fontWeight:"bold"}}>Selected files</Typography>                            
+                {this.renderSelectedFiles()}
+            </Grid>
+        
+        </Container>                                        
+         )
        
-    }
+        }    
+
 }

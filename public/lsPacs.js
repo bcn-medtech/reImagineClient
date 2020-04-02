@@ -83,27 +83,3 @@ function getFilesFromDir(dir, fileTypes) {
   return filesToReturn; 
 }
 
-function getRunDeidPath(){
-  var ExecuteOs;
-  if (process.platform === 'win32') {
-    ExecuteOs = path.join('win32', 'runDeid.bat');
-  } else {
-    ExecuteOs = path.join('linux', 'runDeid.sh');
-  }
-  var Script_Path = (isDev ? path.join(__dirname, 'scripts', 'deiden', ExecuteOs) : path.join(__dirname, 'scripts', 'deiden', ExecuteOs));
-  return Script_Path
-}
-
-function getDeidTestPath(){
-  let file = (isDev ? path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py') : path.join(__dirname,"..", "..", "..", 'Scripts', 'deiden', 'src', 'deidTest_pyd.py'));
-  return file;
-}
-
-function getOutputPath(){
-  const home = require('os').homedir();
-  let outPath = path.join(home,'Documents','Anonimized_Files')
-  if(!fs.existsSync(outPath)){
-    fs.mkdirSync(outPath);
-  }
-  return outPath;
-}

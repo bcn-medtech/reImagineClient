@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-
 import AppBar from '../Components/AppBar';
-import {CssBaseline, Container, Button } from '@material-ui/core';
+import {CssBaseline, Container, Button, Typography } from '@material-ui/core';
+
+const { ipcRenderer } = window.require("electron");
 
 const styles = {
     fxb: {
@@ -11,18 +12,65 @@ const styles = {
 }
 
 export class AnonimizerPage extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             files: [],
-            pacs: '',
-            output: "",
+            anonResultDir: null
         };
     }
 
-    saveAndTransition(newRoute) {
-        this.props.history.push(newRoute)
+    componentWillUnmount() {
+        ipcRenderer.removeAllListeners()
     }
+
+    componentDidMount() {
+               
+        //console.log(callerState.selectedFiles)
+        //Register handler to receive files from main process
+        //ipcRenderer.on('onFilesChanged', (event, result) => {
+        //    this.setState({files: result})
+        //})
+        
+        //Ask main process to send files
+        //ipcRenderer.send('getFiles')
+
+        this.setState({files: this.props.location.state.selectedFiles})
+    }
+
+    saveAndTransition(newRoute) {
+        this.props.history.push(newRoute, {anonResultDir: this.state.anonResultDir})
+    }
+
+    doAnonimization() {
+        let program = "Conda"
+        let flag = ipcRenderer.sendSync('Install_Check', [program.toLowerCase()]);
+        if (!flag){
+            alert(`Must install, ${program} needed`);
+        }
+        let [res, resOut, anonDir] = ipcRenderer.sendSync('condaAnonimizeRequest', this.state.files, null);
+        console.log(resOut);
+        this.setState({anonResultDir :anonDir})
+    }
+
+
+    renderFiles() {
+        if (!this.state.files) {
+            return null
+        }
+
+        return (
+            <div>
+                <Typography>Files to anonimize:</Typography>
+                {
+                this.state.files.map((value, idx) => {
+                    return <Typography key={idx}>{value}</Typography>
+                })
+                }        
+            </div>                    
+        )
+                
+    }    
 
     renderNavigationButtons() {
         let nav = {
@@ -57,7 +105,12 @@ export class AnonimizerPage extends Component {
         return (
             <CssBaseline>
                 <AppBar page="Anonimization" history={this.props.history} />
-                <Container>This is the anonimizer</Container>
+                <Container>
+                    {this.renderFiles()}
+                    <Button variant="contained" color="secondary" className="buttonSecondary" onClick={() => this.doAnonimization() }>
+                        Perform anonimization
+                    </Button>                    
+                </Container>
                 {this.renderNavigationButtons()}                
             </CssBaseline>                
         )

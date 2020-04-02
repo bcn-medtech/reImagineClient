@@ -1,6 +1,5 @@
 
-let config = require("./config");
-const CONSTANTS = config.CONSTANTS;
+
 const electron = require('electron');
 const { Menu, Tray } = require('electron')
 
@@ -11,8 +10,7 @@ const isDev = require('electron-is-dev');
 
 const path = require('path');
 const url = require('url');
-const fs = require('fs');
-const exec = require('child_process');
+
 const { ipcMain, dialog } = require('electron');
 let mainWindow;
 
@@ -30,8 +28,6 @@ var appStatus = {
   logged_in: false,  
   creds: false,       
 }
-
-var filesToProcess = []
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -130,7 +126,10 @@ ipcMain.on('Install_Request', (event, arg) => { lsConda.installRequest(event, ar
 //Call with sendSync and returns bool
 ipcMain.on('Install_Check', (event, arg) => { lsConda.installCheck(event, arg)});
 // Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
-ipcMain.on('Conda_Script', (event, arg1, arg2) => {lsConda.condaScript(event, arg1, arg2)});
+ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => {
+  let [res, resOut, anonDir] = lsConda.runCondaAnonimizer(files, outDir)
+  event.returnValue = [res, resOut, anonDir]
+});
 
 
 //python src/deidTest_pyd.py $basedir --outdir $outdir
@@ -140,14 +139,13 @@ ipcMain.on('console-log', (event, arg) => {
 })
 
 // uploading of images deidentificated for deid script
-ipcMain.on('MinioUpload', (event, files, tmpDir) => { 
+ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => { 
 
   new Promise(resolve => {
     let res = false
-    for (let file of files) {
-      fname = file[0]
-      res = lsMinio.minioUpload(fname, tmpDir)    
-    }
+    
+    res = lsMinio.minioUpload(uploadDir, tmpDir)    
+    
     resolve("success")
   })
   .then((value) => {
@@ -167,15 +165,6 @@ ipcMain.on('Pacs_Request', (event, arg) => { lsPacs.pacsRequest(event, arg); });
 ipcMain.on('checkStatus', (event) => {
   // Run internal checks or wait for other to fire the event?
   event.reply("onStatusUpdate", appStatus)
-})
-
-ipcMain.on('onFilesUpdate', (event, args) => {
-  filesToProcess = args
-  event.reply("onFilesChanged", filesToProcess)
-})
-
-ipcMain.on('getFiles', (event) => {
-  event.reply("onFilesChanged", filesToProcess)
 })
 
 ipcMain.on('select-dirs', async (event, args) => {

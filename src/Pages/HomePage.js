@@ -17,8 +17,8 @@ const styles = {
 }
 
 export class HomePage extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             appStatus: [],
             appStatusDescr: [],
@@ -29,11 +29,11 @@ export class HomePage extends Component {
     componentDidMount() {
         ipcRenderer.on('onDirSelection', (event, arg) => this.setState({files: this.state.files.concat([arg])}))
         ipcRenderer.on('onStatusUpdate', (event, arg) => this._changeStatusListener(arg))
-        ipcRenderer.on('onFilesChanged', (event, arg) => this.setState({files: arg}))
         
         //Update status
         ipcRenderer.send('checkStatus')
-        ipcRenderer.send('getFiles')        
+        let testProcess = ["/home/gerardgarcia/Documents/toAnonimize/1.2.124.113532.159.237.137.76.20020826.93757.32838/1.3.12.2.1107.5.1.4.24550.2.0.810657717422047"]
+        this.setState({files: testProcess})
     }
 
     componentWillUnmount() {
@@ -133,8 +133,8 @@ export class HomePage extends Component {
     }
 
     saveAndTransition(newRoute) {
-        ipcRenderer.send("onFilesUpdate", this.state.files)
-        this.props.history.push(newRoute)
+        //ipcRenderer.send("onFilesUpdate", this.state.files)
+        this.props.history.push(newRoute, {selectedFiles: this.state.files})
     }
 
     renderNavigationButtons() {

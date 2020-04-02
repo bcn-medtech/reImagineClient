@@ -123,8 +123,8 @@ app.on('activate', function () {
 
 
 ipcMain.on('Install_Request', (event, arg) => { lsConda.installRequest(event, arg)});
-//Call with sendSync and returns bool
-ipcMain.on('Install_Check', (event, arg) => { lsConda.installCheck(event, arg)});
+//Call with sendSync and returns bool and description
+ipcMain.on('Install_Check', (event, arg) => { event.result = lsConda.installCheck()});
 // Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
 ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => {
   let [res, resOut, anonDir] = lsConda.runCondaAnonimizer(files, outDir)
@@ -164,6 +164,11 @@ ipcMain.on('Pacs_Request', (event, arg) => { lsPacs.pacsRequest(event, arg); });
 
 ipcMain.on('checkStatus', (event) => {
   // Run internal checks or wait for other to fire the event?
+  let errs = lsConda.installCheck();
+  appStatus.thirdparty_installed = (errs.length? false: true)
+
+  console.log("Errs"+errs)
+  console.log("Status"+appStatus.thirdparty_installed)
   event.reply("onStatusUpdate", appStatus)
 })
 

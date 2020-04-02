@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import AppBar from '../Components/AppBar';
-import {CssBaseline, Grid, Paper, Typography, Container, Button} from '@material-ui/core';
+import {CssBaseline, Grid, Typography, Container, Button} from '@material-ui/core';
 import {List, ListItem, ListItemText, ListItemSecondaryAction} from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -16,12 +16,21 @@ const styles = {
     }
 }
 
+const statusMessages = [
+    ["No credentials to upload files!","Credentials are ok"],
+    ["User is not logged in the ReImage platform!", "Logged into the ReImage platform"],
+    ["Please install 3rd party applications!", "All external programs correctly installed"]
+]
+
+const messageColors = [
+    ["red","green"],["red","green"],["red","green"]]
+
 export class HomePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
             appStatus: [],
-            appStatusDescr: [],
+            statusCodes: [],
             files: []
         };
     }
@@ -34,6 +43,7 @@ export class HomePage extends Component {
         ipcRenderer.send('checkStatus')
         let testProcess = ["/home/gerardgarcia/Documents/toAnonimize/1.2.124.113532.159.237.137.76.20020826.93757.32838/1.3.12.2.1107.5.1.4.24550.2.0.810657717422047"]
         this.setState({files: testProcess})
+
     }
 
     componentWillUnmount() {
@@ -46,56 +56,39 @@ export class HomePage extends Component {
 
         var data = []
 
-        if (!this.state.appStatus.creds) {
-            data.push("No credentials to upload files!");
-        }
-        if (!this.state.appStatus.logged_in) {
-            data.push("Use has not logon on the platform!");
-        }
-        if (!this.state.appStatus.thirdparty_installed) {
-            data.push("Please install 3rd party applications!");
-        }
-        this.setState({appStatusDescr: data})
+        data.push(this.state.appStatus.creds? 1: 0);
+        data.push(this.state.appStatus.logged_in? 1: 0);
+        data.push(this.state.appStatus.thirdparty_installed? 1: 0);
+        
+        this.setState({statusCodes: data})
         
     }
 
     isStatusOk() {
-        //return this.state.appStatus.thirdparty_installed && this.state.appStatus.logged_in && this.state.appStatus.creds
-        return true
+        return this.state.appStatus.thirdparty_installed && this.state.appStatus.logged_in && this.state.appStatus.creds
     }
 
     renderStatus() {
-        if ( this.isStatusOk() ) return (
-            <Grid item xs={12} sm={3}>
-                <Typography> All is okay </Typography>
-            </Grid>
-        );
-     
-        return this.state.appStatusDescr.map((value, index) => 
+        return this.state.statusCodes.map((value, index) => 
                     <Grid item key={index} xs={12} sm={3}>
-                        <Typography style={{fontWeight:"bold", color: "red"}}> {value} </Typography>
+                        <Typography style={{fontWeight:"bold", color: messageColors[index][value? 1: 0]}}> 
+                            {statusMessages[index][value? 1: 0]} 
+                        </Typography>
                     </Grid>
                 );
     
     }
 
     renderFiler() {
-        var filer=(
-            <Grid item>
-                <Typography>File selection is disabled while there are status errors!</Typography>
+      
+        var filer = (
+            <Grid>
+                <Typography>Choose a directory to load from...</Typography>
+                <Button variant="contained" color="secondary" className="buttonSecondary" onClick={
+                        () => ipcRenderer.send("select-dirs")
+                        }>Add directory</Button>
             </Grid>
         );
-
-        if (this.isStatusOk()) {
-            filer = (
-                <Grid>
-                    <Typography>Choose a directory to load from...</Typography>
-                    <Button variant="contained" color="secondary" className="buttonSecondary" onClick={
-                            () => ipcRenderer.send("select-dirs")
-                            }>Add directory</Button>
-                </Grid>
-            );
-        }
 
         return filer;
         

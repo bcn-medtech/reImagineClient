@@ -43,10 +43,11 @@ export class AnonimizerPage extends Component {
     }
 
     doAnonimization() {
-        let program = "Conda"
-        let flag = ipcRenderer.sendSync('Install_Check', [program.toLowerCase()]);
-        if (!flag){
-            alert(`Must install, ${program} needed`);
+        
+        let errs = ipcRenderer.sendSync('Install_Check', ["conda"]);
+        if (errs){
+            console.log(errs)
+            alert("Could not find thirdparty software conda. Plase reinstall it!");
         }
         let [res, resOut, anonDir] = ipcRenderer.sendSync('condaAnonimizeRequest', this.state.files, null);
         console.log(resOut);

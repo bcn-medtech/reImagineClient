@@ -3,7 +3,7 @@ const fs = require('fs');
 const os = require("os");
 const exec = require('child_process'); 
 const uuid = require("uuid")
-//const shell = require("shelljs") 
+const shell = require("shelljs") 
 let config = require("./config");
 const CONSTANTS = config.CONSTANTS;
 
@@ -50,7 +50,41 @@ function doInstallRequest(event, arg) {
 /*
   Instead of checking in the entire fs, just let the user configure the path
 */
-function doInstallCheck(event, arg) {
+function doInstallCheck() {
+  console.log("Install checks...")
+  let errs = []
+
+  /* Check if conda is installed
+   *  First in the path
+   *  Then in the user settings
+   *  Then in the common locations
+   */
+
+  let userCondaPath = ""
+  let condaCommonPaths = [
+    path.join(os.homedir(), "miniconda3", "bin", "activate"),
+    path.join(os.homedir(), "anaconda3", "bin", "activate"),
+  ]
+  condaCommonPaths.concat([userCondaPath])
+
+  let condaPath = shell.which('conda');
+  if (!condaPath) {
+    for (const _p of condaCommonPaths) {
+      if (fs.existsSync(_p)){
+        condaPath = _p
+        break
+      }
+    }
+  }
+
+  if (!condaPath) {
+    errs.push("Cannot find conda")
+  }
+
+  console.log("Install checks results:"+errs)
+  return errs
+
+  /*
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
   var SearchUbi = path.join('scripts', ExecuteOs)
   if (process.platform == 'win32') {
@@ -78,6 +112,7 @@ function doInstallCheck(event, arg) {
       event.returnValue = false;
     }
   }
+  */
 }
 /*
 function _execShellCommand(cmd, argv) {

@@ -33,6 +33,7 @@
     "electron-builder": "^20.0.8",
     "electron-log": "^4.1.1",
     "minio": "^7.0.15",
+    "shelljs": "^0.8.3",
     "tar": "^6.0.1",
     "wait-on": "^2.1.0"
   },

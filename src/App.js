@@ -2,12 +2,10 @@ import React, { Component } from 'react';
 import { Router, Route } from 'react-router-dom';
 import './App.css';
 import  { UploaderPage }  from './Pages/UploaderPage';
+import  { InstallersPage }  from './Pages/InstallersPage';
 import { createBrowserHistory } from "history";
-import { withRouter } from 'react-router';
 
 const history = createBrowserHistory();
-//const HomePageWithRouter = withRouter(HomePage);
-//const AnonimizerPageWithRouter = withRouter(AnonimizerPage);
 
 class App extends Component {
 
@@ -15,10 +13,6 @@ class App extends Component {
     /*
     return (
       <Router history={history}>
-        <Route exact path="/" component={HomePageWithRouter} />
-        <Route exact path="/Anonimizer" component={AnonimizerPageWithRouter} />
-        <Route exact path="/Uploader" component={UploaderPage} />
-        <Route exact path="/installers" component={InstallersPage} />
         <Route exact path="/LogIn" component={PlPageLogin} />
         <Route exact path="/Settings" component={SettingsPage} />
       </Router>
@@ -27,6 +21,7 @@ class App extends Component {
    return (
     <Router history={history}>
       <Route exact path="/" component={UploaderPage} />
+      <Route exact path="/Installers" component={InstallersPage} />
     </Router>
   );   
   }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import AppBar from '../Components/AppBar';
+import TopBar from '../Components/TopBar';
 import {CssBaseline} from '@material-ui/core';
 import  { Filer } from '../Components/Filer';
 import  { Anonimizer }  from '../Components/Anonimizer';
@@ -29,7 +29,7 @@ export class UploaderPage extends Component {
 
         return (
             <CssBaseline>
-                <AppBar page="Image anonimization and upload" history={this.props.history} />
+                <TopBar page="Image anonimization and upload" history={this.props.history} />
                 <Filer
                     files={selectedFiles}
                     onFilesChange={(newFiles) => this.setState({selectedFiles: newFiles})}

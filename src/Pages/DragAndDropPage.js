@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 //import AppBar_Component from './../../Components/AppBar_Component/AppBar_Component';
 import Horizontal from '../Components/horizBar';
-import AppBar from '../Components/AppBar';
+import AppBar from '../Components/TopBar';
 import {CssBaseline, Container, Grid, ListItem, Typography, Paper, Button, Input } from '@material-ui/core';
 import {List, ListItemText, Avatar, ListItemAvatar, ListItemSecondaryAction} from '@material-ui/core';
 

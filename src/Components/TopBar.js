@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function ButtonAppBar(props) {
+export default function TopBar(props) {
   const classes = useStyles();
 //  const [auth, setAuth] = React.useState(true);
   const [auth] = React.useState(true);
@@ -46,8 +46,6 @@ export default function ButtonAppBar(props) {
   };
 
   function Home(where) {
-
-    console.log(props.history);
     var browserHistory = props.history;
     browserHistory.push("/"+where);
   }
@@ -94,7 +92,7 @@ export default function ButtonAppBar(props) {
               </Menu>
             </div>
           )}
-          <IconButton edge="start" className={classes.installResources} color="inherit" onClick={() => Home('installers/')} aria-label="Install Resources">
+          <IconButton edge="start" className={classes.installResources} color="inherit" onClick={() => Home('Installers/')} aria-label="Install Resources">
             <GetAppIcon />
           </IconButton>
         </Toolbar>

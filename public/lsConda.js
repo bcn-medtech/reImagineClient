@@ -4,7 +4,7 @@ const os = require("os");
 const exec = require('child_process'); 
 const uuid = require("uuid")
 const shell = require("shelljs") 
-let config = require("./config");
+let config = require("../src/conf/config");
 const CONSTANTS = config.CONSTANTS;
 
 function doInstallRequest(event, arg) {
@@ -47,42 +47,51 @@ function doInstallRequest(event, arg) {
   }
 }
 
+function doInstallChecks(programs) {
+  var res = []
+  for (var p of programs) {
+    let hints = []
+    if (config.installHints.hasOwnProperty(p.name)) {
+      hints = config.installHints[p.name]
+    }
+    //hints.concat([userHints])
+    _e = doInstallCheck(p.name, hints)
+    res.push({"name":p.name, "err":_e})
+  }
+
+  return res;
+}
+
 /*
   Instead of checking in the entire fs, just let the user configure the path
 */
-function doInstallCheck() {
-  console.log("Install checks...")
+function doInstallCheck(program, hints) {
+
+  console.log("Checking install status of program ", program);  
+  console.log("Provided hints: ", hints);  
   let errs = []
 
-  /* Check if conda is installed
-   *  First in the path
-   *  Then in the user settings
-   *  Then in the common locations
-   */
+  if (!program) {
+    return ["Cannot check a null program name!"]
+  }
 
-  let userCondaPath = ""
-  let condaCommonPaths = [
-    path.join(os.homedir(), "miniconda3", "bin", "activate"),
-    path.join(os.homedir(), "anaconda3", "bin", "activate"),
-  ]
-  condaCommonPaths.concat([userCondaPath])
-
-  let condaPath = shell.which('conda');
-  if (!condaPath) {
-    for (const _p of condaCommonPaths) {
+  let pPath = shell.which(program);
+  if (!pPath) {
+    for (const _p of hints) {
       if (fs.existsSync(_p)){
-        condaPath = _p
+        pPath = _p
         break
       }
     }
   }
 
-  if (!condaPath) {
-    errs.push("Cannot find conda")
+  if (!pPath) {
+    errs.push("Cannot find "+program)
+    return errs
   }
 
-  console.log("Install checks results:"+errs)
-  return errs
+  console.log(program, "path: ", pPath)
+  return []
 
   /*
   var ExecuteOs = (process.platform === 'win32' ? ExecuteOs = 'searcher.bat' : 'searcher.sh');
@@ -234,7 +243,7 @@ function installMiniconda(){
 }
 
 module.exports.installRequest = doInstallRequest;
-module.exports.installCheck = doInstallCheck;
+module.exports.installChecks = doInstallChecks;
 module.exports.runCondaAnonimizer = runCondaAnonimizer;
 
 function createEnvExecute(PrepareConda){

@@ -2,18 +2,13 @@ import React, {Component} from 'react';
 import TopBar from '../Components/TopBar';
 import {Tabs, Tab} from '@material-ui/core';
 import {CssBaseline, Container, Typography, Box, Chip, Avatar } from '@material-ui/core';
+import config from "../conf/config"
 
 // import logos
-import MinicondaPng from '../assets/logo_anaconda.png';
+
 import GetAppIcon from '@material-ui/icons/GetApp';
 
 const { ipcRenderer } = window.require("electron");
-
-
-const required = [
-    {name: "conda", icon: MinicondaPng},
-    {name: "Skyrim", icon: null},
-]
 
 const styles = {
     fxb: {
@@ -50,24 +45,34 @@ export class InstallersPage extends Component {
     }
 
     componentDidMount() {
+        ipcRenderer.on("installedCheckRes", (event, program, status, errs) => this._onInstalledCheck(program, status, errs));
         this.checkInstallStatus();
     }
 
+    _onInstalledCheck(program, status, errs) {
+
+        if (status) {
+            this.setState({pInst: this.state.pInst.concat([program])})
+        } else {
+            this.setState({pNotInst: this.state.pNotInst.concat([program])})
+        }
+
+    }
+
     checkInstallStatus() {
-        let newInst = [required[0]]
-        let newNotInst = [required[1]]
-
-        this.setState({pInst: newInst, pNotInst: newNotInst})
-
+        for (var _p of config.requiredPrograms) {
+            ipcRenderer.send('checkInstalled', _p);
+        }
     }
 
     doInstallApp(app) {
         console.log("Received Install request! "+app)
 
-        let arg = ipcRenderer.sendSync('Install_Check', [program.toLowerCase()]);
+        /*
         if(arg === false) {
-            let arg2 = ipcRenderer.sendSync('Install_Request', [program.toLowerCase()]);
+            let arg2 = ipcRenderer.sendSync('Install_Request', [app.toLowerCase()]);
         }
+        */
 
     }
 

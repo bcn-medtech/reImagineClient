@@ -4,7 +4,7 @@ const fs = require("fs")
 var tmp = require("tmp")
 var path = require("path")
 const os = require("os")
-const config = require("./config")
+const config = require("../src/conf/config")
 const uuid = require("uuid")
 
 function getMinioClient() {

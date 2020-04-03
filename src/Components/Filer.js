@@ -29,7 +29,7 @@ export class Filer extends Component {
     componentDidMount() {
         //ipcRenderer.on('onDirSelection', (event, arg) => this.setState({files: this.state.files.concat([arg])}))
         ipcRenderer.on('onDirSelection', (event, arg) => this.props.onFilesChange(this.props.files.concat([arg])))
-        ipcRenderer.on('onStatusUpdate', (event, arg) => this._changeStatusListener(arg))
+        ipcRenderer.on('onStatusUpdate', (event, status, errs) => this._changeStatusListener(status, errs))
         
         //Update status
         ipcRenderer.send('checkStatus')
@@ -42,9 +42,9 @@ export class Filer extends Component {
         ipcRenderer.removeAllListeners()
     }
 
-    _changeStatusListener(arg) {
+    _changeStatusListener(status, errs) {
         
-        this.setState({appStatus: arg})
+        this.setState({appStatus: status})
 
         var data = []
 

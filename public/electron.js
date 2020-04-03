@@ -23,7 +23,10 @@ let lsConda = require("./lsConda");
 const log = require("electron-log");
 Object.assign(console, log.functions);
 
+const config = require("../src/conf/config");
+
 var appStatus = {
+  required: config.requiredPrograms,
   thirdparty_installed: false,
   logged_in: false,  
   creds: false,       
@@ -123,8 +126,7 @@ app.on('activate', function () {
 
 
 ipcMain.on('Install_Request', (event, arg) => { lsConda.installRequest(event, arg)});
-//Call with sendSync and returns bool and description
-ipcMain.on('Install_Check', (event, arg) => { event.result = lsConda.installCheck()});
+
 // Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
 ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => {
   let [res, resOut, anonDir] = lsConda.runCondaAnonimizer(files, outDir)
@@ -162,14 +164,30 @@ ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => {
 ipcMain.on('CondaUpload', (event, arg, arg1) => { lsPacs.pacsUpload(event, arg, arg1); });
 ipcMain.on('Pacs_Request', (event, arg) => { lsPacs.pacsRequest(event, arg); });
 
+function areProgramsInstalled(programs) {
+  console.log("areProgramsInstalled", programs)
+  let isOk = true
+  let res = lsConda.installChecks(programs);
+  for (let _r of res) {
+    if (_r.err.length) {
+      console.log("Error installing",_r.name, ": ", _r.err)
+      isOk = false
+    }
+  }
+  return [isOk, res]
+}
+
+ipcMain.on('checkInstalled', (event, program) => {
+  console.log("checkInstalled", program)
+  let [isOk, res] = areProgramsInstalled([program])
+  event.reply("installedCheckRes", program, isOk, res)
+})
+
 ipcMain.on('checkStatus', (event) => {
   // Run internal checks or wait for other to fire the event?
-  let errs = lsConda.installCheck();
-  appStatus.thirdparty_installed = (errs.length? false: true)
-
-  console.log("Errs"+errs)
-  console.log("Status"+appStatus.thirdparty_installed)
-  event.reply("onStatusUpdate", appStatus)
+  let [isOk, res] = areProgramsInstalled(appStatus.required)
+  appStatus.thirdparty_installed = (isOk? true: false)
+  event.reply("onStatusUpdate", appStatus, res)
 })
 
 ipcMain.on('select-dirs', async (event, args) => {

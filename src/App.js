@@ -9,6 +9,7 @@ const history = createBrowserHistory();
 
 class App extends Component {
 
+
   render() {
     /*
     return (
@@ -21,7 +22,7 @@ class App extends Component {
    return (
     <Router history={history}>
       <Route exact path="/" component={UploaderPage} />
-      <Route exact path="/Installers" component={InstallersPage} />
+      <Route exact path="/Installers" component={InstallersPage} requiredPrograms={this.props.config.requiredPrograms}/>
     </Router>
   );   
   }

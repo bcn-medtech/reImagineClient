@@ -39,6 +39,7 @@
   },
   "homepage": "./",
   "main": "public/electron.js",
+  "type": "module",
   "build": {
     "win": {
       "target": "NSIS"

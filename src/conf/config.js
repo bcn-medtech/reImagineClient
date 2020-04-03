@@ -4,13 +4,13 @@ const os = require("os")
 const CONSTANTS = {};
 
 CONSTANTS.INSTALLERS = {};
-CONSTANTS.INSTALLERS.WIN = 'installers\\Miniconda2-latest-Windows-x86_64.exe';
-CONSTANTS.INSTALLERS.LIN = 'installers/Miniconda3-latest-Linux--x86_64.sh';
-CONSTANTS.INSTALLERS.MAC = 'installers/Miniconda3-latest-MacOSX-x86_64.sh';
-CONSTANTS.INSTALLERS.DEV_WIN = 'resources\\win32\\Miniconda2-latest-Windows-x86_64.exe';
-CONSTANTS.INSTALLERS.DEV_LIN = 'public/resources/linux/Miniconda3-latest-Linux-x86_64.sh';
-CONSTANTS.INSTALLERS.DEV_MAC = 'public/resources/mac/Miniconda3-latest-MacOSX-x86_64.sh';
-CONSTANTS.INSTALLERS.CONDAPATH = "$HOME/miniconda3";
+CONSTANTS.INSTALLERS.WIN = path.join("installers",'Miniconda2-latest-Windows-x86_64.exe')
+CONSTANTS.INSTALLERS.LIN = path.join("installers",'Miniconda3-latest-Linux--x86_64.sh');
+CONSTANTS.INSTALLERS.MAC = path.join("installers",'Miniconda3-latest-MacOSX-x86_64.sh');
+CONSTANTS.INSTALLERS.DEV_WIN = path.join("resources",'win32','Miniconda2-latest-Windows-x86_64.exe');
+CONSTANTS.INSTALLERS.DEV_LIN = path.join("public",'resources','linux','Miniconda3-latest-Linux-x86_64.sh');
+CONSTANTS.INSTALLERS.DEV_MAC = path.join("public",'resources','mac','Miniconda3-latest-MacOSX-x86_64.sh');
+CONSTANTS.INSTALLERS.CONDAPATH = path.join(os.homedir(),"miniconda3");
 
 const requiredPrograms = [
     {name: "conda", icon: "../assets/logo_anaconda.png"}

@@ -125,7 +125,11 @@ app.on('activate', function () {
 });
 
 
-ipcMain.on('Install_Request', (event, arg) => { lsConda.installRequest(event, arg)});
+ipcMain.on('installRequest', (event, app) => { 
+  console.log("Received Install request for ",app.name)
+  let [isOk, res] = lsConda.installRequest(event, app)
+  console.log("installRequest result is", isOk, res)
+});
 
 // Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
 ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => {
@@ -133,12 +137,6 @@ ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => {
   event.returnValue = [res, resOut, anonDir]
 });
 
-
-//python src/deidTest_pyd.py $basedir --outdir $outdir
-ipcMain.on('console-log', (event, arg) => {
-  console.log(arg);
-  event.returnValue = 'Done';
-})
 
 // uploading of images deidentificated for deid script
 ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => { 
@@ -170,7 +168,7 @@ function areProgramsInstalled(programs) {
   let res = lsConda.installChecks(programs);
   for (let _r of res) {
     if (_r.err.length) {
-      console.log("Error installing",_r.name, ": ", _r.err)
+      console.log("Error searching for",_r.name, ": ", _r.err)
       isOk = false
     }
   }

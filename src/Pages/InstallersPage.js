@@ -66,8 +66,7 @@ export class InstallersPage extends Component {
     }
 
     doInstallApp(app) {
-        console.log("Received Install request! "+app)
-
+        ipcRenderer.send("installRequest", app)
         /*
         if(arg === false) {
             let arg2 = ipcRenderer.sendSync('Install_Request', [app.toLowerCase()]);

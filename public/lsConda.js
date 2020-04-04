@@ -144,7 +144,7 @@ function installMiniconda(){
       instArgs = []
       envScript =  path.join('win32', 'createEnv.bat')
     }
-    else if (process.platform === 'MacOS') {
+    else if (process.platform === 'darwin') {
       instCmd = CONSTANTS.INSTALLERS.DEV_MAC, //(isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);  
       instArgs = ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH]
       envScript = path.join('linux', 'createEnv.sh')

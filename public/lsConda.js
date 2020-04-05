@@ -74,7 +74,7 @@ function _execShellCommand(cmd, argv) {
 
 }
 */
-function runCondaAnonimizer(files, outDir) {
+function runCondaAnonimizer(files, outDir,callback) {
 
   if (!outDir) {
     outDir = path.join(os.homedir(), "Documents/reimagine/an")
@@ -95,35 +95,39 @@ function runCondaAnonimizer(files, outDir) {
   var PythonScript_Path = getDeidTestPath()
   let argv;
   
-  let res = false;
+  let res = 0;
   let resOut = "";
+  let result=false;
 
   for( elem in files ){
     argv = [files[elem], outDir, PythonScript_Path];
 
     console.log("About to run:",Script_Path, argv);
-    
     //const deploySh = _execShellCommand(Script_Path, argv)
     const deploySh = exec.execFile(Script_Path, argv);
 
     deploySh.stdout.on('data', (data) => {
       resOut += "Data: " + data + "\n"
       console.log(`Output: ${data}`);
+      result={res:res,resOut:resOut,outDir:outDir};
+      callback(result);
     });
   
     deploySh.stderr.on('data', (data) => {
       resOut += "Data: " + data + "\n"
       console.log(`stderr: ${data}`)
+      res=-1
+      result={res:res,resOut:resOut,outDir:outDir};
+      callback(result);
     })
   
     deploySh.on('exit', (data) => {
       console.log(`final data ${data}`);
-      resOut += "Data: " + data + "\n"
-    })      
-
-
-    return [res, resOut, outDir]
-    
+      resOut += "Data: " + data + "\n";
+      res=1;
+      result={res:res,resOut:resOut,outDir:outDir};
+      callback(result);
+    })          
   }
   
 }

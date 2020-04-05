@@ -19,7 +19,6 @@ let lsMinio = require("./lsMinio");
 let lsConda = require("./lsConda");
 
 
-
 const log = require("electron-log");
 Object.assign(console, log.functions);
 
@@ -34,8 +33,8 @@ var appStatus = {
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 900,
+        height: 700,
         webPreferences: {
             nodeIntegration: true,
         }
@@ -131,10 +130,47 @@ ipcMain.on('installRequest', (event, app) => {
   console.log("installRequest result is", isOk, res)
 });
 
+
 // Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
-ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => {
-  let [res, resOut, anonDir] = lsConda.runCondaAnonimizer(files, outDir)
-  event.returnValue = [res, resOut, anonDir]
+/*ipcMain.on('condaAnonimizeRequest',(event, files, outDir) => {
+  console.log("************* Run anonimization **********");
+  new Promise(resolve => {
+    // lsConda.runCondaAnonimizer(files, outDir,(result)=>{
+    //   console.log(result.res);
+    //   console.log(result.outDir);
+  
+    //   if(result.res===1){
+    //     resolve(result);
+    //   }
+    resolve(true);
+
+  }).then(value)=>{
+    event.reply("condaAnonimizeRequestFinished",value);
+  });
+});*/
+
+ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => { 
+
+  new Promise(resolve => {  
+
+    lsConda.runCondaAnonimizer(files, outDir,(result)=>{
+      console.log(result.res);
+      console.log(result.outDir);
+  
+      if(result.res===1){
+        resolve(result);
+      }
+    });
+  })
+  .then((value) => {
+    console.log("Anonimization done");
+    event.reply("condaAnonimizeRequestFinished",value);
+  })
+  .catch(e => {
+    event.reply("condaAnonimizeRequestFinished",e);
+  })
+  
+
 });
 
 

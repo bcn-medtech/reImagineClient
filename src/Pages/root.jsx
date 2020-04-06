@@ -18,6 +18,7 @@ export const RootPage = () => {
 
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [anonDir, setAnonDir]=useState(false);
+    const [dataUploadedSuccesfully,setDataUploadedSuccesfully]=useState(false);
     const [step,setStep] = useState("filer");
     //const [step,setStep] = useState("uploader");
     const [runningAnonimization,setRunningAnonimization]=useState(false);
@@ -29,6 +30,8 @@ export const RootPage = () => {
             case "ADD FOLDER":
                 const newSelectedFiles=action.values;
                 setSelectedFiles(newSelectedFiles);
+                setDataUploadedSuccesfully(false);
+                setAnonDir(false);
                 break;
 
             case "DELETE FOLDER":
@@ -38,6 +41,8 @@ export const RootPage = () => {
                     }
                 });
                 setSelectedFiles(newSelectedFiles2);
+                setDataUploadedSuccesfully(false);
+                setAnonDir(false);
                 break;
             case "GO TO ANONIMIZATION":
                 setStep("anonimizer");
@@ -54,11 +59,15 @@ export const RootPage = () => {
             case "FINISH ANONIMIZATION":
                 setAnonDir(action.values.outDir);
                 setRunningAnonimization(false);
+                setDataUploadedSuccesfully(false);
                 break;
             case "RUN UPLOAD IMAGES":
                 setUploadingImages(true);
                 break;
             case "FINISH UPLOAD IMAGES":
+                if(action.values==="success"){
+                    setDataUploadedSuccesfully(true);
+                }
                 setUploadingImages(false);
                 break;
             default:
@@ -92,6 +101,7 @@ export const RootPage = () => {
                     runninganonimization={runningAnonimization}
                     uploadingimages={uploadingImages}
                     anonimizationdir={anonDir}
+                    datauploadedsuccesfully={dataUploadedSuccesfully}
                     files={selectedFiles}/>)
                 break;
             default:

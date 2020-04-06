@@ -14,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
 
 export const UploadToCloudSVG = (props) => {
     const classes = useStyles();
-    console.log(props);
     return (
         <IconButton className={classes.root} edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={props.onclickcomponent}>
         <svg width="361" height="363" viewBox="0 0 361 363" fill="none" xmlns="http://www.w3.org/2000/svg">

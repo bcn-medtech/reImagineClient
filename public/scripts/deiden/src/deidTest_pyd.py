@@ -60,7 +60,13 @@ def _prepare(args, sid):
         
 def _find_or_create_anonid(db, fields):
   pid = fields["PatientID"];name = fields["PatientName"]      
-  accNum = fields["AccessionNumber"]
+  accNum = None
+  if "AccessionNumber" in fields:
+    accNum = fields["AccessionNumber"]
+  else:
+    _l.error("No accession number? Setting it to false")
+    accNum = "NOT_FOUND"
+    
   res = list(db.searchId(pid))
   if not res:
     _l.info("Creating new patient Patient(%s, %s, %s)"%(pid, name, accNum))

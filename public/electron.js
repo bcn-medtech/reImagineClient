@@ -18,7 +18,6 @@ let lsPacs = require("./lsPacs");
 let lsMinio = require("./lsMinio");
 let lsConda = require("./lsConda");
 
-
 const log = require("electron-log");
 Object.assign(console, log.functions);
 

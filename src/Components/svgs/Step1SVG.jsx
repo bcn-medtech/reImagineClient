@@ -22,17 +22,6 @@ export const Step1SVG = (props) => {
                     <path d="M61 97C83.0914 97 101 79.0914 101 57C101 34.9086 83.0914 17 61 17C38.9086 17 21 34.9086 21 57C21 79.0914 38.9086 97 61 97Z" fill="#01F5C0" />
                 </g>
                 <path opacity={opacity} d="M54.2031 72V69.5977H60.8828V46.3945L54.2031 49.207V46.8047L60.8828 43.9922H63.4023V69.5977H70.082V72H54.2031Z" fill="white" />
-                <defs>
-                    <filter id="filter0_d" x="0" y="0" width="122" height="122" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
-                        <feOffset dy="4" />
-                        <feGaussianBlur stdDeviation="10.5" />
-                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
-                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow" />
-                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape" />
-                    </filter>
-                </defs>
             </svg>
         </IconButton>
     );

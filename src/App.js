@@ -5,7 +5,7 @@ import './../node_modules/foundation-apps/dist/css/foundation-apps.min.css';
 import  { UploaderPage }  from './Pages/UploaderPage';
 import  { InstallersPage }  from './Pages/InstallersPage';
 import { createBrowserHistory } from "history";
-import {RootPage} from "./Pages/root";
+import {RootPage} from "./Pages/root/root";
 
 const history = createBrowserHistory();
 

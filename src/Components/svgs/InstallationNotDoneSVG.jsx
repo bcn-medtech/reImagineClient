@@ -16,7 +16,7 @@ export const InstallationNotDoneSVG = (props) => {
     }
 
     return (
-        <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+        <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={props.onclickcomponent}>
         <svg width="122" height="122" viewBox="0 0 122 122" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g filter="url(#filter0_d)">
         <path d="M61 97C83.0914 97 101 79.0914 101 57C101 34.9086 83.0914 17 61 17C38.9086 17 21 34.9086 21 57C21 79.0914 38.9086 97 61 97Z" fill="#F86D70"/>

@@ -31,15 +31,15 @@ export const NavigateToFilerLeftSVG = (props) => {
         <div className={"grid-block shrink " + classes.root} onClick={props.onclickcomponent}>
             <div className="grid-block shrink">
                 <svg width="92" height="92" viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#clip0)">
+                    <g clipPath="url(#clip0)">
                         <path d="M42.2104 33.9383C42.563 33.5931 43.1159 33.5953 43.4658 33.9434C43.8038 34.2797 43.8015 34.8372 43.4608 35.1701L37.07 41.4276L58.0759 41.5122C58.5656 41.5142 58.9532 41.8999 58.9513 42.3833C58.9493 42.8666 58.5586 43.2617 58.0689 43.2597L37.0622 43.175L43.4024 49.4714C43.7403 49.8194 43.7381 50.3777 43.3974 50.7105C43.0448 51.0558 42.4919 51.0535 42.142 50.7054L34.301 42.9031C33.963 42.5668 33.9652 42.0093 34.3059 41.6765L42.2104 33.9383Z" fill="#01F5C0" className="svgitem"/>
                     </g>
                     <g filter="url(#filter0_d)">
-                        <path d="M69.5 42C69.5 54.9787 58.9787 65.5 46 65.5C33.0213 65.5 22.5 54.9787 22.5 42C22.5 29.0213 33.0213 18.5 46 18.5C58.9787 18.5 69.5 29.0213 69.5 42Z" stroke="#00FFB3" stroke-width="3" className="svgitem1"/>
+                        <path d="M69.5 42C69.5 54.9787 58.9787 65.5 46 65.5C33.0213 65.5 22.5 54.9787 22.5 42C22.5 29.0213 33.0213 18.5 46 18.5C58.9787 18.5 69.5 29.0213 69.5 42Z" stroke="#00FFB3" strokeWidth="3" className="svgitem1"/>
                     </g>
                     <defs>
-                        <filter id="filter0_d" x="0" y="0" width="92" height="92" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                        <filter id="filter0_d" x="0" y="0" width="92" height="92" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                            <feFlood floodOpacity="0" result="BackgroundImageFix" />
                             <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
                             <feOffset dy="4" />
                             <feGaussianBlur stdDeviation="10.5" />

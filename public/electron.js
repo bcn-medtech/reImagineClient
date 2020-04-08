@@ -122,31 +122,12 @@ app.on('activate', function () {
     }
 });
 
-
 ipcMain.on('installRequest', (event, app) => { 
   console.log("Received Install request for ",app.name)
-  let [isOk, res] = lsConda.installRequest(event, app)
-  console.log("installRequest result is", isOk, res)
+    lsConda.installRequest(event, app,(result)=>{
+      event.reply("condaInstallRequestFinished",result);
+    });
 });
-
-
-// Runs a conda script, first run createEnv to prepare conda environment. Secondly runs runDeid, to run deidentification script.
-/*ipcMain.on('condaAnonimizeRequest',(event, files, outDir) => {
-  console.log("************* Run anonimization **********");
-  new Promise(resolve => {
-    // lsConda.runCondaAnonimizer(files, outDir,(result)=>{
-    //   console.log(result.res);
-    //   console.log(result.outDir);
-  
-    //   if(result.res===1){
-    //     resolve(result);
-    //   }
-    resolve(true);
-
-  }).then(value)=>{
-    event.reply("condaAnonimizeRequestFinished",value);
-  });
-});*/
 
 ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => { 
 

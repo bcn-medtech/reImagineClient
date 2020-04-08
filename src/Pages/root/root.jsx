@@ -1,12 +1,12 @@
-import React , { useState,useEffect }from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { TopBar } from './../../Components/TopBar.jsx';
 import { Filer } from './../../Components/Filer/Filer';
 import { Anonimizer } from './../../Components/Anonimizer/Anonimizer';
-import { Uploader} from './../../Components/Uploader/Uploader';
-import {Installers} from './../../Components/Installers/Installers';
+import { Uploader } from './../../Components/Uploader/Uploader';
+import { Installers } from './../../Components/Installers/Installers';
 import config from "./../../conf/config";
-import {getSoftwareInstalledAnNotInstalled} from './helper';
+import { getSoftwareInstalledAnNotInstalled } from './helper';
 //Electron 
 const { ipcRenderer } = window.require("electron");
 
@@ -26,35 +26,38 @@ export const RootPage = () => {
     const classes = useStyles();
 
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const [anonDir, setAnonDir]=useState(false);
-    const [dataUploadedSuccesfully,setDataUploadedSuccesfully]=useState(false);
+    const [anonDir, setAnonDir] = useState(false);
+    const [dataUploadedSuccesfully, setDataUploadedSuccesfully] = useState(false);
     //const [allSoftwareIsInstalledSuccesfully, setAllSoftwareIsInstalledSuccesfully]=useState(false);
-    const [step,setStep] = useState("filer");
-    const [runningAnonimization,setRunningAnonimization]=useState(false);
-    const [runningInstallation3rdPartySoftware,setRunningInstallation3rdPartySoftware]=useState(true);
-    const [uploadingImages,setUploadingImages]=useState(false);
-    const [softwareInstalled,setSoftwareInstalled]=useState([]);
-    const [softwareNotInstalled,setSoftwareNotInstalled]=useState([]);
+    const [step, setStep] = useState("filer");
+    const [runningAnonimization, setRunningAnonimization] = useState(false);
+    const [runningInstallers, setRunningInstallers] = useState(false);
+    const [uploadingImages, setUploadingImages] = useState(false);
+    const [softwareInstalled, setSoftwareInstalled] = useState([]);
+    const [softwareNotInstalled, setSoftwareNotInstalled] = useState([]);
 
     ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
 
-    const onInstalledSoftwareCheck=(softwareInstalled, status, errs)=>{
-        if(status){
+    const onInstalledSoftwareCheck = (softwareInstalled, status, errs) => {
+
+        console.log(status);
+
+        if (status) {
             //const result =getSoftwareInstalledAnNotInstalled(config.requiredPrograms,softwareInstalled);
             // softwareInstalled=result.softwareInstalled;
             // softwareNotInstalled=result.softwareNotInstalled;
-            setSoftwareInstalled([{name: "conda", icon: "../assets/logo_anaconda.png"}]);
+            setSoftwareInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
             setSoftwareNotInstalled([]);
             //setAllSoftwareIsInstalledSuccesfully(true);
-        }else{
+        } else {
             //setAllSoftwareIsInstalledSuccesfully(false);
             setSoftwareInstalled([]);
-            setSoftwareNotInstalled([{name: "conda", icon: "../assets/logo_anaconda.png"}]);
+            setSoftwareNotInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
             setStep("installers");
         }
     }
 
-    const checkIfSoftwareIsInstalled=()=> {
+    const checkIfSoftwareIsInstalled = () => {
         for (let software of config.requiredPrograms) {
             ipcRenderer.send('checkInstalled', software);
         }
@@ -67,19 +70,19 @@ export const RootPage = () => {
     }, [])
 
 
-    const onActionToPerform=(action)=>{
+    const onActionToPerform = (action) => {
 
         switch (action.action) {
             case "ADD FOLDER":
-                const newSelectedFiles=action.values;
+                const newSelectedFiles = action.values;
                 setSelectedFiles(newSelectedFiles);
                 setDataUploadedSuccesfully(false);
                 setAnonDir(false);
                 break;
 
             case "DELETE FOLDER":
-                let newSelectedFiles2=selectedFiles.filter((element)=>{
-                    if(element !== action.values){
+                let newSelectedFiles2 = selectedFiles.filter((element) => {
+                    if (element !== action.values) {
                         return true;
                     }
                 });
@@ -111,35 +114,51 @@ export const RootPage = () => {
                 setUploadingImages(true);
                 break;
             case "FINISH UPLOAD IMAGES":
-                if(action.values==="success"){
+                if (action.values === "success") {
                     setDataUploadedSuccesfully(true);
                 }
                 setUploadingImages(false);
+                break;
+            case "RUN INSTALLERS":
+                setRunningInstallers(true);
+                break;
+            case "FINISH INSTALLERS":
+
+                if("isOk" in action.values){
+                    if(action.values.isOk===true){
+                        setSoftwareInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
+                        setSoftwareNotInstalled([]);
+                    }else{
+                        setSoftwareInstalled([]);
+                        setSoftwareNotInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
+                    }
+                }
+                setRunningInstallers(false);
                 break;
             default:
                 break;
         }
     }
 
-    const renderBody=(step)=>{
+    const renderBody = (step) => {
 
-        switch(step){
+        switch (step) {
             case "filer":
-                return(
-                    <Filer 
-                    onactiontoperform={onActionToPerform}
-                    runninganonimization={runningAnonimization}
-                    uploadingimages={uploadingImages}
-                    files={selectedFiles}/>
-                    );
+                return (
+                    <Filer
+                        onactiontoperform={onActionToPerform}
+                        runninganonimization={runningAnonimization}
+                        uploadingimages={uploadingImages}
+                        files={selectedFiles} />
+                );
                 break;
             case "anonimizer":
-                    return (<Anonimizer
+                return (<Anonimizer
                     onactiontoperform={onActionToPerform}
                     runninganonimization={runningAnonimization}
                     uploadingimages={uploadingImages}
                     anonimizationdir={anonDir}
-                    files={selectedFiles}/>)
+                    files={selectedFiles} />)
                 break;
             case "uploader":
                 return (<Uploader
@@ -148,18 +167,18 @@ export const RootPage = () => {
                     uploadingimages={uploadingImages}
                     anonimizationdir={anonDir}
                     datauploadedsuccesfully={dataUploadedSuccesfully}
-                    files={selectedFiles}/>)
+                    files={selectedFiles} />)
                 break;
             case "installers":
-                return(<Installers
+                return (<Installers
                     softwareinstalled={softwareInstalled}
                     softwarenotinstalled={softwareNotInstalled}
-                    runninginstallation3rdpartysoftware={runningInstallation3rdPartySoftware}
+                    runninginstallation3rdpartysoftware={runningInstallers}
                     onactiontoperform={onActionToPerform}
-                    />)
+                />)
             default:
                 break;
-            
+
         }
     }
 
@@ -167,7 +186,7 @@ export const RootPage = () => {
         <div className={"grid-frame"}>
             <div className={"grid-block vertical"}>
                 <div className="grid-block shrink">
-                    <TopBar onactiontoperform={onActionToPerform}/>
+                    <TopBar onactiontoperform={onActionToPerform} />
                 </div>
                 <div className="grid-block">
                     {renderBody(step)}

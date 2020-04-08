@@ -1,21 +1,27 @@
-const path = require('path'); 
+const path = require('path');
 const fs = require('fs');
 const os = require("os");
-const exec = require('child_process'); 
+const exec = require('child_process');
 const uuid = require("uuid")
-const shell = require("shelljs") 
+const shell = require("shelljs")
 let config = require("../src/conf/config");
 const CONSTANTS = config.CONSTANTS;
 
-function doInstallRequest(event, app) {
+function doInstallRequest(event, app, callback) {
   if (app.name === "conda") {
     if (fs.existsSync(CONSTANTS.INSTALLERS.CONDAPATH)) {
-      return [true, "Conda already installed"]
-    }    
-    let [flag, res] = installMiniconda()  
-    return [flag, res]
+      //return [true, "Conda already installed"]
+      callback({ isOk: true, res: "Conda already installed" });
+    } else {
+      installMiniconda((result)=>{
+        callback({ isOk: result.isOk, res: result.reason });
+      });
+      //return [flag, res]
+    }
+
   } else {
-    return [false, "Cannot install program "+app.name]
+    //return [false, "Cannot install program " + app.name]
+    callback({ isOk:false, res: res});
   }
 }
 
@@ -28,7 +34,7 @@ function doInstallChecks(programs) {
     }
     //hints.concat([userHints])
     _e = doInstallCheck(p.name, hints)
-    res.push({"name":p.name, "err":_e})
+    res.push({ "name": p.name, "err": _e })
   }
 
   return res;
@@ -39,8 +45,8 @@ function doInstallChecks(programs) {
 */
 function doInstallCheck(program, hints) {
 
-  console.log("Checking install status of program ", program);  
-  console.log("Provided hints: ", hints);  
+  console.log("Checking install status of program ", program);
+  console.log("Provided hints: ", hints);
   let errs = []
 
   if (!program) {
@@ -50,7 +56,7 @@ function doInstallCheck(program, hints) {
   let pPath = shell.which(program);
   if (!pPath) {
     for (const _p of hints) {
-      if (fs.existsSync(_p)){
+      if (fs.existsSync(_p)) {
         pPath = _p
         break
       }
@@ -58,7 +64,7 @@ function doInstallCheck(program, hints) {
   }
 
   if (!pPath) {
-    errs.push("Cannot find "+program)
+    errs.push("Cannot find " + program)
     return errs
   }
 
@@ -74,7 +80,7 @@ function _execShellCommand(cmd, argv) {
 
 }
 */
-function runCondaAnonimizer(files, outDir,callback) {
+function runCondaAnonimizer(files, outDir, callback) {
 
   if (!outDir) {
     outDir = path.join(os.homedir(), "Documents/reimagine/an")
@@ -83,142 +89,140 @@ function runCondaAnonimizer(files, outDir,callback) {
   //Add a unique uuid for run
   outDir = path.join(outDir, uuid.v4());
 
-  console.log("Starting anonimization process");  
+  console.log("Starting anonimization process");
   console.log("Files", files)
   console.log("outDir", outDir)
 
   if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, {recursive: true})
+    fs.mkdirSync(outDir, { recursive: true })
   }
-    
+
   var Script_Path = getRunDeidPath()
   var PythonScript_Path = getDeidTestPath()
   let argv;
-  
+
   let res = 0;
   let resOut = "";
-  let result=false;
+  let result = false;
 
-  for( elem in files ){
+  for (elem in files) {
     argv = [files[elem], outDir, PythonScript_Path];
 
-    console.log("About to run:",Script_Path, argv);
+    console.log("About to run:", Script_Path, argv);
     //const deploySh = _execShellCommand(Script_Path, argv)
     const deploySh = exec.execFile(Script_Path, argv);
 
     deploySh.stdout.on('data', (data) => {
       resOut += "Data: " + data + "\n"
       console.log(`Output: ${data}`);
-      result={res:res,resOut:resOut,outDir:outDir};
+      result = { res: res, resOut: resOut, outDir: outDir };
       callback(result);
     });
-  
+
     deploySh.stderr.on('data', (data) => {
       resOut += "Data: " + data + "\n"
       console.log(`stderr: ${data}`)
-      res=-1
-      result={res:res,resOut:resOut,outDir:outDir};
+      res = -1
+      result = { res: res, resOut: resOut, outDir: outDir };
       callback(result);
     })
-  
+
     deploySh.on('exit', (data) => {
       console.log(`final data ${data}`);
       resOut += "Data: " + data + "\n";
-      res=1;
-      result={res:res,resOut:resOut,outDir:outDir};
+      res = 1;
+      result = { res: res, resOut: resOut, outDir: outDir };
       callback(result);
-    })          
+    })
   }
-  
+
 }
 
 
 // Script to isntall program requested for, like miniconda
-function installMiniconda(){
+function installMiniconda(callback) {
   // Set the installation path, check if exists, else install. THE RETURNS AREN'T IMPORTANT by now
-  
-    let isOk = false
-    let reason = "Not implemented"
 
-    var instCmd = null
-    var instArgs = null
-    var envScript = null
-    if (process.platform === "win32") {
-      instCmd = CONSTANTS.INSTALLERS.DEV_WIN, //(isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
+  let isOk = false
+  let reason = "Not implemented"
+
+  var instCmd = null
+  var instArgs = null
+  var envScript = null
+  if (process.platform === "win32") {
+    instCmd = CONSTANTS.INSTALLERS.DEV_WIN, //(isDev ? CONSTANTS.INSTALLERS.DEV_WIN : CONSTANTS.INSTALLERS.WIN);
       instArgs = []
-      envScript =  path.join('win32', 'createEnv.bat')
+    envScript = path.join('win32', 'createEnv.bat')
+  }
+  else if (process.platform === 'darwin') {
+    instCmd = CONSTANTS.INSTALLERS.DEV_MAC, //(isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);  
+      instArgs = ["-b", "-p " + CONSTANTS.INSTALLERS.CONDAPATH]
+    envScript = path.join('linux', 'createEnv.sh')
+  }
+  else if (process.platform === 'linux') {
+    instCmd = CONSTANTS.INSTALLERS.DEV_LIN //(isDev ? CONSTANTS.INSTALLERS.DEV_LIN : CONSTANTS.INSTALLERS.LIN),
+    instArgs = ["-b", "-p " + CONSTANTS.INSTALLERS.CONDAPATH]
+    envScript = path.join('linux', 'createEnv.sh')
+  } else {
+    isOk = false; reason = "Unknown platform: " + process.platform
+    callback({isOk:isOk, reason:reason});
+  }
+
+  envScript = path.join(__dirname, 'scripts', 'deiden', envScript);
+  console.log("About to run:", instCmd, instArgs, envScript)
+
+  var pInstall = exec.execFile(instCmd, instArgs)
+
+  pInstall.stdout.on('data', (data) => {
+    reason += "Data: " + data + "\n"
+    console.log(`Output: ${data}`);
+  });
+
+  pInstall.stderr.on('data', (data) => {
+    reason += "Data: " + data + "\n"
+    console.log(`stderr: ${data}`)
+  })
+
+  pInstall.on('exit', (data) => {
+    console.log(`final data ${data}`);
+    reason += "Data: " + data + "\n"
+
+    /*
+      INSTALLING CONDA ENVIRONMENT!!!!!
+    */
+    console.log("Miniconda installed, now installing ENVIRONMENT")
+    if (envScript) {
+
+      console.log("About to run:", envScript, [])
+
+      var pInstall = exec.execFile(envScript, [], { env: 'bin/bash' })
+
+      pInstall.stdout.on('data', (data) => {
+        reason += "Data: " + data + "\n"
+        console.log(`Output: ${data}`);
+      });
+
+      pInstall.stderr.on('data', (data) => {
+        reason += "Data: " + data + "\n"
+        console.log(`stderr: ${data}`)
+      })
+
+      pInstall.on('exit', (data) => {
+        console.log(`final data ${data}`);
+        reason += "Data: " + data + "\n";
+        isOk=true;
+        callback({isOk:isOk, reason:reason});
+      })
     }
-    else if (process.platform === 'darwin') {
-      instCmd = CONSTANTS.INSTALLERS.DEV_MAC, //(isDev ? CONSTANTS.INSTALLERS.DEV_MAC : CONSTANTS.INSTALLERS.MAC);  
-      instArgs = ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH]
-      envScript = path.join('linux', 'createEnv.sh')
-    }
-    else if (process.platform === 'linux') {
-      instCmd = CONSTANTS.INSTALLERS.DEV_LIN //(isDev ? CONSTANTS.INSTALLERS.DEV_LIN : CONSTANTS.INSTALLERS.LIN),
-      instArgs = ["-b", "-p "+CONSTANTS.INSTALLERS.CONDAPATH]
-      envScript = path.join('linux', 'createEnv.sh')
-    } else {
-      isOk = false; reason="Unknown platform: "+process.platform
-      return [isOk, reason]
-    }
 
-    envScript = path.join(__dirname, 'scripts', 'deiden', envScript);
-    console.log("About to run:",instCmd, instArgs, envScript)
-
-    var pInstall = exec.execFile(instCmd, instArgs)
-
-    pInstall.stdout.on('data', (data) => {
-      reason += "Data: " + data + "\n"
-      console.log(`Output: ${data}`);
-    });
-  
-    pInstall.stderr.on('data', (data) => {
-      reason += "Data: " + data + "\n"
-      console.log(`stderr: ${data}`)
-    })
-  
-    pInstall.on('exit', (data) => {
-      console.log(`final data ${data}`);
-      reason += "Data: " + data + "\n"
-
-      /*
-        INSTALLING CONDA ENVIRONMENT!!!!!
-      */
-      console.log("Miniconda installed, now installing ENVIRONMENT")
-      if (envScript) {
-
-        console.log("About to run:",envScript, [])
-  
-        var pInstall = exec.execFile(envScript, [], { env: 'bin/bash' })
-    
-        pInstall.stdout.on('data', (data) => {
-          reason += "Data: " + data + "\n"
-          console.log(`Output: ${data}`);
-        });
-      
-        pInstall.stderr.on('data', (data) => {
-          reason += "Data: " + data + "\n"
-          console.log(`stderr: ${data}`)
-        })
-      
-        pInstall.on('exit', (data) => {
-          console.log(`final data ${data}`);
-          reason += "Data: " + data + "\n"
-        
-        })
-      }
-
-    })
-
-    return [isOk, reason]
-  
+  })
 }
 
 module.exports.installRequest = doInstallRequest;
 module.exports.installChecks = doInstallChecks;
 module.exports.runCondaAnonimizer = runCondaAnonimizer;
 
-function getRunDeidPath(){
+function getRunDeidPath() {
   var ExecuteOs;
   if (process.platform === 'win32') {
     ExecuteOs = path.join('win32', 'runDeid.bat');
@@ -229,8 +233,8 @@ function getRunDeidPath(){
   return Script_Path
 }
 
-function getDeidTestPath(){
+function getDeidTestPath() {
   //let file = (isDev ? path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py') : path.join(__dirname,"..", "..", "..", 'Scripts', 'deiden', 'src', 'deidTest_pyd.py'));
-  let file = path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py');  
+  let file = path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py');
   return file;
 }

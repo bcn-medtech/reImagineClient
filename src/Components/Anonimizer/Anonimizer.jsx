@@ -39,11 +39,11 @@ export const Anonimizer = (props) => {
     });
     
      //Component did unmount
-     useEffect(() => {
-        return () => {
-            ipcRenderer.removeAllListeners();
-        }
-    }, []);
+    //  useEffect(() => {
+    //     return () => {
+    //         ipcRenderer.removeAllListeners();
+    //     }
+    // }, []);
 
     const runAnonimization=()=>{
         props.onactiontoperform({action:"RUN ANONIMIZATION", values:"false"});

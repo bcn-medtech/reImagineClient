@@ -55,11 +55,11 @@ export const Installers = (props) => {
     });
 
     //Component did unmount
-    useEffect(() => {
-        return () => {
-            ipcRenderer.removeAllListeners();
-        }
-    }, []);
+    // useEffect(() => {
+    //     return () => {
+    //         ipcRenderer.removeAllListeners();
+    //     }
+    // }, []);
 
     const runInstallationThirdPartySoftware = () => {
         console.log("Run installation third party software");

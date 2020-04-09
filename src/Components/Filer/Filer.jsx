@@ -40,11 +40,11 @@ export const Filer = (props) => {
     });
 
     //Component did unmount
-    useEffect(() => {
-        return () => {
-            ipcRenderer.removeAllListeners();
-        }
-    }, []);
+    // useEffect(() => {
+    //     return () => {
+    //         ipcRenderer.removeAllListeners();
+    //     }
+    // }, []);
 
     const renderAddFolderBody = (files) => {
 

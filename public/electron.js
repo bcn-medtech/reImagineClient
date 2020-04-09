@@ -160,9 +160,10 @@ ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => {
   new Promise(resolve => {
     let res = false
     
-    res = lsMinio.minioUpload(uploadDir, tmpDir)    
+    lsMinio.minioUpload(uploadDir, tmpDir,(result)=>{
+      resolve(result)
+    })    
     
-    resolve("success")
   })
   .then((value) => {
     event.reply("uploadResult",value);

@@ -40,15 +40,19 @@ function nex(fname) {
 }
 
 // uploading of images deidentificated for deid script
-function doMinioUpload(baseName, tmpDir) {
+function doMinioUpload(baseName, tmpDir,callback) {
 
   if (!tmpDir) tmpDir = tmp.dirSync();
   console.log('Temporary dir: '+tmpDir.name);  
-  if (nex(tmpDir.name)) return false;
+  if (nex(tmpDir.name)){
+    callback(false);
+  };
 
   console.log('Selected for upload: '+baseName);
   console.log(typeof baseName);
-  if (nex(baseName)) return false;
+  if (nex(baseName)){
+    callback(false);
+  };
 
   var cwd = path.dirname(baseName);
   var dirName = path.basename(baseName);  
@@ -66,16 +70,18 @@ function doMinioUpload(baseName, tmpDir) {
     );
   } catch (err) {
     console.log("Encountered an error in creating tar file: "+err)
-    return false;
+    callback(false);
   }
-  if (nex(fname)) return false;
+  if (nex(fname)){
+    callback(false);
+  };
 
   console.log('Connecting to minio client...');
 
   let minioClient = getMinioClient();
   if (minioClient === null) {
     console.log("Cannot create minio client. Maybe credential file is missing?");
-    return false
+    callback(false);
   }
   
   metaData = {
@@ -89,18 +95,17 @@ function doMinioUpload(baseName, tmpDir) {
     minioClient.fPutObject(bucket, upfname, fname, metaData, (err, etag) => {
         if (err) {
           console.log("Error in uploading file!"+err);
-          return false;
+          callback(false);
         } 
         console.log("Upload successfull!");
         fs.unlinkSync(fname);
         tmpDir.removeCallback();
+        callback(true);
       });
   } catch(err) {
-    console.error(err)
+    console.error(err);
+    calback(false);
   }
-
-  return true;
-  
 };
 
 

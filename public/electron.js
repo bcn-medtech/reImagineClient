@@ -60,7 +60,7 @@ function createWindow() {
       mainWindow.webContents.openDevTools();      
     } else {
       urlLoc = url.format({
-        pathname: path.join(__dirname, 'index.html'),
+        pathname: path.resolve(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
       })
@@ -70,7 +70,7 @@ function createWindow() {
     console.log("Loading version from:"+urlLoc);
     checkConfiguration();
     mainWindow.loadURL(urlLoc);
-    // mainWindow.webContents.openDevTools();
+    
     mainWindow.on('closed', function () {
         mainWindow = null
     })

@@ -2,13 +2,13 @@ import React, {Component} from 'react';
 import TopBar from '../Components/TopBar';
 import {Tabs, Tab} from '@material-ui/core';
 import {CssBaseline, Container, Typography, Box, Chip, Avatar } from '@material-ui/core';
-import config from "../conf/config"
 
 // import logos
 
 import GetAppIcon from '@material-ui/icons/GetApp';
 
 const { ipcRenderer } = window.require("electron");
+var config = null; //Inizialized in componentDidMount from main thread
 
 const styles = {
     fxb: {
@@ -45,6 +45,7 @@ export class InstallersPage extends Component {
     }
 
     componentDidMount() {
+        config = ipcRenderer.sendSync("getConfig");
         ipcRenderer.on("installedCheckRes", (event, program, status, errs) => this._onInstalledCheck(program, status, errs));
         this.checkInstallStatus();
     }

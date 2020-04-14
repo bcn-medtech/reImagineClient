@@ -4,7 +4,8 @@ const os = require("os");
 const exec = require('child_process');
 const uuid = require("uuid")
 const shell = require("shelljs")
-let config = require("../src/conf/config");
+const main = require("./electron.js")
+const config = main.getConfig();
 const CONSTANTS = config.CONSTANTS;
 
 function doInstallRequest(event, app, callback) {

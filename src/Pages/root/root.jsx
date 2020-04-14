@@ -5,7 +5,6 @@ import { Filer } from './../../Components/Filer/Filer';
 import { Anonimizer } from './../../Components/Anonimizer/Anonimizer';
 import { Uploader } from './../../Components/Uploader/Uploader';
 import { Installers } from './../../Components/Installers/Installers';
-import config from "./../../conf/config";
 import { getSoftwareInstalledAnNotInstalled } from './helper';
 //Electron 
 const { ipcRenderer } = window.require("electron");
@@ -15,8 +14,6 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "#1B1C1E"
     }
 }));
-
-
 
 // let softwareInstalled=[];
 // let softwareNotInstalled=[];
@@ -37,6 +34,7 @@ export const RootPage = () => {
     const [softwareNotInstalled, setSoftwareNotInstalled] = useState([]);
 
     ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
+    const config = ipcRenderer.sendSync("getConfig");
 
     const onInstalledSoftwareCheck = (softwareInstalled, status, errs) => {
 
@@ -151,7 +149,7 @@ export const RootPage = () => {
                         uploadingimages={uploadingImages}
                         files={selectedFiles} />
                 );
-                break;
+                
             case "anonimizer":
                 return (<Anonimizer
                     onactiontoperform={onActionToPerform}
@@ -159,7 +157,7 @@ export const RootPage = () => {
                     uploadingimages={uploadingImages}
                     anonimizationdir={anonDir}
                     files={selectedFiles} />)
-                break;
+                
             case "uploader":
                 return (<Uploader
                     onactiontoperform={onActionToPerform}
@@ -168,7 +166,7 @@ export const RootPage = () => {
                     anonimizationdir={anonDir}
                     datauploadedsuccesfully={dataUploadedSuccesfully}
                     files={selectedFiles} />)
-                break;
+                
             case "installers":
                 return (<Installers
                     softwareinstalled={softwareInstalled}

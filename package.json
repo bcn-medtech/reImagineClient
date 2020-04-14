@@ -1,31 +1,36 @@
 {
   "author": "Mario Ceresa <mario.ceresa@upf.edu>",
   "description": "Client for the reimagine analysis platform",
-  "name": "ReImagineClient",
-  "version": "0.1.0",
+  "name": "reImagineClient",
+  "version": "1.0.0",
+  "repository": "https://bitbucket.org/simbiosys/reimagineclient/src/master/",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.0.0-rc.0",
     "@material-ui/icons": "^4.0.0-rc.0",
     "electron-is-dev": "^0.3.0",
+    "electron-log": "^4.1.1",    
     "express": "^4.17.1",
+    "foundation-apps": "^1.2.0",
     "multer": "^1.4.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-router-dom": "^5.0.2",
     "react-scripts": "1.1.1",
     "react-swipeable-views": "^0.13.3",
-    "foundation-apps": "^1.2.0"
+    "minio": "^7.0.15",    
+    "shelljs": "^0.8.3",
+    "tar": "^6.0.1"
   },
   "scripts": {
-    "react-start": "cross-env BROWSER=none react-scripts start",
-    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000/ && electron .\"",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "postinstall": "install-app-deps",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "electron-dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000/ && electron .\"",
+    "postinstall": "electron-builder install-app-deps",
+    "preelectron-pack": "yarn build",
+    "electron-pack": "build -mwl"
   },
   "devDependencies": {
     "concurrently": "^3.5.1",
@@ -42,9 +47,13 @@
   "main": "public/electron.js",
   "type": "module",
   "build": {
+    "appId": "edu.upf.simbiosys.reImagineClient",
+    "productName": "reImagineClient",
+    "copyright": "Copyright 2020",
     "win": {
       "target": "NSIS"
     },
+    "mac": {},
     "extraFiles": [
       {
         "from": "public/resources/${os}/",
@@ -68,5 +77,6 @@
         ]
       }
     ]
-  }
+  },
+  "license": "MIT"
 }

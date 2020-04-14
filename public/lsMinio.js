@@ -4,12 +4,13 @@ const fs = require("fs")
 var tmp = require("tmp")
 var path = require("path")
 const os = require("os")
-const config = require("../src/conf/config")
 const uuid = require("uuid")
+const main = require("./electron.js")
+const config = main.getConfig();
 
 function getMinioClient() {
 
-  cfname = path.join(process.cwd(), config.minioCred)
+  cfname = config.minioCred
 
   if (nex(cfname)) {
     console.log("Please configure minio credentials in "+cfname);

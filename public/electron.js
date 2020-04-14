@@ -10,18 +10,29 @@ const isDev = require('electron-is-dev');
 
 const path = require('path');
 const url = require('url');
+const fs = require('fs');
+const os = require('os');
 
 const { ipcMain, dialog } = require('electron');
 let mainWindow;
 
-let lsPacs = require("./lsPacs");
-let lsMinio = require("./lsMinio");
-let lsConda = require("./lsConda");
-
 const log = require("electron-log");
 Object.assign(console, log.functions);
 
-const config = require("../src/conf/config");
+var config = require("./config");
+
+function getConfig() {
+  return config
+}
+
+module.exports = {
+  getConfig: getConfig
+};
+
+
+let lsPacs = require("./lsPacs");
+let lsMinio = require("./lsMinio");
+let lsConda = require("./lsConda");
 
 var appStatus = {
   required: config.requiredPrograms,
@@ -51,11 +62,32 @@ function createWindow() {
     
 
     console.log("Loading version from:"+urlLoc);
+    checkConfiguration();
     mainWindow.loadURL(urlLoc);
     // mainWindow.webContents.openDevTools();
     mainWindow.on('closed', function () {
         mainWindow = null
     })
+}
+
+function checkConfiguration() {
+  confDir = path.join(os.homedir(), "Documents","reimagine")
+  if (!fs.existsSync(confDir)) {
+    fs.mkdirSync(confDir, { recursive: true })
+  }
+
+  confFile = path.join(confDir, "reImagine.json");
+  config.confFile = confFile;
+  config.minioCred = path.join(confDir, config.minioCred);
+  if (!fs.existsSync(confFile)) {
+    let data = JSON.stringify(config)
+    fs.writeFileSync(confFile, data)
+  } else {
+    console.log("Loading configuration data from",confFile)    
+    let data = fs.readFileSync(confFile)
+    config = JSON.parse(data);
+    console.log(config)
+  }
 }
 
 // Tray just let us have an icon saved in taskbar to do more easily to use the app and do it less heavy interface
@@ -210,6 +242,10 @@ ipcMain.on('select-dirs', async (event, args) => {
     properties: ['openDirectory']
   })
   event.reply("onDirSelection",result.filePaths)
+})
+
+ipcMain.on('getConfig', (event) => {
+  event.returnValue = getConfig()
 })
 
 

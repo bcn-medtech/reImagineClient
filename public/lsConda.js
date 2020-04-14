@@ -4,6 +4,7 @@ const os = require("os");
 const exec = require('child_process');
 const uuid = require("uuid")
 const shell = require("shelljs")
+const isDev = require('electron-is-dev');
 const main = require("./electron.js")
 const config = main.getConfig();
 const CONSTANTS = config.CONSTANTS;
@@ -84,7 +85,7 @@ function _execShellCommand(cmd, argv) {
 function runCondaAnonimizer(files, outDir, callback) {
 
   if (!outDir) {
-    outDir = path.join(os.homedir(), "Documents/reimagine/an")
+    outDir = path.join(config.confDir, "an")
   }
 
   //Add a unique uuid for run
@@ -98,8 +99,6 @@ function runCondaAnonimizer(files, outDir, callback) {
     fs.mkdirSync(outDir, { recursive: true })
   }
 
-  var Script_Path = getRunDeidPath()
-  var PythonScript_Path = getDeidTestPath()
   let argv;
 
   let res = 0;
@@ -107,11 +106,11 @@ function runCondaAnonimizer(files, outDir, callback) {
   let result = false;
 
   for (elem in files) {
-    argv = [files[elem], outDir, PythonScript_Path];
+    argv = [files[elem], outDir, config.scripts.deidenScript];
 
-    console.log("About to run:", Script_Path, argv);
+    console.log("About to run:", config.scripts.deidenScript, argv);
     //const deploySh = _execShellCommand(Script_Path, argv)
-    const deploySh = exec.execFile(Script_Path, argv);
+    const deploySh = exec.execFile(config.scripts.condaScript, argv);
 
     deploySh.stdout.on('data', (data) => {
       resOut += "Data: " + data + "\n"
@@ -223,19 +222,6 @@ module.exports.installRequest = doInstallRequest;
 module.exports.installChecks = doInstallChecks;
 module.exports.runCondaAnonimizer = runCondaAnonimizer;
 
-function getRunDeidPath() {
-  var ExecuteOs;
-  if (process.platform === 'win32') {
-    ExecuteOs = path.join('win32', 'runDeid.bat');
-  } else {
-    ExecuteOs = path.join('linux', 'runDeid.sh');
-  }
-  var Script_Path = path.join(__dirname, 'scripts', 'deiden', ExecuteOs);
-  return Script_Path
-}
 
-function getDeidTestPath() {
-  //let file = (isDev ? path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py') : path.join(__dirname,"..", "..", "..", 'Scripts', 'deiden', 'src', 'deidTest_pyd.py'));
-  let file = path.join(__dirname, 'scripts', 'deiden', 'src', 'deidTest_pyd.py');
-  return file;
-}
+
+

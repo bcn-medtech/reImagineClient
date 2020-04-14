@@ -60,6 +60,7 @@
     "mac": {
       "icon":"icon.icns"
     },
+    "extraResources": "public/scripts",
     "extraFiles": [
       {
         "from": "public/resources/${os}/",

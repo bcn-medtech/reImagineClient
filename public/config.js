@@ -1,5 +1,7 @@
 const path = require('path')
 const os = require("os")
+const isDev = require('electron-is-dev');
+const {app} = require("electron")
 
 const CONSTANTS = {};
 
@@ -24,7 +26,63 @@ const installHints = {
     ]
 }
 
+function getScriptDir() {
+
+    let sPath = path.join('public', 'scripts');
+    if (isDev) {
+        sPath = path.join(app.getAppPath(), sPath)
+    } else {
+        sPath = path.join(app.getAppPath(), "..", sPath)
+    }
+
+    return sPath
+}
+
+function getPlatformDir() {
+    let sPath = getScriptDir()
+
+    if (process.platform === 'win32') {
+        sPath = path.join(sPath, 'win32');
+    } else {
+        sPath = path.join(sPath, 'linux');
+    }
+
+    return sPath
+
+}
+
+function getCondaScript() {
+    let sPath = getPlatformDir()
+    
+    if (process.platform === 'win32') {
+        sPath = path.join(sPath, 'runDeid.bat');
+    } else {
+        sPath = path.join(sPath, 'runDeid.sh');
+    }
+
+    return sPath
+
+}
+
+
+function getDeidenScript() {
+    let sPath = path.join(getScriptDir(), 'deiden', 'src', 'deidTest_pyd.py');
+
+    return sPath
+
+}
+
+const scripts = {
+    scriptDir: getScriptDir(),
+    platformDir: getPlatformDir(),
+    condaScript: getCondaScript(),
+    deidenScript: getDeidenScript(),
+
+}
+
 module.exports.CONSTANTS = CONSTANTS;
 module.exports.minioCred = 'minio.json';
 module.exports.requiredPrograms = requiredPrograms;
 module.exports.installHints = installHints;
+module.exports.scripts = scripts;
+module.exports.confDir = path.join(app.getPath("documents"),"reimagine")

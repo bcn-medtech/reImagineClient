@@ -57,7 +57,7 @@ function createWindow() {
     
     if (isDev) {
       urlLoc = 'http://localhost:3000';
-      mainWindow.webContents.openDevTools();      
+      //mainWindow.webContents.openDevTools();      
     } else {
       urlLoc = url.format({
         pathname: path.resolve(__dirname, 'index.html'),
@@ -68,6 +68,7 @@ function createWindow() {
     
 
     console.log("Loading version from:"+urlLoc);
+    console.log("App path is", app.getAppPath());
     checkConfiguration();
     mainWindow.loadURL(urlLoc);
     
@@ -77,23 +78,31 @@ function createWindow() {
 }
 
 function checkConfiguration() {
-  confDir = path.join(os.homedir(), "Documents","reimagine")
-  if (!fs.existsSync(confDir)) {
-    fs.mkdirSync(confDir, { recursive: true })
+  
+  if (!fs.existsSync(config.confDir)) {
+    fs.mkdirSync(config.confDir, { recursive: true })
   }
 
-  confFile = path.join(confDir, "reImagine.json");
+  confFile = path.join(config.confDir, "reImagine.json");
   config.confFile = confFile;
-  config.minioCred = path.join(confDir, config.minioCred);
+  config.minioCred = path.join(config.confDir, config.minioCred);  
+  let data = JSON.stringify(config)
+  fs.writeFileSync(confFile, data)
+  console.log(config)  
+  /*
+  REMOVED FOR NOW BECAUSE EVERY TIME THE APP IMAGE IS LAUNCHED THE PATHS CHANGE
+    AND AS SUCH THERE IS NO REASON TO SAVE THEM   
   if (!fs.existsSync(confFile)) {
     let data = JSON.stringify(config)
     fs.writeFileSync(confFile, data)
+    console.log(config)
   } else {
     console.log("Loading configuration data from",confFile)    
     let data = fs.readFileSync(confFile)
     config = JSON.parse(data);
     console.log(config)
-  }
+    }
+  */
 }
 
 // Tray just let us have an icon saved in taskbar to do more easily to use the app and do it less heavy interface

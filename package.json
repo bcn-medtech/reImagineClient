@@ -30,7 +30,7 @@
     "electron-dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000/ && electron .\"",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
-    "electron-pack": "build -mwl"
+    "electron-pack": "build -l"
   },
   "devDependencies": {
     "concurrently": "^3.5.1",
@@ -50,10 +50,16 @@
     "appId": "edu.upf.simbiosys.reImagineClient",
     "productName": "reImagineClient",
     "copyright": "Copyright 2020",
+    "linux": {
+      "icon":"icon256x256.png"
+    },    
     "win": {
+      "icon":"icon.ico",
       "target": "NSIS"
     },
-    "mac": {},
+    "mac": {
+      "icon":"icon.icns"
+    },
     "extraFiles": [
       {
         "from": "public/resources/${os}/",

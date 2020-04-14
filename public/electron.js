@@ -58,6 +58,12 @@ function createWindow() {
     if (isDev) {
       urlLoc = 'http://localhost:3000';
       mainWindow.webContents.openDevTools();      
+    } else {
+      urlLoc = url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
+      })
     }
     
 
@@ -93,7 +99,14 @@ function checkConfiguration() {
 // Tray just let us have an icon saved in taskbar to do more easily to use the app and do it less heavy interface
 let tray = null
 app.on('ready', () => {
-  tray = new Tray(isDev ? path.join('public', 'resources', 'icons', 'lung.png') : path.join('icons', 'lung.png'));
+  var icon = path.join('public', 'resources', 'icons', 'lung.png');
+  if(!isDev) {
+    icon = path.join(__dirname, 'resources', 'icons', 'lung.png')
+    if (!fs.existsSync(icon)) {
+      console.log(__dirname)
+    }
+  }
+  tray = new Tray(icon);
   const trayMenuTemplate = [
     {
       label: 'open window',
@@ -104,7 +117,11 @@ app.on('ready', () => {
     {
       label: '3rdPart Installers',
       click: function () {
-        mainWindow.loadURL(isDev ? 'http://localhost:3000/installers' : `file://${path.join(__dirname, '../build/index.html#/installers')}`);
+        mainWindow.loadURL(isDev ? 'http://localhost:3000/installers' : url.format({
+          pathname: path.join(__dirname, 'index.html#installers'),
+          protocol: 'file:',
+          slashes: true
+        }));
       }
     }, {
       label: 'Quit',

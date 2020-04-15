@@ -225,6 +225,15 @@ ipcMain.on('installRequest', (event, app) => {
     });
 });
 
+
+// ipcMain.on('removeFolderFromOs', (event, app) => { 
+//   // console.log("Received Install request for ",app.name)
+//   //   lsConda.installRequest(event, app,(result)=>{
+//   //     event.reply("condaInstallRequestFinished",result);
+//   //   });
+//   console.log("Remove folder from os");
+// });
+
 ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => { 
 
   new Promise(resolve => {  
@@ -256,9 +265,12 @@ ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => {
   new Promise(resolve => {
     let res = false
     
-    lsMinio.minioUpload(uploadDir, tmpDir,(result)=>{
+    console.log(uploadDir);
+    console.log(tmpDir);    
+    
+    /*lsMinio.minioUpload(uploadDir, tmpDir,(result)=>{
       resolve(result)
-    })    
+    })*/    
     
   })
   .then((value) => {

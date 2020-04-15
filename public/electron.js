@@ -84,7 +84,11 @@ function checkConfiguration() {
   }
 
   confFile = path.join(config.confDir, "reImagine.json");
+  sqlFile = path.join(config.confDir, "patients.sqlite");
+  anDir = path.join(config.confDir, "an");
   config.confFile = confFile;
+  config.sqlFile = sqlFile;
+  config.anDir = anDir;
   config.minioCred = path.join(config.confDir, config.minioCred);  
   let data = JSON.stringify(config)
   fs.writeFileSync(confFile, data)

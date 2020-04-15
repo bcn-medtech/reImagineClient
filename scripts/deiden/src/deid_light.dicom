@@ -1,0 +1,27 @@
+FORMAT dicom
+
+%header
+
+REMOVE PatientID
+REMOVE PatientName
+REMOVE PatientsName
+REMOVE OtherPatientIDs
+REMOVE OtherPatientNames
+REMOVE OtherPatientIDsSequence
+REMOVE PatientAddress
+REMOVE PatientBirthName
+REMOVE PatientMotherBirthName
+REMOVE startswith:PatientTelephoneNumber
+REMOVE PersonName
+REMOVE PersonAddress
+REMOVE ContactDisplayName
+REMOVE AdditionalPatientHistory
+REMOVE AccessionNumber
+
+JITTER PatientBirthDate 31
+JITTER StudyDate 31
+
+ADD IssuerOfPatientID STARR. In an effort to remove PHI all dates are offset from their original values.
+ADD PatientID var:entity_id
+ADD PatientIdentityRemoved Yes
+REMOVE jitter

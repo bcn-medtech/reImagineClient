@@ -3,17 +3,6 @@ const os = require("os")
 const isDev = require('electron-is-dev');
 const {app} = require("electron")
 
-const CONSTANTS = {};
-
-CONSTANTS.INSTALLERS = {};
-CONSTANTS.INSTALLERS.WIN = path.join("installers",'Miniconda2-latest-Windows-x86_64.exe')
-CONSTANTS.INSTALLERS.LIN = path.join("installers",'Miniconda3-latest-Linux--x86_64.sh');
-CONSTANTS.INSTALLERS.MAC = path.join("installers",'Miniconda3-latest-MacOSX-x86_64.sh');
-CONSTANTS.INSTALLERS.DEV_WIN = path.join("resources",'win32','Miniconda2-latest-Windows-x86_64.exe');
-CONSTANTS.INSTALLERS.DEV_LIN = path.join("public",'resources','linux','Miniconda3-latest-Linux-x86_64.sh');
-CONSTANTS.INSTALLERS.DEV_MAC = path.join("public",'resources','mac','Miniconda3-latest-MacOSX-x86_64.sh');
-CONSTANTS.INSTALLERS.CONDAPATH = path.join(os.homedir(),"miniconda3");
-
 const requiredPrograms = [
     {name: "conda", icon: "../assets/logo_anaconda.png"}
   ]
@@ -26,13 +15,35 @@ const installHints = {
     ]
 }
 
+function getCondaInstaller() {
+    let sPath = 'installers';
+    if (isDev) {
+        sPath = path.join(app.getAppPath(), sPath, process.platform)
+    } else {
+        sPath = path.join(process.resourcesPath, sPath)
+    }
+
+    if (process.platform === 'win32') {
+        sPath = path.join(sPath, 'Miniconda3-latest-Windows-x86_64.exe');
+    } else if (process.platform === 'linux') {
+        sPath = path.join(sPath, 'Miniconda3-latest-Linux-x86_64.sh');
+    } else if (process.platform === 'darwin') {
+        sPath = path.join(sPath, 'Miniconda3-latest-MacOSX-x86_64.sh');
+    } else {
+        console.log("Platform not supported! "+process.platform)
+    }
+
+
+    return sPath    
+}
+
 function getScriptDir() {
 
-    let sPath = path.join('public', 'scripts');
+    let sPath = 'scripts';
     if (isDev) {
         sPath = path.join(app.getAppPath(), sPath)
     } else {
-        sPath = path.join(app.getAppPath(), "..", sPath)
+        sPath = path.join(process.resourcesPath, sPath)
     }
 
     return sPath
@@ -41,11 +52,9 @@ function getScriptDir() {
 function getPlatformDir() {
     let sPath = getScriptDir()
 
-    if (process.platform === 'win32') {
-        sPath = path.join(sPath, 'win32');
-    } else {
-        sPath = path.join(sPath, 'linux');
-    }
+    if (isDev) {
+        sPath = path.join(sPath, process.platform)
+    } 
 
     return sPath
 
@@ -65,6 +74,19 @@ function getCondaScript() {
 }
 
 
+function getCondaInstallEnvScript() {
+    let sPath = getPlatformDir()
+    
+    if (process.platform === 'win32') {
+        sPath = path.join(sPath, 'createEnv.bat');
+    } else {
+        sPath = path.join(sPath, 'createEnv.sh');
+    }
+
+    return sPath
+
+}
+
 function getDeidenScript() {
     let sPath = path.join(getScriptDir(), 'deiden', 'src', 'deidTest_pyd.py');
 
@@ -77,10 +99,12 @@ const scripts = {
     platformDir: getPlatformDir(),
     condaScript: getCondaScript(),
     deidenScript: getDeidenScript(),
+    condaInstallEnvScript: getCondaInstallEnvScript(),
+    condaInstaller: getCondaInstaller(),
+    condaPath: path.join(os.homedir(),"miniconda3")
 
 }
 
-module.exports.CONSTANTS = CONSTANTS;
 module.exports.minioCred = 'minio.json';
 module.exports.requiredPrograms = requiredPrograms;
 module.exports.installHints = installHints;

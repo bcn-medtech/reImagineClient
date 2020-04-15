@@ -77,7 +77,7 @@ def _find_or_create_anonid(db, fields):
   return res[0].anonid
         
 def main(args):
-  patients = LocalDB(verbose=False, db=args.db_location)
+  patients = LocalDB(verbose=False, sqlfile=args.db_location)
   patients._initdb()
   basedir = os.getcwd()
   _l.info("Loading receipe from %s"%args.recipe)

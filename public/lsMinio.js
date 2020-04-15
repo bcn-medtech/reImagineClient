@@ -17,11 +17,13 @@ function getMinioClient() {
     return null;
   }
   let data = fs.readFileSync(cfname);
-  let minioCred = JSON.parse(data);
+  let minioConf = JSON.parse(data);
 
+  var minioCred = minioConf.credentials
+  var bucket = minioConf.bucket
   var minioClient = new minio.Client(minioCred);
 
-  return minioClient;
+  return [bucket, minioClient];
 
 }
 
@@ -79,7 +81,7 @@ function doMinioUpload(baseName, tmpDir,callback) {
 
   console.log('Connecting to minio client...');
 
-  let minioClient = getMinioClient();
+  let [bucket, minioClient] = getMinioClient();
   if (minioClient === null) {
     console.log("Cannot create minio client. Maybe credential file is missing?");
     callback(false);
@@ -90,8 +92,7 @@ function doMinioUpload(baseName, tmpDir,callback) {
   }
 
   var upfname = path.basename(fname);
-  var bucket = 'fetal';
-
+  
   try {
     minioClient.fPutObject(bucket, upfname, fname, metaData, (err, etag) => {
         if (err) {

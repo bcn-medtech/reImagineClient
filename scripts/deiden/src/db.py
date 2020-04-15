@@ -20,10 +20,12 @@ class Patient(Base):
                               self.name)  
                                 
 class LocalDB(object):                                
-  def __init__(self, verbose=True):
+  def __init__(self, verbose=True, sqlfile=None):
     #self._engine = create_engine('sqlite:///:memory:', echo=verbose)
     basedir = os.getcwd()
-    sqlfile = os.path.join(basedir, "patients.sqlite")
+    if (not sqlfile):
+      sqlfile = os.path.join(basedir, "patients.sqlite")
+    
     #self._engine = create_engine('sqlite:///:memory:', echo=verbose)
     self._engine = create_engine('sqlite:///%s'%sqlfile, echo=verbose)            
     self._sessionMaker = sessionmaker(bind=self._engine)    

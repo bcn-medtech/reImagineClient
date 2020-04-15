@@ -77,7 +77,7 @@ def _find_or_create_anonid(db, fields):
   return res[0].anonid
         
 def main(args):
-  patients = LocalDB(verbose=False)
+  patients = LocalDB(verbose=False, db=args.db_location)
   patients._initdb()
   basedir = os.getcwd()
   _l.info("Loading receipe from %s"%args.recipe)
@@ -126,6 +126,8 @@ if __name__ == '__main__':
                     help='Location of deid recipe file')
   parser.add_argument('--save-headers', action="store_true",
                     help='Save headers pre y post anonimization for debug purpose')
+  parser.add_argument('--db-location', type=str, default="patients.sqlite",
+                    help='Location of the sqlite db')
 
   args = parser.parse_args()
   main(args)

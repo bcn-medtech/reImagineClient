@@ -106,7 +106,7 @@ function runCondaAnonimizer(files, outDir, callback) {
   let result = false;
 
   for (elem in files) {
-    argv = [files[elem], outDir, config.scripts.deidenScript];
+    argv = [files[elem], outDir, config.scripts.deidenScript, config.sqlFile];
 
     console.log("About to run:", config.scripts.deidenScript, argv);
     //const deploySh = _execShellCommand(Script_Path, argv)

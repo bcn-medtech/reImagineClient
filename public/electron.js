@@ -34,6 +34,38 @@ let lsPacs = require("./lsPacs");
 let lsMinio = require("./lsMinio");
 let lsConda = require("./lsConda");
 
+const {autoUpdater} = require("electron-updater");
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToWindow('Current version is ' + app.getVersion() + '. Checking for update...');
+})
+autoUpdater.on('update-available', (info) => {
+  sendStatusToWindow('Update available.');
+})
+autoUpdater.on('update-not-available', (info) => {
+  sendStatusToWindow('Update not available.');
+})
+autoUpdater.on('error', (err) => {
+  sendStatusToWindow('Error in auto-updater. ' + err);
+})
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  sendStatusToWindow(log_message);
+})
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow('Update downloaded');
+});
+
+function sendStatusToWindow(text) {
+  log.info(text);
+  console.log('message', text);
+}
+
 var appStatus = {
   required: config.requiredPrograms,
   thirdparty_installed: false,
@@ -116,7 +148,7 @@ app.on('ready', () => {
   if(!isDev) {
     icon = path.join(__dirname, 'resources', 'icons', 'lung.png')
     if (!fs.existsSync(icon)) {
-      console.log(__dirname)
+      console.log("CANNOT FIND ICON")
     }
   }
   tray = new Tray(icon);
@@ -166,6 +198,8 @@ app.on('ready', () => {
       mainWindow.hide();
     } else mainWindow.show();
   })
+
+  autoUpdater.checkForUpdatesAndNotify();
 
 })
 

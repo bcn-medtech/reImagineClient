@@ -37,6 +37,7 @@
     "preelectron-pack": "yarn build",
     "electron-pack": "build -lw",
     "electron-pack-mac": "yarn build && electron-builder -m",
+    "electron-publish-mac": "yarn build && electron-builder -m -p always",
     "electron-dist-mac": "electron-builder",
     "electron-publish": "build -lw -p always",
     "buildmac": "react-scripts build --mac"

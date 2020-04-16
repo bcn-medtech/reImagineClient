@@ -12,6 +12,9 @@ const installHints = {
     conda: [
         path.join(os.homedir(), "miniconda3", "bin", "activate"),
         path.join(os.homedir(), "anaconda3", "bin", "activate"),
+    ],
+    deiden: [
+        path.join("envs","deid")
     ]
 }
 
@@ -23,6 +26,9 @@ function getCondaInstaller() {
         if (plat === 'darwin') {
             plat = "mac"
         }
+        if (plat === 'win32') {
+            plat = "win"
+        }        
         sPath = path.join(app.getAppPath(), sPath, plat)
     } else {
         sPath = path.join(process.resourcesPath, sPath)
@@ -63,6 +69,9 @@ function getPlatformDir() {
         if (plat === 'darwin') {
             plat = "mac"
         }
+        if (plat === 'win32') {
+            plat = "win"
+        }        
         sPath = path.join(sPath, plat)
     } 
 

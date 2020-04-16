@@ -263,11 +263,22 @@ ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => {
 
   new Promise(resolve => {
     let res = false
+<<<<<<< HEAD
     lsMinio.minioUpload(uploadDir, tmpDir,(result1)=>{
       lsHost.removeFolder(uploadDir,(result2)=>{
         resolve(result1);
       });
     });
+=======
+    
+    console.log(uploadDir);
+    console.log(tmpDir);    
+    
+    lsMinio.minioUpload(uploadDir, tmpDir,(result)=>{
+      resolve(result)
+    })    
+    
+>>>>>>> 8e5d26660265b8f6189c2b818180ac73848b78b1
   })
   .then((value) => {
     event.reply("uploadResult",value);

@@ -36,26 +36,18 @@ export const RootPage = () => {
     ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
     const config = ipcRenderer.sendSync("getConfig");
 
-    const onInstalledSoftwareCheck = (softwareInstalled, status, errs) => {
-
-        console.log(status);
+    const onInstalledSoftwareCheck = (program, status, errs) => {
 
         if (status) {
-            //const result =getSoftwareInstalledAnNotInstalled(config.requiredPrograms,softwareInstalled);
-            // softwareInstalled=result.softwareInstalled;
-            // softwareNotInstalled=result.softwareNotInstalled;
-            setSoftwareInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
-            setSoftwareNotInstalled([]);
-            //setAllSoftwareIsInstalledSuccesfully(true);
+            setSoftwareInstalled(softwareInstalled.concat([program]));
         } else {
-            //setAllSoftwareIsInstalledSuccesfully(false);
-            setSoftwareInstalled([]);
-            setSoftwareNotInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
-            setStep("installers");
+            setSoftwareNotInstalled(softwareNotInstalled.concat([program]));
         }
     }
 
     const checkIfSoftwareIsInstalled = () => {
+        setSoftwareInstalled([]);
+        setSoftwareNotInstalled([]);
         for (let software of config.requiredPrograms) {
             ipcRenderer.send('checkInstalled', software);
         }

@@ -68,8 +68,8 @@ export const Installers = (props) => {
         const softwarenotinstalled = props.softwarenotinstalled;
 
         //#TODO currently working only for conda
-        if (softwarenotinstalled.length > 0) {
-            ipcRenderer.send("installRequest", softwarenotinstalled[0])
+        for (var app of softwarenotinstalled) {
+            ipcRenderer.send("installRequest", app)
         }
     }
 

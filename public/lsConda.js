@@ -115,7 +115,7 @@ function doInstallCheck(program, hints) {
       foundDeid = out.startsWith("deid");
     } catch (e) {
       console.error(out, e)
-      res.push([out, e])
+      errs.push([out, e])
     }
 
     if (!foundDeid) {

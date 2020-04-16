@@ -31,20 +31,22 @@ export const Filer = (props) => {
 
     const classes = useStyles();
 
-    ipcRenderer.on('onDirSelection', (event, args) => { 
+    const onDirSelection=(event,args)=>{
         let newFiles=JSON.parse(JSON.stringify(props.files));
         args.forEach(arg => {
             newFiles.push(arg);
         });
         props.onactiontoperform({ action: "ADD FOLDER", values: newFiles}) 
-    });
+    }
 
     //Component did unmount
-    // useEffect(() => {
-    //     return () => {
-    //         ipcRenderer.removeAllListeners();
-    //     }
-    // }, []);
+    useEffect(() => {
+        ipcRenderer.on('onDirSelection', (event, args) => onDirSelection(event,args));
+        return () => {
+            //ipcRenderer.removeAllListeners();
+            ipcRenderer.removeListener('onDirSelection', onDirSelection)
+        }
+    }, []);
 
     const renderAddFolderBody = (files) => {
 

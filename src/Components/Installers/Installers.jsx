@@ -50,16 +50,16 @@ export const Installers = (props) => {
 
     const classes = useStyles();
 
-    ipcRenderer.on('condaInstallRequestFinished', (event, installed) => {
+    const condaInstallRequestFinished=(event, installed)=>{
         props.onactiontoperform({ action: "FINISH INSTALLERS", values: installed });
-    });
+    }
 
-    //Component did unmount
-    // useEffect(() => {
-    //     return () => {
-    //         ipcRenderer.removeAllListeners();
-    //     }
-    // }, []);
+    useEffect(() => {
+        ipcRenderer.on('condaInstallRequestFinished', (event, args) => condaInstallRequestFinished(event,args));
+        return () => {
+            ipcRenderer.removeListener('condaInstallRequestFinished', condaInstallRequestFinished)
+        }
+    }, []);
 
     const runInstallationThirdPartySoftware = () => {
         console.log("Run installation third party software");

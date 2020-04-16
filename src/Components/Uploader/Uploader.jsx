@@ -35,15 +35,20 @@ export const Uploader = (props) => {
 
     const classes = useStyles();
 
-    ipcRenderer.on('uploadResult', (event, args) => {
-        console.log(args);
+    // ipcRenderer.on('uploadResult', (event, args) => {
+    //     console.log(args);
+    //     props.onactiontoperform({ action: "FINISH UPLOAD IMAGES", values: args });
+    // });
+
+    const uploadResult=(event, args) => {
         props.onactiontoperform({ action: "FINISH UPLOAD IMAGES", values: args });
-    });
+    }
 
     //Component did unmount
     useEffect(() => {
+        ipcRenderer.on('uploadResult', (event, args) => uploadResult(event,args));
         return () => {
-            ipcRenderer.removeAllListeners();
+            ipcRenderer.removeListener('uploadResult', uploadResult)
         }
     }, []);
 

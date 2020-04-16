@@ -33,12 +33,14 @@ export const RootPage = () => {
     const [softwareInstalled, setSoftwareInstalled] = useState([]);
     const [softwareNotInstalled, setSoftwareNotInstalled] = useState([]);
 
-    ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
+    //useEffect(() => {
+    //    console.log("hola");
+        //ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
+    //});
+
     const config = ipcRenderer.sendSync("getConfig");
 
     const onInstalledSoftwareCheck = (softwareInstalled, status, errs) => {
-
-        console.log(status);
 
         if (status) {
             //const result =getSoftwareInstalledAnNotInstalled(config.requiredPrograms,softwareInstalled);
@@ -65,7 +67,8 @@ export const RootPage = () => {
     useEffect(() => {
         // code to run on component mount
         checkIfSoftwareIsInstalled();
-    }, [])
+        ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
+    },[])
 
 
     const onActionToPerform = (action) => {

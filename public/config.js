@@ -12,6 +12,9 @@ const installHints = {
     conda: [
         path.join(os.homedir(), "miniconda3", "bin", "activate"),
         path.join(os.homedir(), "anaconda3", "bin", "activate"),
+    ],
+    deiden: [
+        path.join("envs","deid")
     ]
 }
 

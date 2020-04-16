@@ -268,9 +268,9 @@ ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => {
     console.log(uploadDir);
     console.log(tmpDir);    
     
-    /*lsMinio.minioUpload(uploadDir, tmpDir,(result)=>{
+    lsMinio.minioUpload(uploadDir, tmpDir,(result)=>{
       resolve(result)
-    })*/    
+    })    
     
   })
   .then((value) => {

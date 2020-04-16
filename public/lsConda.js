@@ -80,9 +80,7 @@ function doInstallCheck(program, hints) {
   let condaPath = null
   if (program === "conda") {
     let condaPath = shell.env["CONDA_EXE"]
-    if (condaPath) {
-      condaPath = path.resolve(condaPath, "..", "..")
-    } else {
+    if (!condaPath) {
       for (const _p of hints) {
         if (fs.existsSync(_p)) {
           condaPath = _p
@@ -101,12 +99,14 @@ function doInstallCheck(program, hints) {
     } else {
       console.log(program, "path: ", condaPath)
       config.scripts.condaPath = condaPath;
+      config.scripts.condaHome = path.resolve(condaPath, "..", "..")
       return []
     }
   }
 
   let foundDeid = false;
   if (program === "deiden") {
+    /*
     let cmd = "source " + path.join(config.scripts.condaPath,"bin","activate") + 
       " && conda env list | grep deid"
     console.log("About to run: ", cmd)
@@ -116,6 +116,16 @@ function doInstallCheck(program, hints) {
     } catch (e) {
       console.error(out, e)
       errs.push([out, e])
+    }
+    */
+   for (const _p of hints) {
+    let _dp = path.join(config.scripts.condaHome, _p)
+    console.log("Searching deid in ", _dp)
+
+    if (fs.existsSync(_dp)) {
+      foundDeid = true
+      break
+      }
     }
 
     if (!foundDeid) {

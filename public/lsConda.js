@@ -20,7 +20,28 @@ function doInstallRequest(event, app, callback) {
       });
       //return [flag, res]
     }
+  } else if (app.name === "deiden") {
+    console.log("Miniconda installed, now installing ENVIRONMENT")  
+    let reason = ""
+    var pInstall = createDeidEnv()
 
+    pInstall.stdout.on('data', (data) => {
+      reason += "Data: " + data + "\n"
+      console.log(`Output: ${data}`);
+    });
+
+    pInstall.stderr.on('data', (data) => {
+      reason += "Data: " + data + "\n"
+      console.log(`stderr: ${data}`)
+    })
+
+    pInstall.on('exit', (data) => {
+      console.log(`final data ${data}`);
+      reason += "Data: " + data + "\n";
+      isOk=true;
+      callback({isOk:isOk, res: reason});
+    })
+  
   } else {
     //return [false, "Cannot install program " + app.name]
     callback({ isOk:false, res: res});
@@ -71,6 +92,9 @@ function doInstallCheck(program, hints) {
   }
 
   console.log(program, "path: ", pPath)
+  if (program === "conda") {
+    config.scripts.condaPath = pPath;
+  }
   return []
 }
 /*
@@ -106,9 +130,9 @@ function runCondaAnonimizer(files, outDir, callback) {
   let result = false;
 
   for (elem in files) {
-    argv = [files[elem], outDir, config.scripts.deidenScript, config.sqlFile];
+    argv = [files[elem], outDir, config.scripts.deidenScript, config.sqlFile, config.scripts.condaPath];
 
-    console.log("About to run:", config.scripts.deidenScript, argv);
+    console.log("About to run:", config.scripts.condaScript, argv);
     //const deploySh = _execShellCommand(Script_Path, argv)
     const deploySh = exec.execFile(config.scripts.condaScript, argv);
 
@@ -182,12 +206,10 @@ function installMiniconda(callback) {
 
     /*
       INSTALLING CONDA ENVIRONMENT!!!!!
-    */
+  
     console.log("Miniconda installed, now installing ENVIRONMENT")  
 
-    console.log("About to run:", config.scripts.condaInstallEnvScript, [])
-
-    var pInstall = exec.execFile(config.scripts.condaInstallEnvScript, [], { env: 'bin/bash' })
+    var pInstall = createDeidEnv()
 
     pInstall.stdout.on('data', (data) => {
       reason += "Data: " + data + "\n"
@@ -205,9 +227,17 @@ function installMiniconda(callback) {
       isOk=true;
       callback({isOk:isOk, reason:reason});
     })
-  
+  */
 
   })
+}
+
+function createDeidEnv() {
+  console.log("About to run:", config.scripts.condaInstallEnvScript, [config.scripts.condaPath])
+
+  var pInstall = exec.execFile(config.scripts.condaInstallEnvScript, [config.scripts.condaPath], { env: 'bin/bash' })
+
+  return pInstall
 }
 
 module.exports.installRequest = doInstallRequest;

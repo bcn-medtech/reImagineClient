@@ -4,21 +4,26 @@ const isDev = require('electron-is-dev');
 const {app} = require("electron")
 
 const requiredPrograms = [
-    {name: "conda", icon: "../assets/logo_anaconda.png"}
+    {name: "conda", icon: "../assets/logo_anaconda.png"},
+    {name: "deiden", icon: "../assets/logo_anaconda.png"},
   ]
 
 const installHints = {
     conda: [
         path.join(os.homedir(), "miniconda3", "bin", "activate"),
         path.join(os.homedir(), "anaconda3", "bin", "activate"),
-
     ]
 }
 
 function getCondaInstaller() {
     let sPath = 'installers';
     if (isDev) {
-        sPath = path.join(app.getAppPath(), sPath, process.platform)
+    // I don't know why process.json uses mac and node uses darwin here!! :(
+        let plat = process.platform
+        if (plat === 'darwin') {
+            plat = "mac"
+        }
+        sPath = path.join(app.getAppPath(), sPath, plat)
     } else {
         sPath = path.join(process.resourcesPath, sPath)
     }
@@ -53,7 +58,12 @@ function getPlatformDir() {
     let sPath = getScriptDir()
 
     if (isDev) {
-        sPath = path.join(sPath, process.platform)
+        // I don't know why process.json uses mac and node uses darwin here!! :(
+        let plat = process.platform
+        if (plat === 'darwin') {
+            plat = "mac"
+        }
+        sPath = path.join(sPath, plat)
     } 
 
     return sPath

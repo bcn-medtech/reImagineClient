@@ -3,7 +3,8 @@ basedir="$1"
 outdir="$2"
 scriptdir="$3"
 sqlfile="$4"
-source ~/miniconda3/etc/profile.d/conda.sh
+condapath="$5"
+source $condapath
 
 conda activate deid
 pushd scripts/deiden/

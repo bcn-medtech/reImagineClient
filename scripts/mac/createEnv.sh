@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #source ~/.bashrc
-source ~/miniconda3/etc/profile.d/conda.sh
+condapath="$1"
+source $condapath
 echo "CREATE ENV:" $(which conda)
 
 ENVS=$(conda env list | grep deid | cut -f1 -d' ')

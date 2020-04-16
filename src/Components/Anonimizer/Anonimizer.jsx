@@ -5,11 +5,11 @@ import { Step1SVG } from './../svgs/Step1SVG';
 import { Step2SVG } from './../svgs/Step2SVG';
 import { Step2RunningSVG } from './../svgs/Step2RunningSVG';
 import { Step3SVG } from './../svgs/Step3SVG';
-import {NavigateToAnonimizerRightSVG} from './../svgs/NavigateToAnonimizerRightSVG';
-import {NavigateToFilerLeftSVG} from './../svgs/NavigateToFilerLeftSVG';
-import {NavigateToUploaderRightSVG} from './../svgs/NavigateToUploaderRightSVG';
+import { NavigateToAnonimizerRightSVG } from './../svgs/NavigateToAnonimizerRightSVG';
+import { NavigateToFilerLeftSVG } from './../svgs/NavigateToFilerLeftSVG';
+import { NavigateToUploaderRightSVG } from './../svgs/NavigateToUploaderRightSVG';
 import { AnonimizerList } from './AnonimizerList';
-import {RunAnonimizerSVG} from './../svgs/RunAnonimizerSVG';
+import { RunAnonimizerSVG } from './../svgs/RunAnonimizerSVG';
 //Electron 
 const { ipcRenderer } = window.require("electron");
 
@@ -32,21 +32,26 @@ const useStyles = makeStyles((theme) => ({
 export const Anonimizer = (props) => {
 
     const classes = useStyles();
-    
-    ipcRenderer.on('condaAnonimizeRequestFinished', (event, args) => { 
-        console.log(args);
-        props.onactiontoperform({action:"FINISH ANONIMIZATION", values:args});  
-    });
-    
-     //Component did unmount
-    //  useEffect(() => {
-    //     return () => {
-    //         ipcRenderer.removeAllListeners();
-    //     }
-    // }, []);
 
-    const runAnonimization=()=>{
-        props.onactiontoperform({action:"RUN ANONIMIZATION", values:"false"});
+    // ipcRenderer.on('condaAnonimizeRequestFinished', (event, args) => {
+    //     console.log(args);
+        
+    // });
+
+    const condaAnonimizeRequestFinished=(event, args) => {
+        props.onactiontoperform({ action: "FINISH ANONIMIZATION", values: args });
+    }
+
+    //Component did unmount
+    useEffect(() => {
+        ipcRenderer.on('condaAnonimizeRequestFinished', (event, args) => condaAnonimizeRequestFinished(event, args));
+        return () => {
+            ipcRenderer.removeListener('condaAnonimizeRequestFinished', condaAnonimizeRequestFinished)
+        }
+    }, []);
+
+    const runAnonimization = () => {
+        props.onactiontoperform({ action: "RUN ANONIMIZATION", values: "false" });
         ipcRenderer.send('condaAnonimizeRequest', props.files, null);
     }
 
@@ -54,12 +59,12 @@ export const Anonimizer = (props) => {
 
         if (files.length === 0) {
             return (
-                <RunAnonimizerSVG onclickcomponent={runAnonimization}/>
+                <RunAnonimizerSVG onclickcomponent={runAnonimization} />
             );
         } else {
             return (
                 <div className="grid-block align-center">
-                    <div className="grid-block shrink"><RunAnonimizerSVG onclickcomponent={runAnonimization}/></div>
+                    <div className="grid-block shrink"><RunAnonimizerSVG onclickcomponent={runAnonimization} /></div>
                     <div className="grid-block shrink vertical">
                         <div className="grid-block">&nbsp;</div>
                         <div className="grid-block shrink">
@@ -76,46 +81,46 @@ export const Anonimizer = (props) => {
     }
 
 
-    const renderSteps = (files,uploadingImages,runningAnonimization,anonimizationdir)=>{
+    const renderSteps = (files, uploadingImages, runningAnonimization, anonimizationdir) => {
 
-        if(runningAnonimization){
-            return(
+        if (runningAnonimization) {
+            return (
                 <div className="grid-block vertical ">
-                <div className={"grid-block align-center shrink " + classes.label1}>Anonimizing Images</div>
-                <div className={"grid-block align-center shrink " + classes.label2}>Please wait upto the anonimization process finish</div>
-                <div className={"grid-block align-center shrink " + classes.stepers}>
-                    <NavigateToFilerLeftSVG onclickcomponent={()=>props.onactiontoperform({action:"GO TO FILER","values":false})}/>
-                    <Step1SVG done={true}/>
-                    <Step2RunningSVG done={true}/>
-                    <Step3SVG done={false}/>
+                    <div className={"grid-block align-center shrink " + classes.label1}>Anonimizing Images</div>
+                    <div className={"grid-block align-center shrink " + classes.label2}>Please wait upto the anonimization process finish</div>
+                    <div className={"grid-block align-center shrink " + classes.stepers}>
+                        <NavigateToFilerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO FILER", "values": false })} />
+                        <Step1SVG done={true} />
+                        <Step2RunningSVG done={true} />
+                        <Step3SVG done={false} />
+                    </div>
                 </div>
-            </div>
             )
-        }if(anonimizationdir!==false){
-            return(
+        } if (anonimizationdir !== false) {
+            return (
                 <div className="grid-block vertical ">
-                <div className={"grid-block align-center shrink " + classes.label1}>Anonimization done</div>
-                <div className={"grid-block align-center shrink " + classes.label2}>Data has been anonimized succesfully</div>
-                <div className={"grid-block align-center shrink " + classes.stepers}>
-                    <NavigateToFilerLeftSVG onclickcomponent={()=>props.onactiontoperform({action:"GO TO FILER","values":false})}/>
-                    <Step1SVG done={true}/>
-                    <Step2SVG done={true}/>
-                    <Step3SVG done={false}/>
-                    <NavigateToUploaderRightSVG onclickcomponent={()=>props.onactiontoperform({action:"GO TO UPLOADER","values":false})}/>
-                </div>
-            </div>);
-        }else{
-            return(
+                    <div className={"grid-block align-center shrink " + classes.label1}>Anonimization done</div>
+                    <div className={"grid-block align-center shrink " + classes.label2}>Data has been anonimized succesfully</div>
+                    <div className={"grid-block align-center shrink " + classes.stepers}>
+                        <NavigateToFilerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO FILER", "values": false })} />
+                        <Step1SVG done={true} />
+                        <Step2SVG done={true} />
+                        <Step3SVG done={false} />
+                        <NavigateToUploaderRightSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO UPLOADER", "values": false })} />
+                    </div>
+                </div>);
+        } else {
+            return (
                 <div className="grid-block vertical ">
-                <div className={"grid-block align-center shrink " + classes.label1}>Anonimize Images</div>
-                <div className={"grid-block align-center shrink " + classes.label2}>Click the big button to run the anonimizer</div>
-                <div className={"grid-block align-center shrink " + classes.stepers}>
-                    <NavigateToFilerLeftSVG onclickcomponent={()=>props.onactiontoperform({action:"GO TO FILER","values":false})}/>
-                    <Step1SVG done={true}/>
-                    <Step2SVG done={true}/>
-                    <Step3SVG done={false}/>
+                    <div className={"grid-block align-center shrink " + classes.label1}>Anonimize Images</div>
+                    <div className={"grid-block align-center shrink " + classes.label2}>Click the big button to run the anonimizer</div>
+                    <div className={"grid-block align-center shrink " + classes.stepers}>
+                        <NavigateToFilerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO FILER", "values": false })} />
+                        <Step1SVG done={true} />
+                        <Step2SVG done={true} />
+                        <Step3SVG done={false} />
+                    </div>
                 </div>
-            </div>
             )
         }
     }
@@ -125,7 +130,7 @@ export const Anonimizer = (props) => {
             <div className="grid-block align-center">
                 {renderAddFolderBody(props.files)}
             </div>
-            {renderSteps(props.files,props.uploadingimages,props.runninganonimization,props.anonimizationdir)}
+            {renderSteps(props.files, props.uploadingimages, props.runninganonimization, props.anonimizationdir)}
         </div>
     );
 }

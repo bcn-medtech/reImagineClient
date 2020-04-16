@@ -2,16 +2,12 @@
   "author": "Mario Ceresa <mario.ceresa@upf.edu>",
   "description": "Client for the reimagine analysis platform",
   "name": "reImagineClient",
-  "version": "1.2.3",
+  "version": "1.1.0-master",
   "repository": "https://bitbucket.org/simbiosys/reimagineclient/src/master/",
   "private": true,
-  "installConfig": {
-    "pnp": false
-  },
   "dependencies": {
     "@material-ui/core": "^4.0.0-rc.0",
     "@material-ui/icons": "^4.0.0-rc.0",
-    "build": "^0.1.4",
     "electron-is-dev": "^0.3.0",
     "electron-log": "^4.1.1",
     "electron-updater": "^4.2.5",
@@ -36,7 +32,7 @@
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
     "electron-pack": "build -lw",
-    "electron-pack-mac": "yarn build && electron-builder -m",
+    "electron-pack-mac": "electron-builder --dir",
     "electron-dist-mac": "electron-builder",
     "electron-publish": "build -lw -p always",
     "buildmac": "react-scripts build --mac"
@@ -67,8 +63,7 @@
       }
     ],
     "linux": {
-      "icon": "icon256x256.png",
-      "target": "AppImage"
+      "icon": "icon256x256.png"
     },
     "win": {
       "icon": "icon.ico",
@@ -76,8 +71,7 @@
     },
     "mac": {
       "icon": "icon.icns",
-      "identity": null,
-      "target": "dmg"
+      "identity": null
     },
     "extraResources": [
       {

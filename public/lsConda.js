@@ -7,6 +7,7 @@ const shell = require("shelljs")
 const isDev = require('electron-is-dev');
 const main = require("./electron.js")
 const config = main.getConfig();
+shell.config.execPath = shell.which('node').toString()
 //const CONSTANTS = config.CONSTANTS;
 
 function doInstallRequest(event, app, callback) {
@@ -76,25 +77,54 @@ function doInstallCheck(program, hints) {
     return ["Cannot check a null program name!"]
   }
 
-  let pPath = shell.which(program);
-  if (!pPath) {
-    for (const _p of hints) {
-      if (fs.existsSync(_p)) {
-        pPath = _p
-        break
+  let condaPath = null
+  if (program === "conda") {
+    let condaPath = shell.env["CONDA_EXE"]
+    if (condaPath) {
+      condaPath = path.resolve(condaPath, "..", "..")
+    } else {
+      for (const _p of hints) {
+        if (fs.existsSync(_p)) {
+          condaPath = _p
+          break
+        }
       }
+    }
+
+    if (!condaPath) {
+      condaPath = shell.which(program);
+    }
+
+    if (!condaPath) {
+      errs.push("Cannot find " + program)
+      return errs
+    } else {
+      console.log(program, "path: ", condaPath)
+      config.scripts.condaPath = condaPath;
+      return []
     }
   }
 
-  if (!pPath) {
-    errs.push("Cannot find " + program)
-    return errs
+  let foundDeid = false;
+  if (program === "deiden") {
+    let cmd = "source " + path.join(config.scripts.condaPath,"bin","activate") + 
+      " && conda env list | grep deid"
+    console.log("About to run: ", cmd)
+    try {
+      var out = shell.exec(cmd,{silent:true}).stdout
+      foundDeid = out.startsWith("deid");
+    } catch (e) {
+      console.error(out, e)
+      res.push([out, e])
+    }
+
+    if (!foundDeid) {
+      errs.push("Cannot find " + program)
+      return errs
+    }
+
   }
 
-  console.log(program, "path: ", pPath)
-  if (program === "conda") {
-    config.scripts.condaPath = pPath;
-  }
   return []
 }
 /*

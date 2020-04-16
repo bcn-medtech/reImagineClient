@@ -18,6 +18,8 @@ const useStyles = makeStyles((theme) => ({
 // let softwareInstalled=[];
 // let softwareNotInstalled=[];
 
+let selectedFilesCopy = [];
+
 export const RootPage = () => {
 
     const classes = useStyles();
@@ -35,7 +37,7 @@ export const RootPage = () => {
 
     //useEffect(() => {
     //    console.log("hola");
-        //ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
+    //ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
     //});
 
     const config = ipcRenderer.sendSync("getConfig");
@@ -62,26 +64,34 @@ export const RootPage = () => {
         // code to run on component mount
         checkIfSoftwareIsInstalled();
         ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
-    },[])
+    }, [])
 
 
     const onActionToPerform = (action) => {
 
         switch (action.action) {
             case "ADD FOLDER":
+                console.log("Add folder");
                 const newSelectedFiles = action.values;
-                setSelectedFiles(newSelectedFiles);
-                setDataUploadedSuccesfully(false);
-                setAnonDir(false);
+                console.log(newSelectedFiles);
+                if (newSelectedFiles.length > 0) {
+                    if (selectedFilesCopy.indexOf(newSelectedFiles[0]) === -1) {
+                        selectedFilesCopy = selectedFilesCopy.concat(newSelectedFiles);
+                        setSelectedFiles(selectedFilesCopy);
+                        setDataUploadedSuccesfully(false);
+                        setAnonDir(false);
+                    }
+                }
                 break;
 
             case "DELETE FOLDER":
-                let newSelectedFiles2 = selectedFiles.filter((element) => {
+                console.log("Delete folder");
+                selectedFilesCopy = selectedFilesCopy.filter((element) => {
                     if (element !== action.values) {
                         return true;
                     }
                 });
-                setSelectedFiles(newSelectedFiles2);
+                setSelectedFiles(selectedFilesCopy);
                 setDataUploadedSuccesfully(false);
                 setAnonDir(false);
                 break;
@@ -109,7 +119,7 @@ export const RootPage = () => {
                 setUploadingImages(true);
                 break;
             case "FINISH UPLOAD IMAGES":
-                if (action.values === "success") {
+                if (action.values === true) {
                     setDataUploadedSuccesfully(true);
                 }
                 setUploadingImages(false);
@@ -119,16 +129,23 @@ export const RootPage = () => {
                 break;
             case "FINISH INSTALLERS":
 
-                if("isOk" in action.values){
-                    if(action.values.isOk===true){
+                if ("isOk" in action.values) {
+                    if (action.values.isOk === true) {
                         setSoftwareInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
                         setSoftwareNotInstalled([]);
-                    }else{
+                    } else {
                         setSoftwareInstalled([]);
                         setSoftwareNotInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
                     }
                 }
                 setRunningInstallers(false);
+                break;
+            case "UPLOAD NEW CASES":
+                selectedFilesCopy=[];
+                setSelectedFiles(selectedFilesCopy);
+                setDataUploadedSuccesfully(false);
+                setAnonDir(false);
+                setStep("filer");
                 break;
             default:
                 break;
@@ -139,6 +156,7 @@ export const RootPage = () => {
 
         switch (step) {
             case "filer":
+                console.log(selectedFiles);
                 return (
                     <Filer
                         onactiontoperform={onActionToPerform}
@@ -146,7 +164,7 @@ export const RootPage = () => {
                         uploadingimages={uploadingImages}
                         files={selectedFiles} />
                 );
-                
+
             case "anonimizer":
                 return (<Anonimizer
                     onactiontoperform={onActionToPerform}
@@ -154,7 +172,7 @@ export const RootPage = () => {
                     uploadingimages={uploadingImages}
                     anonimizationdir={anonDir}
                     files={selectedFiles} />)
-                
+
             case "uploader":
                 return (<Uploader
                     onactiontoperform={onActionToPerform}
@@ -163,7 +181,7 @@ export const RootPage = () => {
                     anonimizationdir={anonDir}
                     datauploadedsuccesfully={dataUploadedSuccesfully}
                     files={selectedFiles} />)
-                
+
             case "installers":
                 return (<Installers
                     softwareinstalled={softwareInstalled}

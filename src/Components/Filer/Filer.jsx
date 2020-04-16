@@ -32,11 +32,7 @@ export const Filer = (props) => {
     const classes = useStyles();
 
     const onDirSelection=(event,args)=>{
-        let newFiles=JSON.parse(JSON.stringify(props.files));
-        args.forEach(arg => {
-            newFiles.push(arg);
-        });
-        props.onactiontoperform({ action: "ADD FOLDER", values: newFiles}) 
+        props.onactiontoperform({ action: "ADD FOLDER", values: args}) 
     }
 
     //Component did unmount

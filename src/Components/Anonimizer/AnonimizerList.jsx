@@ -61,11 +61,11 @@ export const AnonimizerList = (props) => {
                                 primary={<Typography className={classes.textList}>{value}</Typography>}
                                 style={{ wordBreak: 'break-all' }}
                             />
-                            <ListItemSecondaryAction className={classes.removeItem}>
+                            {/*<ListItemSecondaryAction className={classes.removeItem}>
                                 <IconButton edge="end" aria-label="delete" onClick={() => props.onactiontoperform({action:"DELETE FOLDER",values:value})}>
                                     <DeleteIcon/>
                                 </IconButton>
-                            </ListItemSecondaryAction>
+                    </ListItemSecondaryAction>*/}
                         </ListItem>
                     )
                 })

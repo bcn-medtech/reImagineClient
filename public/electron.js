@@ -1,5 +1,4 @@
 
-
 const electron = require('electron');
 const { Menu, Tray } = require('electron')
 
@@ -33,6 +32,7 @@ module.exports = {
 let lsPacs = require("./lsPacs");
 let lsMinio = require("./lsMinio");
 let lsConda = require("./lsConda");
+let lsHost = require("./lsHost"); 
 
 const {autoUpdater} = require("electron-updater");
 
@@ -258,20 +258,16 @@ ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => {
 
 });
 
-
 // uploading of images deidentificated for deid script
 ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => { 
 
   new Promise(resolve => {
     let res = false
-    
-    console.log(uploadDir);
-    console.log(tmpDir);    
-    
-    /*lsMinio.minioUpload(uploadDir, tmpDir,(result)=>{
-      resolve(result)
-    })*/    
-    
+    lsMinio.minioUpload(uploadDir, tmpDir,(result1)=>{
+      lsHost.removeFolder(uploadDir,(result2)=>{
+        resolve(result1);
+      });
+    });
   })
   .then((value) => {
     event.reply("uploadResult",value);
@@ -322,6 +318,11 @@ ipcMain.on('select-dirs', async (event, args) => {
 
 ipcMain.on('getConfig', (event) => {
   event.returnValue = getConfig()
+})
+
+ipcMain.on('checkUploadCerticates', (event) => {
+  const certificatePath=config.confDir+path.sep+"minio.json";
+  event.reply("onCheckUploadCerticates",lsHost.checkCertificateInHost(certificatePath));
 })
 
 

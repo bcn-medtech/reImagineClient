@@ -43,7 +43,6 @@ export const Filer = (props) => {
     useEffect(() => {
         ipcRenderer.on('onDirSelection', (event, args) => onDirSelection(event,args));
         return () => {
-            //ipcRenderer.removeAllListeners();
             ipcRenderer.removeListener('onDirSelection', onDirSelection)
         }
     }, []);

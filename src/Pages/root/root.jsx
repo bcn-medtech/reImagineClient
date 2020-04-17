@@ -43,17 +43,25 @@ export const RootPage = () => {
     const config = ipcRenderer.sendSync("getConfig");
 
     const onInstalledSoftwareCheck = (program, status, errs) => {
-
+        console.log("*****onInstalledSoftwareCheck***", program, status)
         if (status) {
-            setSoftwareInstalled(softwareInstalled.concat([program]));
+            setSoftwareInstalled( (OldSoftwareInstalled) => {
+                return OldSoftwareInstalled.concat([program]);
+            });
         } else {
-            setSoftwareNotInstalled(softwareNotInstalled.concat([program]));
+            setSoftwareNotInstalled( (OldSoftwareNotInstalled) => {
+                return OldSoftwareNotInstalled.concat([program]);
+            });
         }
     }
 
     const checkIfSoftwareIsInstalled = () => {
-        setSoftwareInstalled([]);
-        setSoftwareNotInstalled([]);
+        setSoftwareInstalled( () => {
+            return [];
+        });
+        setSoftwareNotInstalled( () => {
+            return [];
+        });
         for (let software of config.requiredPrograms) {
             ipcRenderer.send('checkInstalled', software);
         }

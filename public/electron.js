@@ -15,10 +15,13 @@ const os = require('os');
 const { ipcMain, dialog } = require('electron');
 let mainWindow;
 
-const log = require("electron-log");
-Object.assign(console, log.functions);
-
 var config = require("./config");
+
+const log = require("electron-log");
+log.transports.file.level = "info";
+log.transports.file.file = path.join(config.logDir, "log_Main.txt")
+
+Object.assign(console, log.functions);
 
 function getConfig() {
   return config
@@ -101,7 +104,7 @@ function createWindow() {
 
     console.log("Loading version from:"+urlLoc);
     console.log("App path is", app.getAppPath());
-    checkConfiguration();
+    writeConfiguration();
     mainWindow.loadURL(urlLoc);
     
     mainWindow.on('closed', function () {
@@ -109,36 +112,12 @@ function createWindow() {
     })
 }
 
-function checkConfiguration() {
+function writeConfiguration() {
   
-  if (!fs.existsSync(config.confDir)) {
-    fs.mkdirSync(config.confDir, { recursive: true })
-  }
-
-  confFile = path.join(config.confDir, "reImagine.json");
-  sqlFile = path.join(config.confDir, "patients.sqlite");
-  anDir = path.join(config.confDir, "an");
-  config.confFile = confFile;
-  config.sqlFile = sqlFile;
-  config.anDir = anDir;
-  config.minioCred = path.join(config.confDir, config.minioCred);  
   let data = JSON.stringify(config)
-  fs.writeFileSync(confFile, data)
+  fs.writeFileSync(config.confFile, data)
   console.log(config)  
-  /*
-  REMOVED FOR NOW BECAUSE EVERY TIME THE APP IMAGE IS LAUNCHED THE PATHS CHANGE
-    AND AS SUCH THERE IS NO REASON TO SAVE THEM   
-  if (!fs.existsSync(confFile)) {
-    let data = JSON.stringify(config)
-    fs.writeFileSync(confFile, data)
-    console.log(config)
-  } else {
-    console.log("Loading configuration data from",confFile)    
-    let data = fs.readFileSync(confFile)
-    config = JSON.parse(data);
-    console.log(config)
-    }
-  */
+  
 }
 
 // Tray just let us have an icon saved in taskbar to do more easily to use the app and do it less heavy interface
@@ -263,22 +242,11 @@ ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => {
 
   new Promise(resolve => {
     let res = false
-<<<<<<< HEAD
     lsMinio.minioUpload(uploadDir, tmpDir,(result1)=>{
       lsHost.removeFolder(uploadDir,(result2)=>{
         resolve(result1);
       });
     });
-=======
-    
-    console.log(uploadDir);
-    console.log(tmpDir);    
-    
-    lsMinio.minioUpload(uploadDir, tmpDir,(result)=>{
-      resolve(result)
-    })    
-    
->>>>>>> 8e5d26660265b8f6189c2b818180ac73848b78b1
   })
   .then((value) => {
     event.reply("uploadResult",value);

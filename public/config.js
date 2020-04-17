@@ -2,6 +2,15 @@ const path = require('path')
 const os = require("os")
 const isDev = require('electron-is-dev');
 const {app} = require("electron")
+const fs = require('fs');
+
+const confDir = path.join(app.getPath("documents"),"reimagine")
+const confFile = path.join(confDir, "reImagine.json");
+const sqlFile = path.join(confDir, "patients.sqlite");
+const logDir = path.join(confDir, "logs");
+const anDir = path.join(confDir, "an");
+
+const _createDirs = [confDir, logDir, anDir]
 
 const requiredPrograms = [
     {name: "conda", icon: "../assets/logo_anaconda.png"},
@@ -121,11 +130,22 @@ const scripts = {
     condaInstallEnvScript: getCondaInstallEnvScript(),
     condaInstaller: getCondaInstaller(),
     condaPath: path.join(os.homedir(),"miniconda3")
-
 }
 
-module.exports.minioCred = 'minio.json';
+// Ensure basic dir structure is ready
+for (_d of _createDirs) {
+    if (!fs.existsSync(_d)) {
+        fs.mkdirSync(_d, { recursive: true })
+    }
+}
+
+module.exports.confDir = confDir
+module.exports.confFile = confFile;
+module.exports.sqlFile = sqlFile;
+module.exports.anDir = anDir;
+module.exports.logDir = logDir;
+module.exports.minioCred = path.join(confDir, "minio.json");
 module.exports.requiredPrograms = requiredPrograms;
 module.exports.installHints = installHints;
 module.exports.scripts = scripts;
-module.exports.confDir = path.join(app.getPath("documents"),"reimagine")
+

@@ -71,9 +71,9 @@ export const RootPage = () => {
 
         switch (action.action) {
             case "ADD FOLDER":
-                console.log("Add folder");
+                //console.log("Add folder");
                 const newSelectedFiles = action.values;
-                console.log(newSelectedFiles);
+                //console.log(newSelectedFiles);
                 if (newSelectedFiles.length > 0) {
                     if (selectedFilesCopy.indexOf(newSelectedFiles[0]) === -1) {
                         selectedFilesCopy = selectedFilesCopy.concat(newSelectedFiles);
@@ -85,7 +85,7 @@ export const RootPage = () => {
                 break;
 
             case "DELETE FOLDER":
-                console.log("Delete folder");
+                //console.log("Delete folder");
                 selectedFilesCopy = selectedFilesCopy.filter((element) => {
                     if (element !== action.values) {
                         return true;
@@ -156,7 +156,6 @@ export const RootPage = () => {
 
         switch (step) {
             case "filer":
-                console.log(selectedFiles);
                 return (
                     <Filer
                         onactiontoperform={onActionToPerform}

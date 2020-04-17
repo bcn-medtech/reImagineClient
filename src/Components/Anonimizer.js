@@ -8,7 +8,6 @@ export class Anonimizer extends Component {
     doAnonimization() {
         
         let [res, resOut, anonDir] = ipcRenderer.sendSync('condaAnonimizeRequest', this.props.files, null);
-        console.log(resOut);
         this.props.onAnonDirChange(anonDir)
     }
 

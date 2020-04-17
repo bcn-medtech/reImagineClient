@@ -45,7 +45,6 @@ export const Filer = (props) => {
 
     const renderAddFolderBody = (files) => {
 
-        console.log(files);
         if (files.length === 0) {
             return (
                 <AddFolderEmptySVG onclickcomponent={() => {ipcRenderer.send("select-dirs") }} />

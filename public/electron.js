@@ -197,6 +197,7 @@ app.on('activate', function () {
     }
 });
 
+/*
 ipcMain.on('installRequest', (event, app) => { 
   console.log("Received Install request for ",app.name)
     lsConda.installRequest(event, app,(result)=>{
@@ -204,7 +205,7 @@ ipcMain.on('installRequest', (event, app) => {
       event.reply("condaInstallRequestFinished",result);
     });
 });
-
+*/
 ipcMain.on('installRequestPromise', (event, app) => { 
   console.log("Received Install request for ",app.name)
     lsConda.installRequest(event, app,(result)=>{
@@ -213,26 +214,16 @@ ipcMain.on('installRequestPromise', (event, app) => {
     });
 });
 
-function resolveAfterSecs(name) {
-  return new Promise( (resolve, reject) => {
-    setTimeout(() => {
-      if (name === 'conda') {
-        reject('Error in installation');
-      } else {
-        resolve('resolved');
-      }
-    }, 5000);
-  });
-}
 
 ipcMain.handle('install-ipc', async (event, app) => { 
   console.log("Received ipc invocation for installing: ",app.name)
   try {
-    const result = await resolveAfterSecs(app.name);
+    const result = await lsConda.installRequestPromise(app);
     console.log("Received result: ",result)
+    return result;
   } catch (error) {
     console.log("Received error: ",error)
-    return error;
+    return {status: false, reason: error};
   }
 });
 

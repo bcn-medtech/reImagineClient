@@ -65,30 +65,36 @@ export const Installers = (props) => {
 */
 
     const runInstallNext = async () => {
-        console.log("Run installation third party software");
+        console.info("Run installation third party software");
         props.onactiontoperform({ action: "RUN INSTALLERS", values: null });
 
         const app = props.softwarenotinstalled[0];
         const result = await ipcRenderer.invoke("install-ipc", app);
         props.onactiontoperform({ action: "FINISH INSTALLERS", values: null });
+        console.info("Installation of ",app, result.status, result.reason);
 
-        if (result === 'resolved') {
-            console.log("Installation of ",app, " finished with status: ", result)
+        if (result.status === true) {
+            console.info("Installation of ",app, " was successfull");
             props.onactiontoperform({ action: "CHECKINSTALLED", values: null });
         } else {
             let errMsg = 'An error occurred while installing ' + app.name
-            errMsg += '\n' + "Because of: " + result
+            errMsg += '\n' + "Reason: " + result.reason
             errMsg += '\n' + "Check into the logs for additional informations"
             console.log("Installation of ",app, " failed!")
+
+            // TODO: Improve the message to the user!
             alert(errMsg);
+
+            // THIS LOCKS THE APP BUT THE WINDOW IS NOT SHOWN
             /*
-            dialog.showMessageBoxSync(BrowserWindow, {
+            dialog.showMessageBoxSync(null, {
                 type: "error",
                 title: "Installation error!",
                 buttons: ["OK"],
                 message: errMsg
             });
             */
+            
         }
         /*
         

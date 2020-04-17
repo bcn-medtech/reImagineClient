@@ -8,17 +8,59 @@ const isDev = require('electron-is-dev');
 const main = require("./electron.js")
 const config = main.getConfig();
 shell.config.execPath = shell.which('node').toString()
+const util = require('util')
+const execFile = util.promisify(exec.execFile)
 
+async function doInstallRequestPromise( app ) {
+
+  if (app.name === "conda") {
+    if (fs.existsSync(config.scripts.condaPath)) {
+      res = { status: true, reason: "Conda already installed" }
+      return res
+    } else {
+      res = await _installMiniconda()
+      return res 
+    }
+  } else {
+    return { status: false, reason: "Not implemented" }
+  }
+
+  
+  /*
+  return new Promise( (resolve, reject) => {
+    if (app.name === "conda") {
+      if (fs.existsSync(config.scripts.condaPath)) {
+        resolve( { status: true, reason: "Conda already installed" } );
+      } else {
+        //reject( "Conda not found!" )
+        
+        installMiniconda((result)=>{
+          callback({ isOk: result.isOk, res: result.reason });
+        });
+        
+       
+       return new Promise( (resolve, reject) => {
+          reject( { status: true, reason: "Conda already installed" } )
+       })
+       .catch( e => {
+          resolve( { status: false, reason: e } );
+       });
+       
+      }
+    }
+  });
+  */
+  
+}
+/*
 function doInstallRequest(event, app, callback) {
   if (app.name === "conda") {
     if (fs.existsSync(config.scripts.condaPath)) {
-      //return [true, "Conda already installed"]
       callback({ isOk: true, res: "Conda already installed" });
     } else {
       installMiniconda((result)=>{
         callback({ isOk: result.isOk, res: result.reason });
       });
-      //return [flag, res]
     }
   } else if (app.name === "deiden") {
     console.log("Miniconda installed, now installing ENVIRONMENT")  
@@ -46,6 +88,68 @@ function doInstallRequest(event, app, callback) {
     //return [false, "Cannot install program " + app.name]
     callback({ isOk:false, res: res});
   }
+}
+*/
+
+async function _installMiniconda() {
+  
+  var instArgs = []
+  
+  if (process.platform === "win32") {
+    instArgs = ["/InstallationType=JustMe","/RegisterPython=0","/S","/D="+ config.scripts.condaHome]
+  }
+  else if ( (process.platform === 'darwin') || (process.platform === 'linux')) {
+    instArgs = ["-b", "-p " + config.scripts.condaHome]
+  }
+  else {
+    res = {status: false, reason: "Unknown platform: " + process.platform}
+    return res
+  }
+
+  console.info("About to run:", config.scripts.condaInstaller, instArgs)
+
+  options = {shell:false};
+  try {
+    let pInstall = execFile(config.scripts.condaInstaller, instArgs, options);
+    pInstall.child.stdout.on('data', data => {
+      console.log("INSTALLER stdout: ", data)
+    })
+
+    pInstall.child.stderr.on('data', data => {
+      console.log("INSTALLER stderr: ", data)
+    })
+    await pInstall
+    return {status: true, reason: "Installer completed successfully"}
+
+  } catch ( error ) {
+    return {status: false, reason: "Error in installer: "+ error.status + " " + error.message}
+  }
+
+/*
+  pInstall.stdout.on('data', (data) => {
+    reason += "Data: " + data + "\n"
+    console.log(`Output: ${data}`);
+  });
+
+  pInstall.stderr.on('data', (data) => {
+    reason += "Data: " + data + "\n"
+    console.log(`stderr: ${data}`)
+  })
+
+  pInstall.on('exit', (data) => {
+    console.log(`final data ${data}`);
+    reason += "Data: " + data + "\n"
+    callback({isOk:isOk, reason:reason});
+  })
+  */
+}
+
+function createDeidEnv() {
+  console.log("About to run:", config.scripts.condaInstallEnvScript, [config.scripts.condaPath])
+
+  var pInstall = exec.execFile(config.scripts.condaInstallEnvScript, [config.scripts.condaPath], { env: 'bin/bash' })
+
+  return pInstall
 }
 
 function doInstallChecks(programs) {
@@ -136,15 +240,7 @@ function doInstallCheck(program, hints) {
 
   return []
 }
-/*
-function _execShellCommand(cmd, argv) {
-  var stdOut = ""
-  var std
-  exec.execFile(cmd, argv)
 
-
-}
-*/
 function runCondaAnonimizer(files, outDir, callback) {
 
   if (!outDir) {
@@ -202,81 +298,10 @@ function runCondaAnonimizer(files, outDir, callback) {
 }
 
 
-// Script to isntall program requested for, like miniconda
-function installMiniconda(callback) {
-  // Set the installation path, check if exists, else install. THE RETURNS AREN'T IMPORTANT by now
 
-  let isOk = false
-  let reason = "Not implemented"
 
-  var instCmd = config.scripts.condaInstaller
-  var instArgs = []
-  
-  if (process.platform === "win32") {
-    instArgs = ["/InstallationType=JustMe","/RegisterPython=0","/S","/D="+ config.scripts.condaPath]
-  }
-  else if ( (process.platform === 'darwin') || (process.platform === 'linux')) {
-    instArgs = ["-b", "-p " + config.scripts.condaPath]
-  }
-  else {
-    isOk = false; reason = "Unknown platform: " + process.platform
-    callback({isOk:isOk, reason:reason});
-  }
-
-  console.log("About to run:", instCmd, instArgs)
-  var pInstall = exec.execFile(instCmd, instArgs)
-
-  pInstall.stdout.on('data', (data) => {
-    reason += "Data: " + data + "\n"
-    console.log(`Output: ${data}`);
-  });
-
-  pInstall.stderr.on('data', (data) => {
-    reason += "Data: " + data + "\n"
-    console.log(`stderr: ${data}`)
-  })
-
-  pInstall.on('exit', (data) => {
-    console.log(`final data ${data}`);
-    reason += "Data: " + data + "\n"
-
-    /*
-      CONDA ENVIRONMENTE IS NOW INSTALLED AS A SEPARATE PROGRAM
-  
-    console.log("Miniconda installed, now installing ENVIRONMENT")  
-
-    var pInstall = createDeidEnv()
-
-    pInstall.stdout.on('data', (data) => {
-      reason += "Data: " + data + "\n"
-      console.log(`Output: ${data}`);
-    });
-
-    pInstall.stderr.on('data', (data) => {
-      reason += "Data: " + data + "\n"
-      console.log(`stderr: ${data}`)
-    })
-
-    pInstall.on('exit', (data) => {
-      console.log(`final data ${data}`);
-      reason += "Data: " + data + "\n";
-      isOk=true;
-      callback({isOk:isOk, reason:reason});
-    })
-  */
-
-  })
-}
-
-function createDeidEnv() {
-  console.log("About to run:", config.scripts.condaInstallEnvScript, [config.scripts.condaPath])
-
-  var pInstall = exec.execFile(config.scripts.condaInstallEnvScript, [config.scripts.condaPath], { env: 'bin/bash' })
-
-  return pInstall
-}
-
-module.exports.installRequest = doInstallRequest;
+module.exports.installRequestPromise = doInstallRequestPromise;
+//module.exports.installRequest = doInstallRequest;
 module.exports.installChecks = doInstallChecks;
 module.exports.runCondaAnonimizer = runCondaAnonimizer;
 

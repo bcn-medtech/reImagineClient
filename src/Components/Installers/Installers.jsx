@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
 export const Installers = (props) => {
 
     const classes = useStyles();
-
+/*
     const condaInstallRequestFinished=(event, installed)=>{
         props.onactiontoperform({ action: "FINISH INSTALLERS", values: installed });
     }
@@ -60,17 +60,28 @@ export const Installers = (props) => {
             ipcRenderer.removeListener('condaInstallRequestFinished', condaInstallRequestFinished)
         }
     }, []);
+*/
 
-    const runInstallationThirdPartySoftware = () => {
+    const runInstallNext = async () => {
         console.log("Run installation third party software");
-        props.onactiontoperform({ action: "RUN INSTALLERS", values: false });
+        props.onactiontoperform({ action: "RUN INSTALLERS", values: null });
 
-        const softwarenotinstalled = props.softwarenotinstalled;
+        const app = props.softwarenotinstalled[0];
+        const result = await ipcRenderer.invoke("install-ipc", app);
+        props.onactiontoperform({ action: "FINISH INSTALLERS", values: null });
 
-        //#TODO currently working only for conda
-        for (var app of softwarenotinstalled) {
-            ipcRenderer.send("installRequest", app)
+        if (result === 'resolved') {
+            console.log("Installation of ",app, " finished with status: ", result)
+            props.onactiontoperform({ action: "CHECKINSTALLED", values: null });
         }
+        /*
+        
+
+        // To avoid dependency problems, run one installer per time
+        if (softwarenotinstalled.length > 0) {
+            ipcRenderer.send("installRequestPromise", softwarenotinstalled[0])
+        }
+        */
     }
 
     const renderInstallationToolbox = (softwareInstalled, softwareNotInstalled, runninginstallation3rdpartysoftware) => {
@@ -87,7 +98,7 @@ export const Installers = (props) => {
         } else if (softwareNotInstalled.length !== 0) {
             return (
                 <div className={"grid-block vertical align-center shrink " + classes.installationInfo}>
-                    <div className="grid-block align-center shrink"><InstallationNotDoneSVG done={true} onclickcomponent={runInstallationThirdPartySoftware} /></div>
+                    <div className="grid-block align-center shrink"><InstallationNotDoneSVG done={true} onclickcomponent={runInstallNext} /></div>
                     <div className={"grid-block align-center shrink " + classes.label1}>Third party software not installed</div>
                     <div className={"grid-block align-center shrink " + classes.label2}>Software needed is not installed, please click the play red button to start the installation</div>
                     {/*<NavigateToFilerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO FILER", "values": false })} />*/}

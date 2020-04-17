@@ -43,7 +43,6 @@ export const RootPage = () => {
     const config = ipcRenderer.sendSync("getConfig");
 
     const onInstalledSoftwareCheck = (program, status, errs) => {
-        console.log("*****onInstalledSoftwareCheck***", program, status)
         if (status) {
             setSoftwareInstalled( (OldSoftwareInstalled) => {
                 return OldSoftwareInstalled.concat([program]);
@@ -52,6 +51,7 @@ export const RootPage = () => {
             setSoftwareNotInstalled( (OldSoftwareNotInstalled) => {
                 return OldSoftwareNotInstalled.concat([program]);
             });
+            setStep("installers")
         }
     }
 
@@ -136,16 +136,6 @@ export const RootPage = () => {
                 setRunningInstallers(true);
                 break;
             case "FINISH INSTALLERS":
-
-                if ("isOk" in action.values) {
-                    if (action.values.isOk === true) {
-                        setSoftwareInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
-                        setSoftwareNotInstalled([]);
-                    } else {
-                        setSoftwareInstalled([]);
-                        setSoftwareNotInstalled([{ name: "conda", icon: "../assets/logo_anaconda.png" }]);
-                    }
-                }
                 setRunningInstallers(false);
                 break;
             case "UPLOAD NEW CASES":
@@ -154,6 +144,9 @@ export const RootPage = () => {
                 setDataUploadedSuccesfully(false);
                 setAnonDir(false);
                 setStep("filer");
+                break;
+            case "CHECKINSTALLED":
+                checkIfSoftwareIsInstalled();
                 break;
             default:
                 break;

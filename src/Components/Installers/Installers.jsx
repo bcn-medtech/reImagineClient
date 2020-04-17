@@ -8,9 +8,11 @@ import { InstallationDoneSVG } from './../svgs/InstallationDoneSVG';
 import { InstallationNotDoneSVG } from './../svgs/InstallationNotDoneSVG';
 import { InstallationInProgressSVG } from './../svgs/InstallationInProgressSVG';
 import { Timer } from './../Timer/Timer';
+//import { BrowserWindow } from 'electron';
 //Components
 //Electron 
 const { ipcRenderer } = window.require("electron");
+//const { dialog } = window.require("electron");
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -73,6 +75,20 @@ export const Installers = (props) => {
         if (result === 'resolved') {
             console.log("Installation of ",app, " finished with status: ", result)
             props.onactiontoperform({ action: "CHECKINSTALLED", values: null });
+        } else {
+            let errMsg = 'An error occurred while installing ' + app.name
+            errMsg += '\n' + "Because of: " + result
+            errMsg += '\n' + "Check into the logs for additional informations"
+            console.log("Installation of ",app, " failed!")
+            alert(errMsg);
+            /*
+            dialog.showMessageBoxSync(BrowserWindow, {
+                type: "error",
+                title: "Installation error!",
+                buttons: ["OK"],
+                message: errMsg
+            });
+            */
         }
         /*
         

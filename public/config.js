@@ -129,7 +129,8 @@ const scripts = {
     deidenScript: getDeidenScript(),
     condaInstallEnvScript: getCondaInstallEnvScript(),
     condaInstaller: getCondaInstaller(),
-    condaPath: path.join(os.homedir(),"miniconda3")
+    condaHome: path.join(os.homedir(),"miniconda3"),
+    condaPath: path.join(os.homedir(),"miniconda3","bin","activate")
 }
 
 // Ensure basic dir structure is ready

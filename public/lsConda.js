@@ -8,7 +8,6 @@ const isDev = require('electron-is-dev');
 const main = require("./electron.js")
 const config = main.getConfig();
 shell.config.execPath = shell.which('node').toString()
-//const CONSTANTS = config.CONSTANTS;
 
 function doInstallRequest(event, app, callback) {
   if (app.name === "conda") {
@@ -214,20 +213,17 @@ function installMiniconda(callback) {
   var instArgs = []
   
   if (process.platform === "win32") {
-    instArgs = []
+    instArgs = ["/InstallationType=JustMe","/RegisterPython=0","/S","/D="+ config.scripts.condaPath]
   }
-  else if (process.platform === 'darwin') {
+  else if ( (process.platform === 'darwin') || (process.platform === 'linux')) {
     instArgs = ["-b", "-p " + config.scripts.condaPath]
   }
-  else if (process.platform === 'linux') {
-    instArgs = ["-b", "-p " + config.scripts.condaPath]
-  } else {
+  else {
     isOk = false; reason = "Unknown platform: " + process.platform
     callback({isOk:isOk, reason:reason});
   }
 
   console.log("About to run:", instCmd, instArgs)
-
   var pInstall = exec.execFile(instCmd, instArgs)
 
   pInstall.stdout.on('data', (data) => {
@@ -245,7 +241,7 @@ function installMiniconda(callback) {
     reason += "Data: " + data + "\n"
 
     /*
-      INSTALLING CONDA ENVIRONMENT!!!!!
+      CONDA ENVIRONMENTE IS NOW INSTALLED AS A SEPARATE PROGRAM
   
     console.log("Miniconda installed, now installing ENVIRONMENT")  
 

@@ -6,6 +6,6 @@ SET outdir=%2
 SET scriptpath=%3
 SET sqlfile=%4
 
-RMDIR /Q  $outdir
+RMDIR /Q $outdir
 
 python %scriptpath% %basedir% --outdir %outdir% --db-location %sqlfile%

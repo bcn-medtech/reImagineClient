@@ -1,8 +1,6 @@
-set root=C:\Users\%USERNAME%\Miniconda2
+set condadir=%1
 
-call %root%\Scripts\activate.bat %root%
-
-REM call conda list
+call %condadir%\Scripts\activate.bat %condadir%
 
 call conda create -n deid sqlalchemy -y
 call conda install --name deid -c SimpleITK SimpleITK python=3.5 -y

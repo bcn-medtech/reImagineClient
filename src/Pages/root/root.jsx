@@ -70,8 +70,12 @@ export const RootPage = () => {
     //Component did mount
     useEffect(() => {
         // code to run on component mount
-        checkIfSoftwareIsInstalled();
-        ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
+        if (!runningInstallers) {
+            checkIfSoftwareIsInstalled();
+            ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
+        } else {
+            setStep("installers")
+        }
     }, [])
 
 

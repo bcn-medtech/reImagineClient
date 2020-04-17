@@ -3,8 +3,6 @@
 condapath="$1"
 source $condapath
 
-echo "CREATE ENV:" $(which conda)
-
 ENVS=$(conda env list | grep deid | cut -f1 -d' ')
 echo "Found environment " $ENVS
 if [ -z "$ENVS" ]; then

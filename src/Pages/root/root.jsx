@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { TopBar } from './../../Components/TopBar.jsx';
 import { Filer } from './../../Components/Filer/Filer';
+import { TopBar } from './../../Components/TopBar';
 import { Anonimizer } from './../../Components/Anonimizer/Anonimizer';
 import { Uploader } from './../../Components/Uploader/Uploader';
 import { Installers } from './../../Components/Installers/Installers';

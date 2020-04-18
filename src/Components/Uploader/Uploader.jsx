@@ -144,10 +144,10 @@ export const Uploader = (props) => {
                     aria-labelledby="alert-dialog-slide-title"
                     aria-describedby="alert-dialog-slide-description"
                   >
-                    <DialogTitle id="alert-dialog-slide-title">{"Ups Minio Certificates is not install"}</DialogTitle>
+                    <DialogTitle id="alert-dialog-slide-title">{"Upload credentials are not installed"}</DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-slide-description">
-                        Please, ask the Admin for the credentials and move the minio.json file to the folder /Documents/remimagineclient/.
+                        Please, ask the Admin for the credentials and move the minio.json file to the folder Documents/remimagineclient/.
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>

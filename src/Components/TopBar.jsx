@@ -24,13 +24,18 @@ const useStyles = makeStyles((theme) => ({
 
 export const TopBar = (props) => {
   const classes = useStyles();
+
+  const handleGoHome = () => {
+    props.onactiontoperform({action:"GO TO FILER", values:false})
+  };
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar variant="dense">
-          <Logo />
+          <Logo onClickHandler={handleGoHome}/>
           <Typography variant="h6" color="inherit">
-            Reimagine Client
+            reImagine Client
           </Typography>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>

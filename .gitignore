@@ -6,6 +6,7 @@ patients.sqlite
 
 # dependencies
 /node_modules
+.pnp/
 public/resources/
 # testing
 /coverage

@@ -70,17 +70,20 @@ export const RootPage = () => {
     //Component did mount
     useEffect(() => {
         // code to run on component mount
-        if (!runningInstallers) {
+        if ( (!runningInstallers) && (!runningAnonimization) ){
             checkIfSoftwareIsInstalled();
             ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
-        } else {
+        } else if (runningInstallers) {
             setStep("installers")
+        } else if (runningAnonimization) {
+            setStep("anonimizer")
         }
     }, [])
 
 
     const onActionToPerform = (action) => {
 
+        console.log("Performing action:", action);
         switch (action.action) {
             case "ADD FOLDER":
                 //console.log("Add folder");

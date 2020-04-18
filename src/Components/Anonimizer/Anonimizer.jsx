@@ -37,22 +37,41 @@ export const Anonimizer = (props) => {
     //     console.log(args);
         
     // });
-
+/*
     const condaAnonimizeRequestFinished=(event, args) => {
         props.onactiontoperform({ action: "FINISH ANONIMIZATION", values: args });
     }
-
+*/
     //Component did unmount
+    /*
     useEffect(() => {
         ipcRenderer.on('condaAnonimizeRequestFinished', (event, args) => condaAnonimizeRequestFinished(event, args));
         return () => {
             ipcRenderer.removeListener('condaAnonimizeRequestFinished', condaAnonimizeRequestFinished)
         }
     }, []);
+    */
 
-    const runAnonimization = () => {
+    const runAnonimization = async () => {
         props.onactiontoperform({ action: "RUN ANONIMIZATION", values: "false" });
-        ipcRenderer.send('condaAnonimizeRequest', props.files, null);
+        const result = await ipcRenderer.invoke("anonimize-ipc", props.files, null);
+        props.onactiontoperform({ action: "FINISH ANONIMIZATION", values: { outDir: result.outDir } });
+        console.info("Anonimization result: ", result.status, result.reason);
+
+        if (result.status === true) {
+            console.info("Anonimization was successfull");
+            result.outDir
+            
+        } else {
+            let errMsg = 'An error occurred during anonimization!'
+            errMsg += '\n' + "Reason: " + result.reason
+            errMsg += '\n' + "Check into the logs for additional informations"
+            console.log("Anonimization of ",props.files, " failed!")
+
+            // TODO: Improve the message to the user!
+            alert(errMsg);
+          
+        }        
     }
 
     const renderAddFolderBody = (files) => {

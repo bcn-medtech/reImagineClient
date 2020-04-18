@@ -174,7 +174,7 @@ function doInstallCheck(program, hints) {
   return []
 }
 
-function runCondaAnonimizer(files, outDir, callback) {
+async function runCondaAnonimizer(files, outDir, callback) {
 
   if (!outDir) {
     outDir = config.anDir
@@ -193,45 +193,31 @@ function runCondaAnonimizer(files, outDir, callback) {
 
   let argv;
 
-  let res = 0;
-  let resOut = "";
-  let result = false;
-
   for (elem in files) {
     argv = [files[elem], outDir, config.scripts.deidenScript, config.sqlFile, config.scripts.condaPath];
 
     console.log("About to run:", config.scripts.condaScript, argv);
-    //const deploySh = _execShellCommand(Script_Path, argv)
-    const deploySh = exec.execFile(config.scripts.condaScript, argv);
+    let options = {shell:false};
+    try {
+      const pInstall = execFile(config.scripts.condaScript, argv, options);
+      pInstall.child.stdout.on('data', data => {
+        console.log("ANONIMIZATION stdout: ", data)
+      })
+    
+      pInstall.child.stderr.on('data', data => {
+        console.log("ANONIMIZATION stderr: ", data)
+      })                
+      await pInstall
+    
+      return {status: true, reason: "Completed successfully", outDir: outDir}
+    
+    } catch ( error ) {
+      return {status: false, reason: "Error while running anonimization: "+ error.status + " " + error.message, outDir: outDir}
+    }    
 
-    deploySh.stdout.on('data', (data) => {
-      resOut += "Data: " + data + "\n"
-      console.log(`Output: ${data}`);
-      result = { res: res, resOut: resOut, outDir: outDir };
-      callback(result);
-    });
-
-    deploySh.stderr.on('data', (data) => {
-      resOut += "Data: " + data + "\n"
-      console.log(`stderr: ${data}`)
-      res = -1
-      result = { res: res, resOut: resOut, outDir: outDir };
-      callback(result);
-    })
-
-    deploySh.on('exit', (data) => {
-      console.log(`final data ${data}`);
-      resOut += "Data: " + data + "\n";
-      res = 1;
-      result = { res: res, resOut: resOut, outDir: outDir };
-      callback(result);
-    })
   }
 
 }
-
-
-
 
 module.exports.installRequestPromise = doInstallRequestPromise;
 module.exports.installChecks = doInstallChecks;

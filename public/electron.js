@@ -66,7 +66,6 @@ autoUpdater.on('update-downloaded', (info) => {
 
 function sendStatusToWindow(text) {
   log.info(text);
-  console.log('message', text);
 }
 
 var appStatus = {
@@ -102,7 +101,7 @@ function createWindow() {
     }
     
 
-    console.log("Loading version from:"+urlLoc);
+    console.log("Welcome to version " + app.getVersion())
     console.log("App path is", app.getAppPath());
     writeConfiguration();
     mainWindow.loadURL(urlLoc);
@@ -210,6 +209,17 @@ ipcMain.handle('install-ipc', async (event, app) => {
   }
 });
 
+ipcMain.handle('anonimize-ipc', async (event, files, outDir) => { 
+  console.log("Received ipc invocation for anonimizing files: ",files, outDir)  
+  try {
+    const result = await lsConda.runCondaAnonimizer(files, outDir)
+    return result;
+  } catch (error) {
+    console.log("Received error: ",error)
+    return {status: false, reason: error, outDir: outDir};
+  }
+});
+
 
 // ipcMain.on('removeFolderFromOs', (event, app) => { 
 //   // console.log("Received Install request for ",app.name)
@@ -219,6 +229,7 @@ ipcMain.handle('install-ipc', async (event, app) => {
 //   console.log("Remove folder from os");
 // });
 
+/*
 ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => { 
 
   new Promise(resolve => {  
@@ -242,7 +253,7 @@ ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => {
   
 
 });
-
+*/
 // uploading of images deidentificated for deid script
 ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => { 
 
@@ -287,12 +298,14 @@ ipcMain.on('checkInstalled', (event, program) => {
   event.reply("installedCheckRes", program, isOk, res)
 })
 
+/*
 ipcMain.on('checkStatus', (event) => {
   // Run internal checks or wait for other to fire the event?
   let [isOk, res] = areProgramsInstalled(appStatus.required)
   appStatus.thirdparty_installed = (isOk? true: false)
   event.reply("onStatusUpdate", appStatus, res)
 })
+*/
 
 ipcMain.on('select-dirs', async (event, args) => {
   const result = await dialog.showOpenDialog(mainWindow, {

@@ -105,18 +105,22 @@ function doInstallChecks(programs) {
 */
 function doInstallCheck(program, hints) {
 
-  console.log("Checking install status of program ", program);
-  console.log("Provided hints: ", hints);
+  program = program.trim()
+  console.info("Checking install status of program", program);
+  console.info("Provided hints:", hints);
   let errs = []
 
   if (!program) {
+    console.error("Cannot check a null program name!");
     return ["Cannot check a null program name!"]
   }
 
   let condaPath = null
   if (program === "conda") {
-    let condaPath = shell.env["CONDA_EXE"]
+    //Check if currently active in shell
+    condaPath = shell.env["CONDA_EXE"]
     if (!condaPath) {
+      //Check if installed in common locations
       for (const _p of hints) {
         if (fs.existsSync(_p)) {
           condaPath = _p
@@ -125,8 +129,24 @@ function doInstallCheck(program, hints) {
       }
     }
 
+    /* Check in search path
+    *   Beware that in some platforms it does not return a string, but a childProcess object
+        So we should check and convert appropriately
+    */
     if (!condaPath) {
-      condaPath = shell.which(program);
+      try {
+        let _oExec = shell.which(program)
+        if (typeof(_oExec) === 'object')  { // then it is a child process object:
+          if (_oExec.code === 0) { // a retcode of 0 means all good
+            condaPath = _oExec.stdout;
+          }
+        } else { // If it is already a string
+          condaPath = _oExec;
+        }
+
+      } catch( e ) {
+        console.log("Could not parse shell object",_oExec)
+      }
     }
 
     if (!condaPath) {
@@ -135,7 +155,12 @@ function doInstallCheck(program, hints) {
     } else {
       console.log(program, "path: ", condaPath)
       config.scripts.condaPath = condaPath;
-      config.scripts.condaHome = path.resolve(condaPath, "..", "..")
+      if (process.platform === 'win32') {
+        config.scripts.condaHome = path.resolve(condaPath, "..", "..", "..")
+      } else {
+        config.scripts.condaHome = path.resolve(condaPath, "..", "..")
+      }
+      
       return []
     }
   }

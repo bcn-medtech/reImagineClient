@@ -5,18 +5,32 @@ import { TopBar } from './../../Components/TopBar';
 import { Anonimizer } from './../../Components/Anonimizer/Anonimizer';
 import { Uploader } from './../../Components/Uploader/Uploader';
 import { Installers } from './../../Components/Installers/Installers';
-import { getSoftwareInstalledAnNotInstalled } from './helper';
+import { Logs } from './../../Components/Logs';
+import { CloudFunctionConfig } from 'minio';
+
+
+
 //Electron 
 const { ipcRenderer } = window.require("electron");
 
 const useStyles = makeStyles((theme) => ({
     root: {
         backgroundColor: "#1B1C1E"
+    },
+    panel: {
+        width: '100%'
+    },
+    heading: {
+        backgroundColor: "#1B1C1E",
+        color: "white",                
+        fontSize: theme.typography.pxToRem(15),
+        fontWeight: theme.typography.fontWeightRegular
+    },
+    logs: {
+        fontSize: theme.typography.pxToRem(10),
+        fontWeight: theme.typography.fontWeightLight
     }
 }));
-
-// let softwareInstalled=[];
-// let softwareNotInstalled=[];
 
 let selectedFilesCopy = [];
 
@@ -27,18 +41,13 @@ export const RootPage = () => {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [anonDir, setAnonDir] = useState(false);
     const [dataUploadedSuccesfully, setDataUploadedSuccesfully] = useState(false);
-    //const [allSoftwareIsInstalledSuccesfully, setAllSoftwareIsInstalledSuccesfully]=useState(false);
     const [step, setStep] = useState("filer");
     const [runningAnonimization, setRunningAnonimization] = useState(false);
     const [runningInstallers, setRunningInstallers] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false);
     const [softwareInstalled, setSoftwareInstalled] = useState([]);
     const [softwareNotInstalled, setSoftwareNotInstalled] = useState([]);
-
-    //useEffect(() => {
-    //    console.log("hola");
-    //ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
-    //});
+    const [logLinesNum, setLogLinesNum] = useState(10);
 
     const config = ipcRenderer.sendSync("getConfig");
 
@@ -155,10 +164,14 @@ export const RootPage = () => {
             case "CHECKINSTALLED":
                 checkIfSoftwareIsInstalled();
                 break;
+            case "GO TO LOGS":
+                setStep("console-log");
+                break;                
             default:
                 break;
         }
     }
+
 
     const renderBody = (step) => {
 
@@ -195,6 +208,10 @@ export const RootPage = () => {
                     softwarenotinstalled={softwareNotInstalled}
                     runninginstallation3rdpartysoftware={runningInstallers}
                     onactiontoperform={onActionToPerform}
+                />)
+            case "console-log":
+                return (<Logs
+                    logFile={config.logFile}
                 />)
             default:
                 break;

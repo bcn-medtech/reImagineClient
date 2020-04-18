@@ -9,6 +9,7 @@ import ScreenShare from '@material-ui/icons/ScreenShare';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -100,6 +101,16 @@ export const TopBar = (props) => {
               <ScreenShare />
             </IconButton>
           </div>
+          <div className={classes.sectionDesktop}>
+            <IconButton
+              aria-label="show logs"
+              aria-haspopup="true"
+              color="inherit"
+              onClick={()=>{props.onactiontoperform({action:"GO TO LOGS", values:false})}}
+            >
+              <AssignmentIcon/>
+            </IconButton>
+          </div>          
         </Toolbar>
       </AppBar>
     </div>

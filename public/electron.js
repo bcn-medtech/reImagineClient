@@ -16,10 +16,13 @@ const { ipcMain, dialog } = require('electron');
 let mainWindow;
 
 var config = require("./config");
-
 const log = require("electron-log");
+
+config.logFile = path.join(config.logDir, "log_Main.txt");
 log.transports.file.level = "info";
-log.transports.file.file = path.join(config.logDir, "log_Main.txt")
+log.transports.file.file = config.logFile
+log.transports.file.streamConfig = { flags: 'w'}
+log.transports.file.stream = fs.createWriteStream(config.logFile)
 
 Object.assign(console, log.functions);
 

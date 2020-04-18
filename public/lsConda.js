@@ -145,7 +145,7 @@ function doInstallCheck(program, hints) {
         }
 
       } catch( e ) {
-        console.log("Could not parse shell object",_oExec)
+        console.log("Error searching ",program, "via shelljs.which")
       }
     }
 

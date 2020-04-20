@@ -12,14 +12,15 @@ Base = declarative_base()
 
 class Patient(Base):
   __tablename__ = 'patients'
-  anonid = Column(Integer, Sequence('anon_id_seq',minvalue=1), primary_key=True)    
-  pid = Column(String(50))  
+  idx = Column(Integer, Sequence('anon_id_seq',minvalue=1), primary_key=True)
+  anoncode = Column(String(100))
+  pid = Column(String(50))
   name = Column(String(50))
-  accessionNumber = Column(String(50))    
+  accessionNumber = Column(String(50))
 
   def __repr__(self):
-      return "<Patient(anonid=%d, pid=%s, accessionNumer=%s, name='%s')>" % (
-                              self.anonid, self.pid, self.accessionNumber,
+      return "<Patient(idx=%d, anoncode=%d, pid=%s, accessionNumer=%s, name='%s')>" % (
+                              self.idx, self.anoncode, self.pid, self.accessionNumber,
                               self.name)  
 
   @staticmethod
@@ -51,13 +52,13 @@ class LocalDB(object):
                     filter_by(pid=pid):
       yield instance
     
-  def searchAnonId(self, anonid):
+  def searchAnonCode(self, anoncode):
     for instance in self._session.query(Patient).\
-                    filter_by(anonid=anonid):
+                    filter_by(anoncode=anoncode):
       yield instance
     
-  def createPatient(self, pid, name, accessionNumber):
-    p = Patient(pid=str(pid), name=name, accessionNumber=accessionNumber)
+  def createPatient(self, anoncode, pid, name, accessionNumber):
+    p = Patient(anoncode=anoncode, pid=str(pid), name=name, accessionNumber=accessionNumber)
     self._session.add(p)
     self._session.commit()
     return p

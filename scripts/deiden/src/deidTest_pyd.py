@@ -7,6 +7,9 @@ from deid.dicom import get_files, get_identifiers, replace_identifiers
 from pydicom import read_file
 import SimpleITK as sitk
 
+import hashlib
+from operator import xor
+
 import time
 import logging
 FORMAT = '%(asctime)-15s %(message)s'
@@ -58,8 +61,25 @@ def _prepare(args, sid):
     pass        
     
   return outdir, hdirpre, hdirpost
-        
-def _find_or_create_anonid(db, fields):
+
+def _generateAnonCode(pid, name):
+  clinical_id = str(pid).encode('utf-8')
+  clinical_name = str(name).encode('utf-8')
+
+  hid = hashlib.md5()
+  hname = hashlib.md5()	
+
+  hid.update(clinical_id)
+  hname.update(clinical_name)
+
+  hid = hid.digest()
+  hname = hname.digest()
+
+  idXname = bytes(map(xor, hid, hname))
+
+  return idXname.hex()
+
+def _find_or_create_anoncode(db, fields):
   pid = fields["PatientID"];name = fields["PatientName"]      
   accNum = None
   if "AccessionNumber" in fields:
@@ -71,11 +91,11 @@ def _find_or_create_anonid(db, fields):
   res = list(db.searchId(pid))
   if not res:
     _l.info("Creating new patient Patient(%s, %s, %s)"%(pid, name, accNum))
-    p = db.createPatient(pid, name, accNum)
-    return p.anonid
+    p = db.createPatient(_generateAnonCode(pid, name), pid, name, accNum)
+    return p.anoncode
   p = res[0]
   _l.debug("Reusing existing patient Patient(%s, %s, %s)"%(p.pid, p.name, p.accessionNumber))    
-  return res[0].anonid
+  return res[0].anoncode
         
 def main(args):
   patients = LocalDB(verbose=False, sqlfile=args.db_location)
@@ -100,8 +120,8 @@ def main(args):
     
     updated_ids = dict()
     for image, fields in ids.items():  
-      anonid = _find_or_create_anonid(patients, fields)
-      fields['id'] = anonid
+      anoncode = _find_or_create_anoncode(patients, fields)
+      fields['id'] = anoncode
       updated_ids[image] = fields
 
 

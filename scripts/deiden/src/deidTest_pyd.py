@@ -45,8 +45,9 @@ def _print_actions(recipe):
   
 def _prepare(args, sid):
   outdir = os.path.join(args.outdir, sid)
-  hdirpre = os.path.join(outdir, "headers_pre/")
-  hdirpost = os.path.join(outdir, "headers_post/")      
+  hdir = os.path.join(args.headers_dir, sid)  
+  hdirpre = os.path.join(hdir, "headers_pre/")
+  hdirpost = os.path.join(hdir, "headers_post/")
   try:
     # Create target Directory
     os.makedirs(outdir)
@@ -115,6 +116,7 @@ def main(args):
 
   #print(list(patients.getAllPatients()))
   if (args.export_on_save):
+    _l.info("Exporting db to " + args.export_on_save)
     patients.exportDb(args.export_on_save)
 
 
@@ -128,6 +130,8 @@ if __name__ == '__main__':
                     help='Location of deid recipe file')
   parser.add_argument('--save-headers', action="store_true",
                     help='Save headers pre y post anonimization for debug purpose')
+  parser.add_argument('--headers-dir', type=str, default="headers",
+                    help='Location of saved headers pre y post anonimization')                    
   parser.add_argument('--db-location', type=str, default="patients.sqlite",
                     help='Location of the sqlite db')
   parser.add_argument('--export-on-save', type=str, default="patients.csv",

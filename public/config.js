@@ -10,8 +10,9 @@ const sqlFile = path.join(confDir, "patients.sqlite");
 const exportDbPath = path.join(confDir, "patients.csv");
 const logDir = path.join(confDir, "logs");
 const anDir = path.join(confDir, "an");
+const headersDir = path.join(confDir, "headers");
 
-const _createDirs = [confDir, logDir, anDir]
+const _createDirs = [confDir, logDir, anDir, headersDir]
 
 const requiredPrograms = [
     {name: "conda", icon: "../assets/logo_anaconda.png"},
@@ -154,6 +155,7 @@ module.exports.confFile = confFile;
 module.exports.sqlFile = sqlFile;
 module.exports.exportDbPath = exportDbPath;
 module.exports.anDir = anDir;
+module.exports.headersDir = headersDir;
 module.exports.logDir = logDir;
 module.exports.minioCred = path.join(confDir, "minio.json");
 module.exports.requiredPrograms = requiredPrograms;

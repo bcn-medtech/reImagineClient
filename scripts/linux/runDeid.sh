@@ -6,6 +6,7 @@ sqlfile="$4"
 condapath="$5"
 recipepath="$6"
 exportdbpath="$7"
+headerspath="$8"
 echo "Sourcing conda from" $condapath
 source $condapath
 
@@ -15,5 +16,5 @@ pushd scripts/deiden/
 export PYTHONPATH=$PYTHONPATH:$(pwd)/src
 
 rm -rf $outdir
-echo "Running " $pyscript $basedir --outdir $outdir --db-location $sqlfile --recipe $recipepath --export-on-save $exportdbpath
-python $pyscript $basedir --outdir $outdir --db-location $sqlfile --recipe $recipepath --export-on-save $exportdbpath
+echo "Running " python $pyscript $basedir --outdir $outdir --db-location $sqlfile --recipe $recipepath --export-on-save $exportdbpath --save-headers --headers-dir $headerspath
+python $pyscript $basedir --outdir $outdir --db-location $sqlfile --recipe $recipepath --export-on-save $exportdbpath --save-headers --headers-dir $headerspath

@@ -63,14 +63,11 @@ class LocalDB(object):
     return p
 
   def exportDb(self, fname):
-    print("Exporting db to ", fname)
     select = sql.select([Patient])
     result = self._session.execute(select)
     headers = result.keys()
 
     with open(fname, 'w') as fh:
       outcsv = csv.writer(fh)
-      print(headers)
-      print(result)
       outcsv.writerow(headers)
       outcsv.writerows(result)

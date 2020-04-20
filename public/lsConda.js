@@ -221,7 +221,8 @@ async function runCondaAnonimizer(files, outDir, callback) {
   for (elem in files) {
     argv = [files[elem], outDir, config.scripts.deidenScript, 
       config.sqlFile, config.scripts.condaPath, 
-      config.scripts.recipePath, config.exportDbPath];
+      config.scripts.recipePath, config.exportDbPath,
+      config.headersDir];
 
     console.log("About to run:", config.scripts.condaScript, argv);
     let options = {shell:false};

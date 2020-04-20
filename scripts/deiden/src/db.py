@@ -4,6 +4,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Sequence
+from sqlalchemy import sql
+
+import csv
 
 Base = declarative_base()
 
@@ -18,7 +21,11 @@ class Patient(Base):
       return "<Patient(anonid=%d, pid=%s, accessionNumer=%s, name='%s')>" % (
                               self.anonid, self.pid, self.accessionNumber,
                               self.name)  
-                                
+
+  @staticmethod
+  def getColumns():
+    return Patient.__table__.c.keys()
+
 class LocalDB(object):                                
   def __init__(self, verbose=True, sqlfile=None):
     #self._engine = create_engine('sqlite:///:memory:', echo=verbose)
@@ -54,3 +61,16 @@ class LocalDB(object):
     self._session.add(p)
     self._session.commit()
     return p
+
+  def exportDb(self, fname):
+    print("Exporting db to ", fname)
+    select = sql.select([Patient])
+    result = self._session.execute(select)
+    headers = result.keys()
+
+    with open(fname, 'w') as fh:
+      outcsv = csv.writer(fh)
+      print(headers)
+      print(result)
+      outcsv.writerow(headers)
+      outcsv.writerows(result)

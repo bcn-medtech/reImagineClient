@@ -7,6 +7,7 @@ const fs = require('fs');
 const confDir = path.join(app.getPath("documents"),"reimagine")
 const confFile = path.join(confDir, "reImagine.json");
 const sqlFile = path.join(confDir, "patients.sqlite");
+const exportDbPath = path.join(confDir, "patients.csv");
 const logDir = path.join(confDir, "logs");
 const anDir = path.join(confDir, "an");
 
@@ -122,11 +123,19 @@ function getDeidenScript() {
 
 }
 
+function getRecipePath() {
+    let sPath = path.join(getScriptDir(), 'deiden', 'src', 'deid_light.dicom');
+
+    return sPath
+
+}
+
 const scripts = {
     scriptDir: getScriptDir(),
     platformDir: getPlatformDir(),
     condaScript: getCondaScript(),
     deidenScript: getDeidenScript(),
+    recipePath: getRecipePath(),
     condaInstallEnvScript: getCondaInstallEnvScript(),
     condaInstaller: getCondaInstaller(),
     condaHome: path.join(os.homedir(),"miniconda3"),
@@ -143,6 +152,7 @@ for (_d of _createDirs) {
 module.exports.confDir = confDir
 module.exports.confFile = confFile;
 module.exports.sqlFile = sqlFile;
+module.exports.exportDbPath = exportDbPath;
 module.exports.anDir = anDir;
 module.exports.logDir = logDir;
 module.exports.minioCred = path.join(confDir, "minio.json");

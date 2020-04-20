@@ -113,7 +113,9 @@ def main(args):
     if (args.save_headers):    
       _saveHeaders(cleaned_files, hdirpost)
 
-  print(list(patients.getAllPatients()))
+  #print(list(patients.getAllPatients()))
+  if (args.export_on_save):
+    patients.exportDb(args.export_on_save)
 
 
 if __name__ == '__main__':
@@ -122,12 +124,14 @@ if __name__ == '__main__':
                     help='data dir')
   parser.add_argument('--outdir', type=str, default="outdir",
                     help='Output data')
-  parser.add_argument('--recipe', type=str, default="public/scripts/deiden/src/deid_light.dicom",
+  parser.add_argument('--recipe', type=str, default="deid_light.dicom",
                     help='Location of deid recipe file')
   parser.add_argument('--save-headers', action="store_true",
                     help='Save headers pre y post anonimization for debug purpose')
   parser.add_argument('--db-location', type=str, default="patients.sqlite",
                     help='Location of the sqlite db')
+  parser.add_argument('--export-on-save', type=str, default="patients.csv",
+                    help='Export patient table to csv for easier visualization')
 
   args = parser.parse_args()
   main(args)

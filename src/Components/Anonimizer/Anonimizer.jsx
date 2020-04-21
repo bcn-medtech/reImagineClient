@@ -59,8 +59,7 @@ export const Anonimizer = (props) => {
         console.info("Anonimization result: ", result.status, result.reason);
 
         if (result.status === true) {
-            console.info("Anonimization was successfull");
-            result.outDir
+            console.info("Anonimization was successfull. Data in: ",result.outDir);
             
         } else {
             let errMsg = 'An error occurred during anonimization!'

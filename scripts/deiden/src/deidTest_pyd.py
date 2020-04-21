@@ -9,6 +9,7 @@ import SimpleITK as sitk
 
 import hashlib
 from operator import xor
+import uuid
 
 import time
 import logging
@@ -80,13 +81,28 @@ def _generateAnonCode(pid, name):
   return idXname.hex()
 
 def _find_or_create_anoncode(db, fields):
-  pid = fields["PatientID"];name = fields["PatientName"]      
+  pid = None
+  if "PatientID" in fields:
+    pid = fields["PatientID"]
+  else:
+    pid = "UNKNOWN_" + uuid.uuid1()
+    _l.error("No patient id? Setting it to "+pid)
+
+  name = None
+  if "PatientName" in fields:
+    name = fields["PatientName"]
+  else:
+    name = "UNKNOWN_" + uuid.uuid1()    
+    _l.error("No patient Name? Setting it to "+name)
+    
+
   accNum = None
   if "AccessionNumber" in fields:
     accNum = fields["AccessionNumber"]
   else:
-    _l.error("No accession number? Setting it to false")
-    accNum = "NOT_FOUND"
+    accNum = "UNKNOWN_" + uuid.uuid1()    
+    _l.error("No accession number? Setting it to "+accNum)
+    
     
   res = list(db.searchId(pid))
   if not res:

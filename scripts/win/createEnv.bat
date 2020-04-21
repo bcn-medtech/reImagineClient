@@ -1,6 +1,7 @@
-set condadir=%1
+set condapath=%1
+set condahome=%2
 
-call %condadir%\Scripts\activate.bat %condadir%
+call %condapath% %condahome%
 
 call conda create -n deid sqlalchemy -y
 call conda install --name deid -c SimpleITK SimpleITK python=3.5 -y

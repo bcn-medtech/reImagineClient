@@ -21,6 +21,7 @@ const requiredPrograms = [
 
 const installHints = {
     conda: [
+        path.join(os.homedir(), "miniconda3", "Scripts", "activate.bat"),
         path.join(os.homedir(), "miniconda3", "bin", "activate"),
         path.join(os.homedir(), "anaconda3", "bin", "activate"),
     ],

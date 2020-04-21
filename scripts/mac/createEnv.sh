@@ -2,7 +2,8 @@
 
 #source ~/.bashrc
 condapath="$1"
-source $condapath
+condahome="$2"
+source $condapath $condahome
 echo "CREATE ENV:" $(which conda)
 
 ENVS=$(conda env list | grep deid | cut -f1 -d' ')

@@ -23,10 +23,10 @@ async function doInstallRequestPromise( app ) {
     }
   } else if (app.name === "deiden") { 
     
-      console.log("About to run:", config.scripts.condaInstallEnvScript, [config.scripts.condaPath])
+      console.log("About to run:", config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome])
       let options = {shell:false};
       try {
-        let pInstall = execFile(config.scripts.condaInstallEnvScript, [config.scripts.condaPath], options)
+        let pInstall = execFile(config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome], options)
         pInstall.child.stdout.on('data', data => {
           console.log("CONDA CREATE ENV stdout: ", data)
         })
@@ -156,7 +156,7 @@ function doInstallCheck(program, hints) {
       console.log(program, "path: ", condaPath)
       config.scripts.condaPath = condaPath;
       if (process.platform === 'win32') {
-        config.scripts.condaHome = path.resolve(condaPath, "..", "..", "..")
+        config.scripts.condaHome = path.resolve(condaPath, "..", "..")
       } else {
         config.scripts.condaHome = path.resolve(condaPath, "..", "..")
       }

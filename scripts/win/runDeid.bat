@@ -1,5 +1,4 @@
 
-call conda activate deid
 SET PYTHONPATH=$PYTHONPATH:$(%cd%)/src
 SET basedir=%1
 SET outdir=%2
@@ -9,6 +8,10 @@ SET condapath=%5
 SET recipepath=%6
 SET exportdbpath=%7
 SET headerspath=%8
+
+call %condapath% 
+
+call conda activate deid
 
 RMDIR /Q $outdir
 

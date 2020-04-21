@@ -1,7 +1,8 @@
 #!/bin/bash
 
 condapath="$1"
-source $condapath
+condahome="$2"
+source $condapath $condahome
 
 ENVS=$(conda env list | grep deid | cut -f1 -d' ')
 echo "Found environment " $ENVS

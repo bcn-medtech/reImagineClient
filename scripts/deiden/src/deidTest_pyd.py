@@ -85,14 +85,14 @@ def _find_or_create_anoncode(db, fields):
   if "PatientID" in fields:
     pid = fields["PatientID"]
   else:
-    pid = "UNKNOWN_" + uuid.uuid1()
+    pid = "UNKNOWN_" + str(uuid.uuid1())
     _l.error("No patient id? Setting it to "+pid)
 
   name = None
   if "PatientName" in fields:
     name = fields["PatientName"]
   else:
-    name = "UNKNOWN_" + uuid.uuid1()    
+    name = "UNKNOWN_" + str(uuid.uuid1())    
     _l.error("No patient Name? Setting it to "+name)
     
 
@@ -100,7 +100,7 @@ def _find_or_create_anoncode(db, fields):
   if "AccessionNumber" in fields:
     accNum = fields["AccessionNumber"]
   else:
-    accNum = "UNKNOWN_" + uuid.uuid1()    
+    accNum = "UNKNOWN_" + str(uuid.uuid1())    
     _l.error("No accession number? Setting it to "+accNum)
     
     

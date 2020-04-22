@@ -1,13 +1,10 @@
 const path = require('path');
 const fs = require('fs');
-const os = require("os");
 const exec = require('child_process');
 const uuid = require("uuid")
 const shell = require("shelljs")
-const isDev = require('electron-is-dev');
 const main = require("./electron.js")
 const config = main.getConfig();
-shell.config.execPath = shell.which('node').toString()
 const util = require('util')
 const execFile = util.promisify(exec.execFile)
 

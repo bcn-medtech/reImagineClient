@@ -70,7 +70,10 @@
     "mac": {
       "icon": "icon.icns",
       "identity": null,
-      "target": "dmg"
+      "target": "dmg",
+      "hardenedRuntime": true,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist"
     },
     "extraResources": [
       {

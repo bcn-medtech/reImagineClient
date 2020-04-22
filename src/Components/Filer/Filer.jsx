@@ -24,7 +24,10 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "13pt",
         paddingTop: "14px"
     },
-    stepers: {}
+    stepers: {},
+    list:{
+        width: "50%"
+    }
 }));
 
 export const Filer = (props) => {
@@ -51,7 +54,7 @@ export const Filer = (props) => {
             );
         } else {
             return (
-                <div className="grid-block align-center">
+                <div className={"grid-block align-center "+classes.list}>
                     <div className="grid-block shrink"><AddFolderNoEmptySVG onclickcomponent={() => { ipcRenderer.send("select-dirs") }} /></div>
                     <div className="grid-block shrink vertical">
                         <div className="grid-block">&nbsp;</div>

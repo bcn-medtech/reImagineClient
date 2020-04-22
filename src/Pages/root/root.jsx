@@ -7,8 +7,7 @@ import { Uploader } from './../../Components/Uploader/Uploader';
 import { Installers } from './../../Components/Installers/Installers';
 import { Logs } from './../../Components/Logs';
 import { CloudFunctionConfig } from 'minio';
-
-
+import {UpdateApp} from './../../Components/UpdateApp/UpdateApp';
 
 //Electron 
 const { ipcRenderer } = window.require("electron");
@@ -48,6 +47,7 @@ export const RootPage = () => {
     const [softwareInstalled, setSoftwareInstalled] = useState([]);
     const [softwareNotInstalled, setSoftwareNotInstalled] = useState([]);
     const [logLinesNum, setLogLinesNum] = useState(10);
+    const [updateAppStatus,setUpdateAppStatus]=useState(0) //0:no updates, 1:download in progress, 2:update downloaded, 3:update available, 4:update not available, 5:update error
 
     const config = ipcRenderer.sendSync("getConfig");
 
@@ -61,6 +61,13 @@ export const RootPage = () => {
                 return OldSoftwareNotInstalled.concat([program]);
             });
             setStep("installers")
+        }
+    }
+
+    const onIsAppUpToDate=(newUpdates)=>{
+        if(newUpdates===2){
+            setStep("updateapp");
+            setUpdateAppStatus(newUpdates);
         }
     }
 
@@ -80,7 +87,9 @@ export const RootPage = () => {
     useEffect(() => {
         // code to run on component mount
         if ( (!runningInstallers) && (!runningAnonimization) ){
+            ipcRenderer.send("checkIfThereAreNewVersions");
             checkIfSoftwareIsInstalled();
+            ipcRenderer.on("isAppUpToDate", (event, program, status, errs) => onIsAppUpToDate(program, status, errs));
             ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
         } else if (runningInstallers) {
             setStep("installers")
@@ -213,9 +222,13 @@ export const RootPage = () => {
                 return (<Logs
                     logFile={config.logFile}
                 />)
+            case "updateapp":
+                return(<UpdateApp
+                    status={updateAppStatus}
+                    onactiontoperform={onActionToPerform}
+                    />)
             default:
                 break;
-
         }
     }
 

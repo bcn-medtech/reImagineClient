@@ -44,28 +44,40 @@ const {autoUpdater} = require("electron-updater");
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
+newUpdates=0;
 
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Current version is ' + app.getVersion() + '. Checking for update...');
 })
-autoUpdater.on('update-available', (info) => {
-  sendStatusToWindow('Update available.');
-})
-autoUpdater.on('update-not-available', (info) => {
-  sendStatusToWindow('Update not available.');
-})
-autoUpdater.on('error', (err) => {
-  sendStatusToWindow('Error in auto-updater. ' + err);
-})
+
 autoUpdater.on('download-progress', (progressObj) => {
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
   log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
   sendStatusToWindow(log_message);
+  newUpdates=1;
 })
 autoUpdater.on('update-downloaded', (info) => {
+  newUpdates=2;
   sendStatusToWindow('Update downloaded');
 });
+
+autoUpdater.on('update-available', (info) => {
+  //newUpdates=3;
+  sendStatusToWindow('Update available.');
+})
+
+autoUpdater.on('update-not-available', (info) => {
+  //newUpdates=4;
+  sendStatusToWindow('Update not available.');
+})
+
+autoUpdater.on('error', (err) => {
+  //newUpdates=5;
+  sendStatusToWindow('Error in auto-updater. ' + err);
+})
+
+
 
 function sendStatusToWindow(text) {
   log.info(text);
@@ -301,6 +313,11 @@ ipcMain.on('checkInstalled', (event, program) => {
   event.reply("installedCheckRes", program, isOk, res)
 })
 
+ipcMain.on('checkIfThereAreNewVersions', (event) => {
+  console.log("checkIfThereAreNewVersions")
+  event.reply("isAppUpToDate", newUpdates);
+})
+
 /*
 ipcMain.on('checkStatus', (event) => {
   // Run internal checks or wait for other to fire the event?
@@ -324,6 +341,14 @@ ipcMain.on('getConfig', (event) => {
 ipcMain.on('checkUploadCerticates', (event) => {
   const certificatePath=config.confDir+path.sep+"minio.json";
   event.reply("onCheckUploadCerticates",lsHost.checkCertificateInHost(certificatePath));
-})
+});
+
+
+ipcMain.on('quitapp', (event) => {
+  console.log("quitapp")
+  app.quit();
+});
+
+
 
 

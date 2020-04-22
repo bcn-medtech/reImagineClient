@@ -50,6 +50,13 @@ export const AnonimizerList = (props) => {
         <List dense={true} className={classes.list}>
             {
                 files.map((value, idx) => {
+
+                    let text=value;
+
+                    if(value.length>40){
+                        text=value.substr(0, 40 - 3)+"...";
+                    }
+
                     return (
                         <ListItem key={idx}>
                             <ListItemAvatar>
@@ -58,7 +65,7 @@ export const AnonimizerList = (props) => {
                                 </Avatar>
                             </ListItemAvatar>
                             <ListItemText
-                                primary={<Typography className={classes.textList}>{value}</Typography>}
+                                primary={<Typography className={classes.textList}>{text}</Typography>}
                                 style={{ wordBreak: 'break-all' }}
                             />
                             {/*<ListItemSecondaryAction className={classes.removeItem}>

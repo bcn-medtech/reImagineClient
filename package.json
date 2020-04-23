@@ -49,7 +49,6 @@
   },
   "homepage": "./",
   "main": "public/electron.js",
-  "type": "module",
   "build": {
     "afterSign": "notarize.js",
     "appId": "edu.upf.simbiosys.reImagineClient",
@@ -72,7 +71,6 @@
     },
     "mac": {
       "icon": "icon.icns",
-      "identity": null,
       "target": "dmg",
       "hardenedRuntime": true,
       "entitlements": "entitlements.mac.plist",

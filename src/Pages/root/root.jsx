@@ -47,7 +47,7 @@ export const RootPage = () => {
     const [softwareInstalled, setSoftwareInstalled] = useState([]);
     const [softwareNotInstalled, setSoftwareNotInstalled] = useState([]);
     const [logLinesNum, setLogLinesNum] = useState(10);
-    const [updateAppStatus,setUpdateAppStatus]=useState(0) //0:no updates, 1:download in progress, 2:update downloaded, 3:update available, 4:update not available, 5:update error
+    const [updateAppStatus,setUpdateAppStatus]=useState(); 
 
     const config = ipcRenderer.sendSync("getConfig");
 
@@ -64,11 +64,13 @@ export const RootPage = () => {
         }
     }
 
-    const onIsAppUpToDate=(newUpdates)=>{
-        if(newUpdates===2){
-            setStep("updateapp");
-            setUpdateAppStatus(newUpdates);
-        }
+    const checkUpdates = async ()=>{
+
+        const newUpdates = await ipcRenderer.invoke('checkUpdate-ipc')
+        setUpdateAppStatus(newUpdates);        
+        if(newUpdates.updateFound){
+            setStep("updateapp");    
+        } 
     }
 
     const checkIfSoftwareIsInstalled = () => {
@@ -87,9 +89,10 @@ export const RootPage = () => {
     useEffect(() => {
         // code to run on component mount
         if ( (!runningInstallers) && (!runningAnonimization) ){
-            ipcRenderer.send("checkIfThereAreNewVersions");
+            //ipcRenderer.send("checkIfThereAreNewVersions");
+            checkUpdates();
             checkIfSoftwareIsInstalled();
-            ipcRenderer.on("isAppUpToDate", (event, program, status, errs) => onIsAppUpToDate(program, status, errs));
+            //ipcRenderer.on("isAppUpToDate", (event, program, status, errs) => onIsAppUpToDate(program, status, errs));
             ipcRenderer.on("installedCheckRes", (event, program, status, errs) => onInstalledSoftwareCheck(program, status, errs));
         } else if (runningInstallers) {
             setStep("installers")

@@ -25,7 +25,7 @@ export const UpdateAppSVG = (props) => {
                 <path d="M155 128.091V136.545L167 125.273L155 114V122.455C141.74 122.455 131 132.544 131 145C131 149.425 132.38 153.539 134.72 157.005L139.1 152.891C137.75 150.552 137 147.846 137 145C137 135.672 145.07 128.091 155 128.091ZM175.28 132.995L170.9 137.109C172.22 139.476 173 142.154 173 145C173 154.328 164.93 161.909 155 161.909V153.455L143 164.727L155 176V167.545C168.26 167.545 179 157.456 179 145C179 140.575 177.62 136.461 175.28 132.995V132.995Z" fill="#FFC107" />
                 <defs>
                     <filter id="filter0_d" x="0" y="0" width="403" height="405" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                        <feFlood floodOpacity="0" result="BackgroundImageFix" />
                         <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
                         <feOffset dy="4" />
                         <feGaussianBlur stdDeviation="10.5" />

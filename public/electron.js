@@ -40,11 +40,18 @@ let lsMinio = require("./lsMinio");
 let lsConda = require("./lsConda");
 let lsHost = require("./lsHost"); 
 
+
+const newUpdates = {
+  curVersion: app.getVersion(), 
+  updateFound: false,
+  donwloadCompleted: false,
+  info: null
+};
+
 const {autoUpdater} = require("electron-updater");
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
-newUpdates=0;
 
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Current version is ' + app.getVersion() + '. Checking for update...');
@@ -55,20 +62,20 @@ autoUpdater.on('download-progress', (progressObj) => {
   log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
   sendStatusToWindow(log_message);
-  newUpdates=1;
 })
 autoUpdater.on('update-downloaded', (info) => {
-  newUpdates=2;
+  newUpdates.donwloadCompleted = true;
   sendStatusToWindow('Update downloaded');
 });
 
 autoUpdater.on('update-available', (info) => {
-  //newUpdates=3;
-  sendStatusToWindow('Update available.');
+  newUpdates.updateFound = true;
+  newUpdates.info = info
+  sendStatusToWindow('Update available: '+info);
 })
 
 autoUpdater.on('update-not-available', (info) => {
-  //newUpdates=4;
+  newUpdates.updateFound = false;
   sendStatusToWindow('Update not available.');
 })
 
@@ -236,40 +243,10 @@ ipcMain.handle('anonimize-ipc', async (event, files, outDir) => {
   }
 });
 
+ipcMain.handle('checkUpdate-ipc', async () => {
+  return newUpdates;
+})
 
-// ipcMain.on('removeFolderFromOs', (event, app) => { 
-//   // console.log("Received Install request for ",app.name)
-//   //   lsConda.installRequest(event, app,(result)=>{
-//   //     event.reply("condaInstallRequestFinished",result);
-//   //   });
-//   console.log("Remove folder from os");
-// });
-
-/*
-ipcMain.on('condaAnonimizeRequest', (event, files, outDir) => { 
-
-  new Promise(resolve => {  
-
-    lsConda.runCondaAnonimizer(files, outDir,(result)=>{
-      console.log(result.res);
-      console.log(result.outDir);
-  
-      if(result.res===1){
-        resolve(result);
-      }
-    });
-  })
-  .then((value) => {
-    console.log("Anonimization done");
-    event.reply("condaAnonimizeRequestFinished",value);
-  })
-  .catch(e => {
-    event.reply("condaAnonimizeRequestFinished",e);
-  })
-  
-
-});
-*/
 // uploading of images deidentificated for deid script
 ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => { 
 
@@ -314,11 +291,6 @@ ipcMain.on('checkInstalled', (event, program) => {
   event.reply("installedCheckRes", program, isOk, res)
 })
 
-ipcMain.on('checkIfThereAreNewVersions', (event) => {
-  console.log("checkIfThereAreNewVersions")
-  event.reply("isAppUpToDate", newUpdates);
-})
-
 /*
 ipcMain.on('checkStatus', (event) => {
   // Run internal checks or wait for other to fire the event?
@@ -347,7 +319,9 @@ ipcMain.on('checkUploadCerticates', (event) => {
 
 ipcMain.on('quitapp', (event) => {
   console.log("quitapp")
-  app.quit();
+  let isSilent = true
+  let isForceRunAfter = true  
+  autoUpdater.quitAndInstall(isSilent, isForceRunAfter)
 });
 
 

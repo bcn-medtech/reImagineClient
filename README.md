@@ -1,12 +1,9 @@
-# Funcionalidad api
-Esta implementada con express y has 2 endpoints declarados en el archivo things.js dentro de src. Funciona en desarrollo ya que se ejecuta el localhost pero en produccion no.
-
 # ReImagine client
 
-A simple electron app to anonimize and upload medical data
+An electron-react app to anonimize and upload medical data for online processing
 
 ## Requirements
- * Node >= 8.2.0
+ * Node >= 10.0
 
 ## Installing
 Clone the repo:
@@ -14,19 +11,17 @@ Clone the repo:
 Then install dependencies and run the project
 
 ```bash
-$ npm i
-$ npm start
+$ yarn
+$ yarn electron-dev
 ```
 
 ## Packaging the app
-1. `npm run build`
-2. `npm run pack`
-3. `npm run dist`
+1. For windows and linux: `yarn electron-pack`
+2. For mac: `yarn electron-pack-mac`
 
-Your app will packaged as an .exe in the dist folder using the [electron-builder](https://github.com/electron-userland/electron-builder) package. Edit the build section of the package.json to build on additional platforms.
+Your app will packaged in the dist folder using the [electron-builder](https://github.com/electron-userland/electron-builder) package. 
 
+## Functionality
 
-
-# Funcionalidad api
-Esta implementada con express y has 2 endpoints declarados en el archivo things.js dentro de src. Funciona en desarrollo ya que se ejecuta el localhost pero en produccion no.
+We create a conda environment with python3 and gdcm to anonimize the images. We can upload on S3, minio or any other compatible server 
 

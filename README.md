@@ -6,6 +6,9 @@ An electron-react app to anonimize and upload medical data for online processing
  * Node >= 10.0
 
 ## Installing
+Download the latest binary release for windows, linux or mac [here](https://github.com/bcn-medtech/reImagineClient/releases)
+
+## Developing
 Clone the repo:
 
 Then install dependencies and run the project

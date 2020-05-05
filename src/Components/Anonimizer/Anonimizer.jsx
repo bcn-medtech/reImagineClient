@@ -105,7 +105,7 @@ export const Anonimizer = (props) => {
             return (
                 <div className="grid-block vertical ">
                     <div className={"grid-block align-center shrink " + classes.label1}>Anonimizing Images</div>
-                    <div className={"grid-block align-center shrink " + classes.label2}>Please wait upto the anonimization process finish</div>
+                    <div className={"grid-block align-center shrink " + classes.label2}>Please wait for the anonimization to finish</div>
                     <div className={"grid-block align-center shrink " + classes.stepers}>
                         <NavigateToFilerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO FILER", "values": false })} />
                         <Step1SVG done={true} />

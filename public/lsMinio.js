@@ -79,7 +79,7 @@ function doMinioUpload(baseName, tmpDir,callback) {
     callback(false);
   };
 
-  console.log('Connecting to minio client...');
+  console.log('Connecting to minio...');
 
   let [bucket, minioClient] = getMinioClient();
   if (minioClient === null) {
@@ -93,17 +93,18 @@ function doMinioUpload(baseName, tmpDir,callback) {
 
   var upfname = path.basename(fname);
   
+  console.log('Uploading to '+bucket);
   try {
-    minioClient.fPutObject(bucket, upfname, fname, metaData, (err, etag) => {
-        if (err) {
-          console.log("Error in uploading file!"+err);
-          callback(false);
-        } 
-        console.log("Upload successfull!");
-        fs.unlinkSync(fname);
-        tmpDir.removeCallback();
-        callback(true);
-      });
+      minioClient.fPutObject(bucket, upfname, fname, metaData, (err, etag) => {
+      if (err) {
+        console.log("Error in uploading file!"+err);
+        callback(false);
+      } 
+      console.log("Upload successfull!");
+      fs.unlinkSync(fname);
+      tmpDir.removeCallback();
+      callback(true);
+    });
   } catch(err) {
     console.error(err);
     calback(false);

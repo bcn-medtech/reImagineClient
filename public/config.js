@@ -11,6 +11,7 @@ const exportDbPath = path.join(confDir, "patients.csv");
 const logDir = path.join(confDir, "logs");
 const anDir = path.join(confDir, "an");
 const headersDir = path.join(confDir, "headers");
+const deidEnv = "deid.1"
 
 const _createDirs = [confDir, logDir, anDir, headersDir]
 
@@ -24,9 +25,10 @@ const installHints = {
         path.join(os.homedir(), "miniconda3", "Scripts", "activate.bat"),
         path.join(os.homedir(), "miniconda3", "bin", "activate"),
         path.join(os.homedir(), "anaconda3", "bin", "activate"),
+        path.join(os.homedir(), "opt", "anaconda3", "bin", "activate")
     ],
     deiden: [
-        path.join("envs","deid")
+        path.join("envs", deidEnv)
     ]
 }
 
@@ -141,7 +143,8 @@ const scripts = {
     condaInstallEnvScript: getCondaInstallEnvScript(),
     condaInstaller: getCondaInstaller(),
     condaHome: path.join(os.homedir(),"miniconda3"),
-    condaPath: path.join(os.homedir(),"miniconda3","bin","activate")
+    condaPath: path.join(os.homedir(),"miniconda3","bin","activate"),
+    deidEnv: deidEnv
 }
 
 // Ensure basic dir structure is ready

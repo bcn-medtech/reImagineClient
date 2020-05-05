@@ -1,26 +1,17 @@
 #!/bin/bash
 
-#source ~/.bashrc
 condapath="$1"
 condahome="$2"
+envname="$3"
 source $condapath $condahome
-echo "CREATE ENV:" $(which conda)
 
-ENVS=$(conda env list | grep deid | cut -f1 -d' ')
-echo "Found environment " $ENVS
-if [ -z "$ENVS" ]; then
-    echo "Create deiden env"
-    conda create -n deid sqlalchemy -y
+echo "Creating env..."
+conda create -n $envname python=3.7 sqlalchemy -y
 
-    conda install --name deid -c SimpleITK SimpleITK -y
-    conda install --name deid -c conda-forge pydicom -y
-    conda install --name deid -c conda-forge deid -y
-    conda install --name deid -c https://services.simbiosys.upf.edu/conda/ -c conda-forge gdcm -y
+conda install --name $envname -c SimpleITK SimpleITK=1.2.4 -y
+conda install --name $envname -c conda-forge pydicom=1.2.1 -y
+conda install --name $envname -c conda-forge deid=0.1.42 -y
+#   conda install --name deid -c https://services.simbiosys.upf.edu/conda/ -c conda-forge gdcm -y
    
-else 
-    echo 'deid is installed'
-    conda update -n base -c defaults conda -y    
-    exit
-fi;
 
 

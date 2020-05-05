@@ -113,7 +113,7 @@ export const Installers = (props) => {
                 <div className={"grid-block vertical align-center shrink " + classes.installationInfo}>
                     <div className="grid-block align-center shrink"><InstallationInProgressSVG done={true} /></div>
                     <div className={"grid-block align-center shrink " + classes.label1}>Installing third party software</div>
-                    <div className={"grid-block align-center text-center shrink " + classes.label2}>The installation of the software can take about 10 minutes,please wait and be sure that the computer is connected to internet. In the mean time you can go and drink a cofee</div>
+                    <div className={"grid-block align-center text-center shrink " + classes.label2}>The installation can take up to 5 minutes, please wait and be sure that the computer is connected to internet.</div>
                     <Timer />
                 </div>
             )
@@ -122,7 +122,7 @@ export const Installers = (props) => {
                 <div className={"grid-block vertical align-center shrink " + classes.installationInfo}>
                     <div className="grid-block align-center shrink"><InstallationNotDoneSVG done={true} onclickcomponent={runInstallNext} /></div>
                     <div className={"grid-block align-center shrink " + classes.label1}>Third party software not installed</div>
-                    <div className={"grid-block align-center shrink " + classes.label2}>Software needed is not installed, please click the play red button to start the installation</div>
+                    <div className={"grid-block align-center shrink " + classes.label2}>Some needed software is not installed, please click the red button to start the installation</div>
                     {/*<NavigateToFilerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO FILER", "values": false })} />*/}
                 </div>
             )
@@ -130,7 +130,7 @@ export const Installers = (props) => {
             return (
                 <div className={"grid-block vertical align-center shrink " + classes.installationInfo}>
                     <div className="grid-block align-center shrink"><InstallationDoneSVG done={true} /></div>
-                    <div className={"grid-block align-center shrink " + classes.label1}>Installation third party software done</div>
+                    <div className={"grid-block align-center shrink " + classes.label1}>Installation of third party software done</div>
                     <div className={"grid-block align-center shrink " + classes.label2}>Everything is installed</div>
                     <NavigateToFilerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO FILER", "values": false })} />
                 </div>

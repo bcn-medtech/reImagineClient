@@ -20,10 +20,10 @@ async function doInstallRequestPromise( app ) {
     }
   } else if (app.name === "deiden") { 
     
-      console.log("About to run:", config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome])
+      console.log("About to run:", config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome, config.scripts.deidEnv])
       let options = {shell:false};
       try {
-        let pInstall = execFile(config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome], options)
+        let pInstall = execFile(config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome, config.scripts.deidEnv], options)
         pInstall.child.stdout.on('data', data => {
           console.log("CONDA CREATE ENV stdout: ", data)
         })
@@ -115,7 +115,10 @@ function doInstallCheck(program, hints) {
   let condaPath = null
   if (program === "conda") {
     //Check if currently active in shell
-    condaPath = shell.env["CONDA_EXE"]
+    let shell_conda = path.resolve(shell.env["CONDA_PREFIX"], "bin", "activate")
+    if (fs.existsSync(shell_conda)) {
+      condaPath = shell_conda
+    }
     if (!condaPath) {
       //Check if installed in common locations
       for (const _p of hints) {
@@ -219,7 +222,7 @@ async function runCondaAnonimizer(files, outDir, callback) {
     argv = [files[elem], outDir, config.scripts.deidenScript, 
       config.sqlFile, config.scripts.condaPath, 
       config.scripts.recipePath, config.exportDbPath,
-      config.headersDir];
+      config.headersDir, config.scripts.deidEnv];
 
     console.log("About to run:", config.scripts.condaScript, argv);
     let options = {shell:false};

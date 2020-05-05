@@ -79,20 +79,20 @@ def _generateAnonCode(pid, name):
 
   return idXname.hex()
 
-def _find_or_create_anoncode(db, fields):
+def _find_or_create_anoncode(image, db, fields):
   pid = None
   if "PatientID" in fields:
     pid = fields["PatientID"]
   else:
     pid = "UNKNOWN_" + str(uuid.uuid1())
-    _l.error("No patient id? Setting it to "+pid)
+    _l.error("No patient id in %s? Setting it to %s"%(image, pid))
 
   name = None
   if "PatientName" in fields:
     name = fields["PatientName"]
   else:
     name = "UNKNOWN_" + str(uuid.uuid1())    
-    _l.error("No patient Name? Setting it to "+name)
+    _l.error("No patient Name in %s? Setting it to %s"%(image, name))
     
 
   accNum = None
@@ -100,7 +100,7 @@ def _find_or_create_anoncode(db, fields):
     accNum = fields["AccessionNumber"]
   else:
     accNum = "UNKNOWN_" + str(uuid.uuid1())    
-    _l.error("No accession number? Setting it to "+accNum)
+    _l.error("No accession number %s? Setting it to %s"%(image, accNum))
     
     
   res = list(db.searchId(pid))
@@ -116,8 +116,12 @@ def main(args):
   patients = LocalDB(verbose=False, sqlfile=args.db_location)
   patients._initdb()
   basedir = os.getcwd()
-  _l.info("Loading receipe from %s"%args.recipe)
-  recipe = DeidRecipe(deid=args.recipe)
+  if os.path.isfile(args.recipe):
+    _l.info("Loading receipe from %s"%args.recipe)
+    recipe = DeidRecipe(deid=args.recipe)
+  else:
+    _l.error("Cannot load recipe %s"%args.recipe)
+    return -1
 
   basedir = args.basedir
   _l.info( "Reading Dicom directory: %s"%basedir )
@@ -125,7 +129,7 @@ def main(args):
   _l.info( "Found %d dicomdirs"%len(dds))
   for datadir, sids in dds:
     _l.info("Entering dir %s"%datadir)
-    dicom_files = list(get_files(datadir))
+    dicom_files = [str(f) for f in get_files(datadir) if os.path.isfile(str(f))]
     ids = get_identifiers(dicom_files)
     _dfiles = list(ids.keys())
     _l.info("Found %d dicom files"%len(_dfiles))
@@ -135,7 +139,7 @@ def main(args):
     if "SeriesInstanceUID" in ids[_fidx]:
       sid = ids[_fidx]["SeriesInstanceUID"]
     else:
-      _l.error(" 'SeriesInstanceUID' is not available in file ", _fidx)
+      _l.error(" 'SeriesInstanceUID' is not available in file %s"%_fidx)
     
     if (sid is None):
       sid = str(uuid.uuid1())
@@ -147,7 +151,7 @@ def main(args):
     
     updated_ids = dict()
     for image, fields in ids.items():  
-      anoncode = _find_or_create_anoncode(patients, fields)
+      anoncode = _find_or_create_anoncode(image, patients, fields)
       fields['id'] = anoncode
       updated_ids[image] = fields
 
@@ -157,7 +161,6 @@ def main(args):
                                 ids=updated_ids,
                                 output_folder=outdir,
                                 remove_private=True)           
-    
     if (args.save_headers):    
       _saveHeaders(cleaned_files, hdirpost)
 

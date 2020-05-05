@@ -8,10 +8,11 @@ SET condapath=%5
 SET recipepath=%6
 SET exportdbpath=%7
 SET headerspath=%8
+SET envname=%9
 
 call %condapath% 
 
-call conda activate deid
+call conda activate %envname%
 
 RMDIR /Q $outdir
 

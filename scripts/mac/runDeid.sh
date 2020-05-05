@@ -7,11 +7,11 @@ condapath="$5"
 recipepath="$6"
 exportdbpath="$7"
 headerspath="$8"
+envname="$9"
 echo "Sourcing conda from" $condapath
-source $condapath
+source $condapath $envname
 
 echo "Activating conda environment deid..."
-conda activate deid
 pushd scripts/deiden/
 export PYTHONPATH=$PYTHONPATH:$(pwd)/src
 

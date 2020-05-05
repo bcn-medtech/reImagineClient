@@ -24,7 +24,6 @@ def _find_dicomdirs(basedir):
   dds = []
   for root, dirs, files in os.walk(basedir):
     if len(files) != 0:
-      print(root)
       series_IDs = sitk.ImageSeriesReader.GetGDCMSeriesIDs(root)  
       if series_IDs:    
         dds.append( (root,  series_IDs))
@@ -127,9 +126,21 @@ def main(args):
   for datadir, sids in dds:
     _l.info("Entering dir %s"%datadir)
     dicom_files = list(get_files(datadir))
-    ids = get_identifiers(dicom_files)      
+    ids = get_identifiers(dicom_files)
+    _dfiles = list(ids.keys())
+    _l.info("Found %d dicom files"%len(_dfiles))
+    if not (len(_dfiles)): continue
+    sid = None
+    _fidx = _dfiles[0]
+    if "SeriesInstanceUID" in ids[_fidx]:
+      sid = ids[_fidx]["SeriesInstanceUID"]
+    else:
+      _l.error(" 'SeriesInstanceUID' is not available in file ", _fidx)
+    
+    if (sid is None):
+      sid = str(uuid.uuid1())
+      _l.info("Assigned a random serie id %s",sid)
 
-    sid = ids[list(ids.keys())[0]]["SeriesInstanceUID"]
     outdir, hdirpre, hdirpost = _prepare(args, sid)
     if (args.save_headers):
       _saveHeaders(dicom_files, hdirpre)

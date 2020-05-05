@@ -5,6 +5,7 @@ import { TopBar } from './../../Components/TopBar';
 import { Anonimizer } from './../../Components/Anonimizer/Anonimizer';
 import { Uploader } from './../../Components/Uploader/Uploader';
 import { Installers } from './../../Components/Installers/Installers';
+import { Metadata } from './../../Components/Metadata';
 import { Logs } from './../../Components/Logs';
 import { CloudFunctionConfig } from 'minio';
 import {UpdateApp} from './../../Components/UpdateApp/UpdateApp';
@@ -137,6 +138,9 @@ export const RootPage = () => {
             case "GO TO FILER":
                 setStep("filer");
                 break;
+            case "GO TO METADATA":
+                    setStep("metadata");
+                    break;                
             case "GO TO UPLOADER":
                 setStep("uploader");
                 break;
@@ -221,6 +225,14 @@ export const RootPage = () => {
                     runninginstallation3rdpartysoftware={runningInstallers}
                     onactiontoperform={onActionToPerform}
                 />)
+            case "metadata":
+                return (
+                    <Metadata
+                    onactiontoperform={onActionToPerform}
+                    anonimizationdir={anonDir}
+                    files={selectedFiles} 
+                    />
+                )
             case "console-log":
                 return (<Logs
                     logFile={config.logFile}

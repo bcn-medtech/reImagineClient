@@ -124,7 +124,7 @@ export const Anonimizer = (props) => {
                         <Step1SVG done={true} />
                         <Step2SVG done={true} />
                         <Step3SVG done={false} />
-                        <NavigateToUploaderRightSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO UPLOADER", "values": false })} />
+                        <NavigateToUploaderRightSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO METADATA", "values": false })} />
                     </div>
                 </div>);
         } else {

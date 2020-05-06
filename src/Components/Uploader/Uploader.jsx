@@ -111,7 +111,7 @@ export const Uploader = (props) => {
                     <div className={"grid-block align-center shrink " + classes.label1}>Upload Images done</div>
                     <div className={"grid-block align-center shrink " + classes.label2}>Data uploaded succesfully</div>
                     <div className={"grid-block align-center shrink " + classes.stepers}>
-                        <NavigateToAnonimizerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO METADATA", "values": false })} />
+                        <NavigateToAnonimizerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO ANONIMIZATION", "values": false })} />
                         <Step1SVG done={true} />
                         <Step2SVG done={true} />
                         <Step3SVG done={true} />
@@ -124,7 +124,7 @@ export const Uploader = (props) => {
                     <div className={"grid-block align-center shrink " + classes.label1}>Upload Images</div>
                     <div className={"grid-block align-center shrink " + classes.label2}>Click the big button to upload the images</div>
                     <div className={"grid-block align-center shrink " + classes.stepers}>
-                        <NavigateToAnonimizerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO METADATA", "values": false })} />
+                        <NavigateToAnonimizerLeftSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO ANONIMIZATION", "values": false })} />
                         <Step1SVG done={true} />
                         <Step2SVG done={true} />
                         <Step3SVG done={true} />

@@ -8,7 +8,7 @@ const config = main.getConfig();
 const util = require('util')
 const execFile = util.promisify(exec.execFile)
 
-async function doInstallRequestPromise( app ) {
+async function doInstallRequestPromise(app) {
 
   if (app.name === "conda") {
     if (fs.existsSync(config.scripts.condaPath)) {
@@ -16,54 +16,54 @@ async function doInstallRequestPromise( app ) {
       return res
     } else {
       res = await _installMiniconda()
-      return res 
+      return res
     }
-  } else if (app.name === "deiden") { 
-    
-      console.log("About to run:", config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome, config.scripts.deidEnv])
-      let options = {shell:false};
-      try {
-        let pInstall = execFile(config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome, config.scripts.deidEnv], options)
-        pInstall.child.stdout.on('data', data => {
-          console.log("CONDA CREATE ENV stdout: ", data)
-        })
-    
-        pInstall.child.stderr.on('data', data => {
-          console.log("CONDA CREATE ENV stderr: ", data)
-        })                
-        await pInstall
+  } else if (app.name === "deiden") {
 
-        return {status: true, reason: "Completed successfully"}
-    
-      } catch ( error ) {
-        return {status: false, reason: "Error while creating conda environment: "+ error.status + " " + error.message}
-      }    
-  
+    console.log("About to run:", config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome, config.scripts.deidEnv])
+    let options = { shell: false };
+    try {
+      let pInstall = execFile(config.scripts.condaInstallEnvScript, [config.scripts.condaPath, config.scripts.condaHome, config.scripts.deidEnv], options)
+      pInstall.child.stdout.on('data', data => {
+        console.log("CONDA CREATE ENV stdout: ", data)
+      })
+
+      pInstall.child.stderr.on('data', data => {
+        console.log("CONDA CREATE ENV stderr: ", data)
+      })
+      await pInstall
+
+      return { status: true, reason: "Completed successfully" }
+
+    } catch (error) {
+      return { status: false, reason: "Error while creating conda environment: " + error.status + " " + error.message }
+    }
+
   } else {
-        return { status: false, reason: "Installation of app " +app.name + " is not implemented" }
+    return { status: false, reason: "Installation of app " + app.name + " is not implemented" }
   }
-  
+
 }
 
 
 async function _installMiniconda() {
-  
+
   var instArgs = []
-  
+
   if (process.platform === "win32") {
-    instArgs = ["/InstallationType=JustMe","/RegisterPython=0","/S","/D="+ config.scripts.condaHome]
+    instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=" + config.scripts.condaHome]
   }
-  else if ( (process.platform === 'darwin') || (process.platform === 'linux')) {
+  else if ((process.platform === 'darwin') || (process.platform === 'linux')) {
     instArgs = ["-b", "-p " + config.scripts.condaHome]
   }
   else {
-    res = {status: false, reason: "Unknown platform: " + process.platform}
+    res = { status: false, reason: "Unknown platform: " + process.platform }
     return res
   }
 
   console.info("About to run:", config.scripts.condaInstaller, instArgs)
 
-  let options = {shell:false};
+  let options = { shell: false };
   try {
     let pInstall = execFile(config.scripts.condaInstaller, instArgs, options);
     pInstall.child.stdout.on('data', data => {
@@ -74,10 +74,10 @@ async function _installMiniconda() {
       console.log("INSTALLER stderr: ", data)
     })
     await pInstall
-    return {status: true, reason: "Installer completed successfully"}
+    return { status: true, reason: "Installer completed successfully" }
 
-  } catch ( error ) {
-    return {status: false, reason: "Error in installer: "+ error.status + " " + error.message}
+  } catch (error) {
+    return { status: false, reason: "Error in installer: " + error.status + " " + error.message }
   }
 
 }
@@ -115,10 +115,13 @@ function doInstallCheck(program, hints) {
   let condaPath = null
   if (program === "conda") {
     //Check if currently active in shell
-    let shell_conda = path.resolve(shell.env["CONDA_PREFIX"], "bin", "activate")
-    if (fs.existsSync(shell_conda)) {
-      condaPath = shell_conda
+    if (shell.env["CONDA_PREFIX"] !== undefined) {
+      let shell_conda = path.resolve(shell.env["CONDA_PREFIX"], "bin", "activate")
+      if (fs.existsSync(shell_conda)) {
+        condaPath = shell_conda
+      }
     }
+
     if (!condaPath) {
       //Check if installed in common locations
       for (const _p of hints) {
@@ -136,7 +139,7 @@ function doInstallCheck(program, hints) {
     if (!condaPath) {
       try {
         let _oExec = shell.which(program)
-        if (typeof(_oExec) === 'object')  { // then it is a child process object:
+        if (typeof (_oExec) === 'object') { // then it is a child process object:
           if (_oExec.code === 0) { // a retcode of 0 means all good
             condaPath = _oExec.stdout;
           }
@@ -144,8 +147,8 @@ function doInstallCheck(program, hints) {
           condaPath = _oExec;
         }
 
-      } catch( e ) {
-        console.log("Error searching ",program, "via shelljs.which")
+      } catch (e) {
+        console.log("Error searching ", program, "via shelljs.which")
       }
     }
 
@@ -160,7 +163,7 @@ function doInstallCheck(program, hints) {
       } else {
         config.scripts.condaHome = path.resolve(condaPath, "..", "..")
       }
-      
+
       return []
     }
   }
@@ -179,13 +182,13 @@ function doInstallCheck(program, hints) {
       errs.push([out, e])
     }
     */
-   for (const _p of hints) {
-    let _dp = path.join(config.scripts.condaHome, _p)
-    console.log("Searching deid in ", _dp)
+    for (const _p of hints) {
+      let _dp = path.join(config.scripts.condaHome, _p)
+      console.log("Searching deid in ", _dp)
 
-    if (fs.existsSync(_dp)) {
-      foundDeid = true
-      break
+      if (fs.existsSync(_dp)) {
+        foundDeid = true
+        break
       }
     }
 
@@ -219,29 +222,29 @@ async function runCondaAnonimizer(files, outDir, callback) {
   let argv;
 
   for (elem in files) {
-    argv = [files[elem], outDir, config.scripts.deidenScript, 
-      config.sqlFile, config.scripts.condaPath, 
-      config.scripts.recipePath, config.exportDbPath,
-      config.headersDir, config.scripts.deidEnv];
+    argv = [files[elem], outDir, config.scripts.deidenScript,
+    config.sqlFile, config.scripts.condaPath,
+    config.scripts.recipePath, config.exportDbPath,
+    config.headersDir, config.scripts.deidEnv];
 
     console.log("About to run:", config.scripts.condaScript, argv);
-    let options = {shell:false};
+    let options = { shell: false };
     try {
       const pInstall = execFile(config.scripts.condaScript, argv, options);
       pInstall.child.stdout.on('data', data => {
         console.log("ANONIMIZATION stdout: ", data)
       })
-    
+
       pInstall.child.stderr.on('data', data => {
         console.log("ANONIMIZATION stderr: ", data)
-      })                
+      })
       await pInstall
-    
-      return {status: true, reason: "Completed successfully", outDir: outDir}
-    
-    } catch ( error ) {
-      return {status: false, reason: "Error while running anonimization: "+ error.status + " " + error.message, outDir: outDir}
-    }    
+
+      return { status: true, reason: "Completed successfully", outDir: outDir }
+
+    } catch (error) {
+      return { status: false, reason: "Error while running anonimization: " + error.status + " " + error.message, outDir: outDir }
+    }
 
   }
 

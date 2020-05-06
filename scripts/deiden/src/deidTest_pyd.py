@@ -152,7 +152,7 @@ def main(args):
     updated_ids = dict()
     for image, fields in ids.items():  
       anoncode = _find_or_create_anoncode(image, patients, fields)
-      fields['id'] = anoncode
+      fields['entity_id'] = anoncode
       updated_ids[image] = fields
 
 

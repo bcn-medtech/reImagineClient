@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 //Components
 import { Step1SVG } from './../svgs/Step1SVG';
@@ -10,6 +10,10 @@ import { NavigateToFilerLeftSVG } from './../svgs/NavigateToFilerLeftSVG';
 import { NavigateToUploaderRightSVG } from './../svgs/NavigateToUploaderRightSVG';
 import { AnonimizerList } from './AnonimizerList';
 import { RunAnonimizerSVG } from './../svgs/RunAnonimizerSVG';
+
+// Forms
+import Form from "@rjsf/core"
+
 //Electron 
 const { ipcRenderer } = window.require("electron");
 
@@ -29,28 +33,43 @@ const useStyles = makeStyles((theme) => ({
     stepers: {}
 }));
 
+const initialSchema = {
+    title: "Initial schema",
+    type: "object",
+    properties: {
+        ann: {type: "string", title: "Additional data or annotations", default: ""}
+    }
+  }
+
+const initialData = {
+    ann: "Initial data"
+  }
+
+const initialUi = {
+    ann: {
+        "ui:widget": "textarea"
+      }
+}  
+
 export const Anonimizer = (props) => {
 
     const classes = useStyles();
+    const [formSchema, setFormSchema] = useState(initialSchema);
+    const [formData, setFormData] = useState(initialData);
+    const [formUi, setFormUi] = useState(initialUi);
+    var annotationForm;
 
-    // ipcRenderer.on('condaAnonimizeRequestFinished', (event, args) => {
-    //     console.log(args);
-        
-    // });
-/*
-    const condaAnonimizeRequestFinished=(event, args) => {
-        props.onactiontoperform({ action: "FINISH ANONIMIZATION", values: args });
-    }
-*/
-    //Component did unmount
-    /*
-    useEffect(() => {
-        ipcRenderer.on('condaAnonimizeRequestFinished', (event, args) => condaAnonimizeRequestFinished(event, args));
-        return () => {
-            ipcRenderer.removeListener('condaAnonimizeRequestFinished', condaAnonimizeRequestFinished)
+    useEffect( () => {
+        const loadForm = async () => {
+            const result = await ipcRenderer.invoke("load-form");
+            if (result.form !== null) {
+                setFormSchema(result.form.schema)
+                setFormData(result.form.data)
+                setFormUi(result.form.ui)
+            }
         }
+        loadForm();
     }, []);
-    */
 
     const runAnonimization = async () => {
         props.onactiontoperform({ action: "RUN ANONIMIZATION", values: "false" });
@@ -73,6 +92,13 @@ export const Anonimizer = (props) => {
         }        
     }
 
+/*
+                            <AnonimizerList
+                                files={files}
+                                onactiontoperform={props.onactiontoperform}
+                            />
+*/
+
     const renderAddFolderBody = (files) => {
 
         if (files.length === 0) {
@@ -86,10 +112,13 @@ export const Anonimizer = (props) => {
                     <div className="grid-block shrink vertical">
                         <div className="grid-block">&nbsp;</div>
                         <div className="grid-block shrink">
-                            <AnonimizerList
-                                files={files}
-                                onactiontoperform={props.onactiontoperform}
-                            />
+                            <Form schema={formSchema}
+                                formData={formData}
+                                uiSchema={formUi}
+                                ref={(form) => {annotationForm = form;}}
+                            >
+                            <div/>
+                            </Form>    
                         </div>
                         <div className="grid-block">&nbsp;</div>
                     </div>
@@ -124,7 +153,11 @@ export const Anonimizer = (props) => {
                         <Step1SVG done={true} />
                         <Step2SVG done={true} />
                         <Step3SVG done={false} />
-                        <NavigateToUploaderRightSVG onclickcomponent={() => props.onactiontoperform({ action: "GO TO METADATA", "values": false })} />
+                        <NavigateToUploaderRightSVG onclickcomponent={ async () => { 
+                            const result = await ipcRenderer.invoke("write-annotations", annotationForm.state.formData, props.anonimizationdir);
+                            props.onactiontoperform({ action: "GO TO UPLOADER", "values": false })
+                            }
+                        }/>
                     </div>
                 </div>);
         } else {

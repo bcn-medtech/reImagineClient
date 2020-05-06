@@ -220,6 +220,44 @@ app.on('activate', function () {
 });
 
 
+ipcMain.handle('load-form', async (event) => { 
+  console.log("Received ipc invocation for loading form data: ",config.metadata_form)
+  try {
+    var jsform = null; var reas = null
+    if (!fs.existsSync(config.metadata_form)) {
+      jsform = JSON.stringify({
+        schema: {
+          title: "Metadata information",
+          description: "A form to add information to the images",
+          type: "object",
+          properties: {
+            ann: {
+              type: "string",
+              title: "Annotation"
+            }
+          }
+        },
+        ui: {
+          ann: {
+            "ui:widget": "textarea"
+          }
+        },
+        data: {
+          ann: "New information"
+        }
+      })
+      fs.writeFileSync(config.metadata_form, jsform)
+    } 
+
+    jsform = fs.readFileSync(config.metadata_form);
+    jsform = JSON.parse(jsform);
+    return {form: jsform, reason: reas};
+  } catch (error) {
+    console.log("Error: ",error)
+    return {form: null, reason: error};
+  }
+});
+
 ipcMain.handle('install-ipc', async (event, app) => { 
   console.log("Received ipc invocation for installing: ",app.name)
   try {
@@ -246,6 +284,20 @@ ipcMain.handle('anonimize-ipc', async (event, files, outDir) => {
 ipcMain.handle('checkUpdate-ipc', async () => {
   return newUpdates;
 })
+
+ipcMain.handle('write-annotations', async (event, jsondata, outDir) => { 
+  console.log("Received ipc invocation for adding metadata to: ",jsondata, outDir)
+  try {
+    let data = JSON.stringify(jsondata)
+    let fname = path.join(outDir, "annotations.json")
+    fs.writeFileSync(fname, data)
+    return {status: true, reason: null};
+  } catch (error) {
+    console.log("Received error: ",error)
+    return {status: false, reason: error};
+  }
+});
+
 
 // uploading of images deidentificated for deid script
 ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => { 

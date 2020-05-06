@@ -11,9 +11,10 @@ const exportDbPath = path.join(confDir, "patients.csv");
 const logDir = path.join(confDir, "logs");
 const anDir = path.join(confDir, "an");
 const headersDir = path.join(confDir, "headers");
+const formDir = path.join(confDir, "forms");
 const deidEnv = "deid.1"
 
-const _createDirs = [confDir, logDir, anDir, headersDir]
+const _createDirs = [confDir, logDir, anDir, headersDir, formDir]
 
 const requiredPrograms = [
     {name: "conda", icon: "../assets/logo_anaconda.png"},
@@ -155,13 +156,15 @@ for (_d of _createDirs) {
 }
 
 module.exports.confDir = confDir
-module.exports.confFile = confFile;
-module.exports.sqlFile = sqlFile;
-module.exports.exportDbPath = exportDbPath;
 module.exports.anDir = anDir;
 module.exports.headersDir = headersDir;
 module.exports.logDir = logDir;
+module.exports.formDir = formDir;
+module.exports.confFile = confFile;
+module.exports.sqlFile = sqlFile;
+module.exports.exportDbPath = exportDbPath;
 module.exports.minioCred = path.join(confDir, "minio.json");
+module.exports.metadata_form = path.join(formDir, "metadata.json");
 module.exports.requiredPrograms = requiredPrograms;
 module.exports.installHints = installHints;
 module.exports.scripts = scripts;

@@ -1,7 +1,7 @@
 
 const electron = require('electron');
 const { Menu, Tray } = require('electron')
-
+const {shell} = require('electron') // deconstructing assignment
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
@@ -377,5 +377,10 @@ ipcMain.on('quitapp', (event) => {
 });
 
 
+
+
+ipcMain.on('open-folder', (event, args) => {
+  shell.showItemInFolder(args)
+})
 
 

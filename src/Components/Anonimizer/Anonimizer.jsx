@@ -10,6 +10,8 @@ import { NavigateToFilerLeftSVG } from './../svgs/NavigateToFilerLeftSVG';
 import { NavigateToUploaderRightSVG } from './../svgs/NavigateToUploaderRightSVG';
 import { AnonimizerList } from './AnonimizerList';
 import { RunAnonimizerSVG } from './../svgs/RunAnonimizerSVG';
+import { AnonimizerForm } from './AnonimizerForm.jsx';
+import { AnonimizerMenu } from './AnonimizerMenu';
 
 // Forms
 import Form from "@rjsf/core"
@@ -30,76 +32,93 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "13pt",
         paddingTop: "14px"
     },
-    stepers: {}
-}));
+    stepers: {},
 
-const initialSchema = {
-    title: "Initial schema",
-    type: "object",
-    properties: {
-        ann: {type: "string", title: "Additional data or annotations", default: ""}
+    headersFolders:{
+        color: "#cdcdcd",
+        fontSize: "14pt",
+        paddingLeft: "15px",
     }
-  }
-
-const initialData = {
-    ann: "Initial data"
-  }
-
-const initialUi = {
-    ann: {
-        "ui:widget": "textarea"
-      }
-}  
+}));
 
 export const Anonimizer = (props) => {
 
     const classes = useStyles();
-    const [formSchema, setFormSchema] = useState(initialSchema);
-    const [formData, setFormData] = useState(initialData);
-    const [formUi, setFormUi] = useState(initialUi);
+    const [tab, setTab] = useState("notes");
     var annotationForm;
 
-    useEffect( () => {
-        const loadForm = async () => {
-            const result = await ipcRenderer.invoke("load-form");
-            if (result.form !== null) {
-                setFormSchema(result.form.schema)
-                setFormData(result.form.data)
-                setFormUi(result.form.ui)
-            }
-        }
-        loadForm();
-    }, []);
+    let anonimizedfiles=[]
+
+    if(typeof props.anonimizationdir==="string"){
+        anonimizedfiles.push(props.anonimizationdir);
+    }
 
     const runAnonimization = async () => {
+
         props.onactiontoperform({ action: "RUN ANONIMIZATION", values: "false" });
         const result = await ipcRenderer.invoke("anonimize-ipc", props.files, null);
         props.onactiontoperform({ action: "FINISH ANONIMIZATION", values: { outDir: result.outDir } });
         console.info("Anonimization result: ", result.status, result.reason);
 
         if (result.status === true) {
-            console.info("Anonimization was successfull. Data in: ",result.outDir);
-            
+            console.info("Anonimization was successfull. Data in: ", result.outDir);
         } else {
             let errMsg = 'An error occurred during anonimization!'
             errMsg += '\n' + "Reason: " + result.reason
             errMsg += '\n' + "Check into the logs for additional informations"
-            console.log("Anonimization of ",props.files, " failed!")
-
-            // TODO: Improve the message to the user!
+            console.log("Anonimization of ", props.files, " failed!")
             alert(errMsg);
-          
-        }        
+        }
     }
 
-/*
-                            <AnonimizerList
-                                files={files}
-                                onactiontoperform={props.onactiontoperform}
-                            />
-*/
+    const onActionToPerform = (action) => {
 
-    const renderAddFolderBody = (files) => {
+        switch (action.action) {
+            case "ON_FORM_CHANGE":
+                console.log(action.value);
+                annotationForm = action.value
+                break;
+            case "CHANGE_TAB_TO_NOTES":
+                console.log("notes");
+                setTab("notes");
+                break;
+            case "CHANGE_TAB_TO_FOLDERS":
+                setTab("folder");
+                console.log("folder");
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    const renderTabs = (files) => {
+        if (tab === "notes") {
+            return (<AnonimizerForm onactiontoperform={onActionToPerform} />)
+        } else {
+            return (
+                <div className="grid-block vertical">
+                    <div className={"grid-block shrink "+ classes.headersFolders}>Origin:</div>
+                    <AnonimizerList
+                        files={files}
+                        onactiontoperform={props.onactiontoperform}
+                    />
+                    <div className={"grid-block shrink "+ classes.headersFolders}>Anonimized data:</div>
+                    <AnonimizerList
+                        files={anonimizedfiles}
+                        onactiontoperform={props.onactiontoperform}
+                    />
+                </div>
+            )
+
+            return (<AnonimizerList
+                files={files}
+                onactiontoperform={props.onactiontoperform}
+            />)
+        }
+    }
+
+    const renderBody = (files) => {
 
         if (files.length === 0) {
             return (
@@ -110,16 +129,8 @@ export const Anonimizer = (props) => {
                 <div className="grid-block align-center">
                     <div className="grid-block shrink"><RunAnonimizerSVG onclickcomponent={runAnonimization} /></div>
                     <div className="grid-block shrink vertical">
-                        <div className="grid-block">&nbsp;</div>
-                        <div className="grid-block shrink">
-                            <Form schema={formSchema}
-                                formData={formData}
-                                uiSchema={formUi}
-                                ref={(form) => {annotationForm = form;}}
-                            >
-                            <div/>
-                            </Form>    
-                        </div>
+                        <AnonimizerMenu currentmenuitem={tab} onactiontoperform={onActionToPerform} />
+                        {renderTabs(files)}
                         <div className="grid-block">&nbsp;</div>
                     </div>
                 </div>
@@ -153,11 +164,11 @@ export const Anonimizer = (props) => {
                         <Step1SVG done={true} />
                         <Step2SVG done={true} />
                         <Step3SVG done={false} />
-                        <NavigateToUploaderRightSVG onclickcomponent={ async () => { 
-                            const result = await ipcRenderer.invoke("write-annotations", annotationForm.state.formData, props.anonimizationdir);
+                        <NavigateToUploaderRightSVG onclickcomponent={async () => {
+                            const result = await ipcRenderer.invoke("write-annotations", annotationForm, props.anonimizationdir);
                             props.onactiontoperform({ action: "GO TO UPLOADER", "values": false })
-                            }
-                        }/>
+                        }
+                        } />
                     </div>
                 </div>);
         } else {
@@ -179,7 +190,7 @@ export const Anonimizer = (props) => {
     return (
         <div className={"grid-block vertical " + classes.root}>
             <div className="grid-block align-center">
-                {renderAddFolderBody(props.files)}
+                {renderBody(props.files)}
             </div>
             {renderSteps(props.files, props.uploadingimages, props.runninganonimization, props.anonimizationdir)}
         </div>

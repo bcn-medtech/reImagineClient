@@ -12,6 +12,9 @@ import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import FolderIcon from '@material-ui/icons/Folder';
 
+//Electron 
+const { ipcRenderer } = window.require("electron");
+
 const useStyles = makeStyles((theme) => ({
     list: {
         "& .MuiButtonBase-root": {
@@ -34,6 +37,12 @@ const useStyles = makeStyles((theme) => ({
                 backgroundColor:"#969595"
             },
             cursor:"pointer"
+        },
+        "& .MuiAvatar-root":{
+            "&:hover":{
+                backgroundColor:"rgb(248, 109, 112)"
+            }
+            
         }
     },
     textList: {
@@ -45,6 +54,11 @@ export const FilerList = (props) => {
 
     const classes = useStyles();
     const files = props.files;
+
+    const openFolder=(path)=>{
+        ipcRenderer.send("open-folder",path);
+    }
+
 
     return (
         <List dense={true} className={classes.list}>
@@ -59,7 +73,7 @@ export const FilerList = (props) => {
 
                     return (
                         <ListItem key={idx}>
-                            <ListItemAvatar>
+                            <ListItemAvatar onClick={()=>{openFolder(value)}} style={{cursor: 'pointer'}}>
                                 <Avatar>
                                     <FolderIcon />
                                 </Avatar>

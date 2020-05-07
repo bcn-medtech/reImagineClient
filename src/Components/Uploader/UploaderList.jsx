@@ -12,6 +12,9 @@ import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import FolderIcon from '@material-ui/icons/Folder';
 
+//Electron 
+const { ipcRenderer } = window.require("electron");
+
 const useStyles = makeStyles((theme) => ({
     list: {
         "& .MuiButtonBase-root": {
@@ -34,6 +37,12 @@ const useStyles = makeStyles((theme) => ({
                 backgroundColor:"#969595"
             },
             cursor:"pointer"
+        },
+        "& .MuiAvatar-root":{
+            "&:hover":{
+                backgroundColor:"rgb(255, 193, 7)"
+            }
+            
         }
     },
     textList: {
@@ -45,6 +54,11 @@ export const UploaderList = (props) => {
 
     const classes = useStyles();
     const files = props.files;
+
+    const openFolder=(path)=>{
+        ipcRenderer.send("open-folder",path);
+    }
+
 
     return (
         <List dense={true} className={classes.list}>
@@ -59,20 +73,15 @@ export const UploaderList = (props) => {
 
                     return (
                         <ListItem key={idx}>
-                            <ListItemAvatar>
+                        <ListItemAvatar onClick={()=>{openFolder(value)}} style={{cursor: 'pointer'}}>
                                 <Avatar>
                                     <FolderIcon />
                                 </Avatar>
                             </ListItemAvatar>
                             <ListItemText
-                                primary={<Typography className={classes.textList}>{Text}</Typography>}
+                                primary={<Typography className={classes.textList}>{text}</Typography>}
                                 style={{ wordBreak: 'break-all' }}
                             />
-                            {/*<ListItemSecondaryAction className={classes.removeItem}>
-                                <IconButton edge="end" aria-label="delete" onClick={() => props.onactiontoperform({action:"DELETE FOLDER",values:value})}>
-                                    <DeleteIcon/>
-                                </IconButton>
-                    </ListItemSecondaryAction>*/}
                         </ListItem>
                     )
                 })

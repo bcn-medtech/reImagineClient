@@ -41,9 +41,9 @@ const initialSchema = {
     }
 }
 
-const initialData = {
-    ann: "Initial data"
-}
+// const initialData = {
+//     ann: "Initial data"
+// }
 
 const initialUi = {
     ann: {
@@ -51,21 +51,26 @@ const initialUi = {
     }
 }
 
+let componentloaded=false;
 
 export const AnonimizerForm = (props) => {
 
     const [formSchema, setFormSchema] = useState(initialSchema);
-    const [formData, setFormData] = useState(initialData);
+    //const [formData, setFormData] = useState(initialData);
     const [formUi, setFormUi] = useState(initialUi);
     const classes = useStyles();
+    const formData= props.anonimizationnotes;
 
     useEffect( () => {
         const loadForm = async () => {
             const result = await ipcRenderer.invoke("load-form");
             if (result.form !== null) {
                 setFormSchema(result.form.schema)
-                setFormData(result.form.data)
                 setFormUi(result.form.ui)
+                if(componentloaded===false){
+                    props.onactiontoperform({action:"INIT_ANONIMIZATION_NOTES",value:result.form.data})
+                    componentloaded=true;
+                }
             }
         }
         loadForm();
@@ -76,7 +81,7 @@ export const AnonimizerForm = (props) => {
             <Form schema={formSchema}
                 formData={formData}
                 uiSchema={formUi}
-                onChange={(event)=>{props.onactiontoperform({action:"ON_FORM_CHANGE",value:event.formData})}}
+                onChange={(event)=>{props.onactiontoperform({action:"CHANGE_ANONIMIZATION_NOTES",value:event.formData})}}
                 />
         </div>);
 }

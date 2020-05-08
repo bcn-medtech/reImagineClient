@@ -33,6 +33,11 @@ const useStyles = makeStyles((theme) => ({
 
 let selectedFilesCopy = [];
 
+
+let initialData = {
+    ann: "Initial data"
+}
+
 export const RootPage = () => {
 
     const classes = useStyles();
@@ -48,6 +53,7 @@ export const RootPage = () => {
     const [softwareNotInstalled, setSoftwareNotInstalled] = useState([]);
     const [logLinesNum, setLogLinesNum] = useState(10);
     const [updateAppStatus,setUpdateAppStatus]=useState(); 
+    const [anonimizationNotes,setAnonimizationNotes]=useState(initialData);
 
     const config = ipcRenderer.sendSync("getConfig");
 
@@ -107,9 +113,7 @@ export const RootPage = () => {
         console.log("Performing action:", action);
         switch (action.action) {
             case "ADD FOLDER":
-                //console.log("Add folder");
                 const newSelectedFiles = action.values;
-                //console.log(newSelectedFiles);
                 if (newSelectedFiles.length > 0) {
                     if (selectedFilesCopy.indexOf(newSelectedFiles[0]) === -1) {
                         selectedFilesCopy = selectedFilesCopy.concat(newSelectedFiles);
@@ -130,6 +134,7 @@ export const RootPage = () => {
                 setSelectedFiles(selectedFilesCopy);
                 setDataUploadedSuccesfully(false);
                 setAnonDir(false);
+                setAnonimizationNotes(initialData);
                 break;
             case "GO TO ANONIMIZATION":
                 setStep("anonimizer");
@@ -178,7 +183,13 @@ export const RootPage = () => {
                 break;
             case "GO TO LOGS":
                 setStep("console-log");
-                break;                
+                break;
+            case "CHANGE_ANONIMIZATION_NOTES":
+                setAnonimizationNotes(action.value);
+                break;
+            case "INIT_ANONIMIZATION_NOTES":
+                setAnonimizationNotes(action.value);
+                initialData=action.value;
             default:
                 break;
         }
@@ -203,6 +214,7 @@ export const RootPage = () => {
                     runninganonimization={runningAnonimization}
                     uploadingimages={uploadingImages}
                     anonimizationdir={anonDir}
+                    anonimizationnotes={anonimizationNotes}
                     files={selectedFiles} />)
 
             case "uploader":

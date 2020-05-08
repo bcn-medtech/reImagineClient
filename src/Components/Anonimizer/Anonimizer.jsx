@@ -74,10 +74,12 @@ export const Anonimizer = (props) => {
     const onActionToPerform = (action) => {
 
         switch (action.action) {
-            case "ON_FORM_CHANGE":
-                console.log(action.value);
-                annotationForm = action.value
-                break;
+            case "INIT_ANONIMIZATION_NOTES":
+                 props.onactiontoperform(action)
+                 break;
+            case "CHANGE_ANONIMIZATION_NOTES":
+                 props.onactiontoperform(action)
+                 break;
             case "CHANGE_TAB_TO_NOTES":
                 console.log("notes");
                 setTab("notes");
@@ -94,7 +96,7 @@ export const Anonimizer = (props) => {
 
     const renderTabs = (files) => {
         if (tab === "notes") {
-            return (<AnonimizerForm onactiontoperform={onActionToPerform} />)
+            return (<AnonimizerForm onactiontoperform={onActionToPerform} anonimizationnotes={props.anonimizationnotes}/>)
         } else {
             return (
                 <div className="grid-block vertical">
@@ -111,10 +113,10 @@ export const Anonimizer = (props) => {
                 </div>
             )
 
-            return (<AnonimizerList
-                files={files}
-                onactiontoperform={props.onactiontoperform}
-            />)
+            // return (<AnonimizerList
+            //     files={files}
+            //     onactiontoperform={props.onactiontoperform}
+            // />)
         }
     }
 
@@ -165,7 +167,7 @@ export const Anonimizer = (props) => {
                         <Step2SVG done={true} />
                         <Step3SVG done={false} />
                         <NavigateToUploaderRightSVG onclickcomponent={async () => {
-                            const result = await ipcRenderer.invoke("write-annotations", annotationForm, props.anonimizationdir);
+                            const result = await ipcRenderer.invoke("write-annotations", props.anonimizationnotes, props.anonimizationdir);
                             props.onactiontoperform({ action: "GO TO UPLOADER", "values": false })
                         }
                         } />

@@ -19,7 +19,8 @@ class Patient(Base):
   accessionNumber = Column(String(50))
 
   def __repr__(self):
-      return "<Patient(idx=%d, anoncode=%d, pid=%s, accessionNumer=%s, name='%s')>" % (
+
+    return "<Patient(idx=%d, anoncode=%s, pid=%s, accessionNumer=%s, name='%s')>" % (
                               self.idx, self.anoncode, self.pid, self.accessionNumber,
                               self.name)  
 
@@ -64,6 +65,7 @@ class LocalDB(object):
     return p
 
   def exportDb(self, fname):
+    
     select = sql.select([Patient])
     result = self._session.execute(select)
     headers = result.keys()

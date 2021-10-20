@@ -16,6 +16,6 @@ pushd scripts/deiden/
 export PYTHONPATH=$PYTHONPATH:$(pwd)/src
 
 rm -rf $outdir
-echo "Running " python $pyscript $basedir --outdir $outdir --db-location $sqlfile --recipe $recipepath --export-on-save $exportdbpath --save-headers --headers-dir $headerspath
-python $pyscript $basedir --outdir $outdir --db-location $sqlfile --recipe $recipepath --export-on-save $exportdbpath --save-headers --headers-dir $headerspath
+echo "Running " python "$pyscript" $basedir --outdir $outdir --db-location $sqlfile --recipe $recipepath --export-on-save $exportdbpath --save-headers --headers-dir $headerspath
+python "$pyscript" "$basedir" --outdir "$outdir" --db-location "$sqlfile" --recipe "$recipepath" --export-on-save "$exportdbpath" --save-headers --headers-dir "$headerspath"
 

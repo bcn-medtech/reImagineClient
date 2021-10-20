@@ -227,10 +227,14 @@ async function runCondaAnonimizer(files, outDir, callback) {
     config.scripts.recipePath, config.exportDbPath,
     config.headersDir, config.scripts.deidEnv];
 
-    console.log("About to run:", config.scripts.condaScript, argv);
+    let escapedScript = config.scripts.condaScript
+    escapedScript = escapedScript.replace(/ /g, '\\ ');
+    console.log("Non escaped path:", config.scripts.condaScript);
+    console.log("Escaped path:", escapedScript);    
+    console.log("About to run:", escapedScript, argv);
     let options = { shell: false };
     try {
-      const pInstall = execFile(config.scripts.condaScript, argv, options);
+      const pInstall = execFile(escapedScript, argv, options);
       pInstall.child.stdout.on('data', data => {
         console.log("ANONIMIZATION stdout: ", data)
       })

@@ -2,7 +2,7 @@
   "author": "Mario Ceresa <mario.ceresa@upf.edu>",
   "description": "Client for the reimagine analysis platform",
   "name": "reImagineClient",
-  "version": "1.4.22",
+  "version": "1.4.23",
   "repository": "https://bitbucket.org/simbiosys/reimagineclient/src/master/",
   "private": true,
   "devDependencies": {
@@ -69,6 +69,12 @@
     "win": {
       "icon": "icon.ico",
       "target": "NSIS"
+    },
+    "nsis": {
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "oneClick": false
     },
     "mac": {
       "icon": "icon.icns",

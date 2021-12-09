@@ -23,10 +23,10 @@ const requiredPrograms = [
 
 const installHints = {
     conda: [
-        path.join(os.homedir(), "miniconda3", "Scripts", "activate.bat"),
-        path.join(os.homedir(), "miniconda3", "bin", "activate"),
-        path.join(os.homedir(), "anaconda3", "bin", "activate"),
-        path.join(os.homedir(), "opt", "anaconda3", "bin", "activate")
+        path.join(app.getAppPath(), "miniconda3", "Scripts", "activate.bat"),
+        path.join(app.getAppPath(), "miniconda3", "bin", "activate"),
+        path.join(app.getAppPath(), "anaconda3", "bin", "activate"),
+        path.join(app.getAppPath(), "opt", "anaconda3", "bin", "activate")
     ],
     deiden: [
         path.join("envs", deidEnv)
@@ -143,8 +143,8 @@ const scripts = {
     recipePath: getRecipePath(),
     condaInstallEnvScript: getCondaInstallEnvScript(),
     condaInstaller: getCondaInstaller(),
-    condaHome: path.join(os.homedir(),"miniconda3"),
-    condaPath: path.join(os.homedir(),"miniconda3","bin","activate"),
+    condaHome: path.join(app.getAppPath(),"miniconda3"),
+    condaPath: path.join(app.getAppPath(),"miniconda3","bin","activate"),
     deidEnv: deidEnv
 }
 

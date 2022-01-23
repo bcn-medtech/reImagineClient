@@ -20,7 +20,7 @@ const requiredPrograms = [
     {name: "conda", icon: "../assets/logo_anaconda.png"},
     {name: "deiden", icon: "../assets/logo_anaconda.png"},
   ]
-const new_path=app.getAppPath();
+const new_path=app.getAppPath().replace('app.asar', 'app.asar.unpacked');
 
 const installHints = {
     conda: [
@@ -46,7 +46,7 @@ function getCondaInstaller() {
         if (plat === 'win32') {
             plat = "win"
         }        
-        sPath = path.join(new_path, sPath, plat)
+        sPath = path.join(app.getAppPath(), sPath, plat)
     } else {
         sPath = path.join(process.resourcesPath, sPath)
     }
@@ -71,7 +71,7 @@ function getScriptDir() {
 
     let sPath = 'scripts';
     if (isDev) {
-        sPath = path.join(new_path, sPath)
+        sPath = path.join(app.getAppPath(), sPath)
     } else {
         sPath = path.join(process.resourcesPath, sPath)
     }

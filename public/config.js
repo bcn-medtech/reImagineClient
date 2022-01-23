@@ -20,18 +20,20 @@ const requiredPrograms = [
     {name: "conda", icon: "../assets/logo_anaconda.png"},
     {name: "deiden", icon: "../assets/logo_anaconda.png"},
   ]
+const new_path=app.getAppPath()+"/../../";
 
 const installHints = {
     conda: [
-        path.join(app.getAppPath(), "miniconda3", "Scripts", "activate.bat"),
-        path.join(app.getAppPath(), "miniconda3", "bin", "activate"),
-        path.join(app.getAppPath(), "anaconda3", "bin", "activate"),
-        path.join(app.getAppPath(), "opt", "anaconda3", "bin", "activate")
+        path.join(new_path, "miniconda3", "Scripts", "activate.bat"),
+        path.join(new_path, "miniconda3", "bin", "activate"),
+        path.join(new_path, "anaconda3", "bin", "activate"),
+        path.join(new_path, "opt", "anaconda3", "bin", "activate")
     ],
     deiden: [
         path.join("envs", deidEnv)
     ]
 }
+
 
 function getCondaInstaller() {
     let sPath = 'installers';
@@ -44,13 +46,15 @@ function getCondaInstaller() {
         if (plat === 'win32') {
             plat = "win"
         }        
-        sPath = path.join(app.getAppPath(), sPath, plat)
+        sPath = path.join(new_path, sPath, plat)
     } else {
         sPath = path.join(process.resourcesPath, sPath)
     }
 
     if (process.platform === 'win32') {
-        sPath = path.join(sPath, 'Miniconda3-latest-Windows-x86_64.exe');
+      sPath = path.join(sPath, 'Miniconda3-latest-Windows-x86_64.exe');
+      console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++',sPath,'++++++++++++++++++++++++++++');
+      //sPath = path.join(sPath, 'Miniconda3-latest-Windows-x86_64.exe /InstallationType=JustMe /RegisterPython=0 /S /D=%ProgramFiles%\TEST');
     } else if (process.platform === 'linux') {
         sPath = path.join(sPath, 'Miniconda3-latest-Linux-x86_64.sh');
     } else if (process.platform === 'darwin') {
@@ -67,7 +71,7 @@ function getScriptDir() {
 
     let sPath = 'scripts';
     if (isDev) {
-        sPath = path.join(app.getAppPath(), sPath)
+        sPath = path.join(new_path, sPath)
     } else {
         sPath = path.join(process.resourcesPath, sPath)
     }
@@ -143,8 +147,8 @@ const scripts = {
     recipePath: getRecipePath(),
     condaInstallEnvScript: getCondaInstallEnvScript(),
     condaInstaller: getCondaInstaller(),
-    condaHome: path.join(app.getAppPath(),"miniconda3"),
-    condaPath: path.join(app.getAppPath(),"miniconda3","bin","activate"),
+    condaHome: path.join(new_path,"miniconda3"),
+    condaPath: path.join(new_path,"miniconda3","bin","activate"),
     deidEnv: deidEnv
 }
 

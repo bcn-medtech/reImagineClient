@@ -52,7 +52,22 @@ async function _installMiniconda() {
   var instArgs = []
 
   if (process.platform === "win32") {
-    instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=" + config.scripts.condaHome]
+    console.log('***********************win32*************************');
+    console.log('***********************config.scripts.condaHome=',config.scripts.condaHome);
+   // instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=" + config.scripts.condaHome]
+   //instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D="+"%PogramFiles%/reImagineClient"+"/"+"miniconda3"]
+   //instArgs = ["InstallationType=JustMe", "/RegisterPython=0", "/S", " /D=/c:\\progra~1\\TEST"]
+   //instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=%UserProfile%\%PogramFiles%\TEST\miniconda3"]//la punto28
+   //instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=%UserProfile%\TEST\miniconda3"]//la punto29
+   //instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=%PogramFiles%\TEST\miniconda3"]//la punto30
+    //instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=\TEST\miniconda3"]//la punto31
+    //instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=%UserProfile%\TEST\Miniconda3"]//la punto32
+    //instArgs = ["/wait",'""',"/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=%UserProfile%\TEST\Miniconda3"]//la punto33
+   //instArgs = ["/wait",'""',"Miniconda-latest-Windows-x86_64","/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=%UserProfile%\TEST\Miniconda3"]//la punto34
+    //instArgs = ['/wait "" Miniconda-latest-Windows-x86_64 /InstallationType=JustMe RegisterPython=0 /S  /D=%UserProfile%\TEST\Miniconda3']//la punto35
+    //instArgs=[]//punto 36
+    //instArgs = ["/InstallationType=JustMe /RegisterPython=0 /S /D=%UserProfile%\TEST\Miniconda3"]//la punto37
+    instArgs = ["/InstallationType=JustMe ", "/RegisterPython=0 ", "/S ", "/D=%UserProfile%\Cacolo\Miniconda3"]//la punto38
   }
   else if ((process.platform === 'darwin') || (process.platform === 'linux')) {
     instArgs = ["-b", "-p " + config.scripts.condaHome]

@@ -19,8 +19,8 @@ class Patient(Base):
   accessionNumber = Column(String(50))
 
   def __repr__(self):
-      return "<Patient(idx=%d, anoncode=%d, pid=%s, accessionNumer=%s, name='%s')>" % (
-                              self.idx, self.anoncode, self.pid, self.accessionNumber,
+      return "<Patient(idx=%d, anoncode=%s, pid=%s, accessionNumer=%s, name='%s')>" % (
+                              self.idx, str(self.anoncode), self.pid, self.accessionNumber,
                               self.name)  
 
   @staticmethod

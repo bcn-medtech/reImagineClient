@@ -20,18 +20,20 @@ const requiredPrograms = [
     {name: "conda", icon: "../assets/logo_anaconda.png"},
     {name: "deiden", icon: "../assets/logo_anaconda.png"},
   ]
+const new_path=app.getAppPath().replace('app.asar', 'app.asar.unpacked');
 
 const installHints = {
     conda: [
-        path.join(os.homedir(), "miniconda3", "Scripts", "activate.bat"),
-        path.join(os.homedir(), "miniconda3", "bin", "activate"),
-        path.join(os.homedir(), "anaconda3", "bin", "activate"),
-        path.join(os.homedir(), "opt", "anaconda3", "bin", "activate")
+        path.join(new_path, "miniconda3", "Scripts", "activate.bat"),
+        path.join(new_path, "miniconda3", "bin", "activate"),
+        path.join(new_path, "anaconda3", "bin", "activate"),
+        path.join(new_path, "opt", "anaconda3", "bin", "activate")
     ],
     deiden: [
         path.join("envs", deidEnv)
     ]
 }
+
 
 function getCondaInstaller() {
     let sPath = 'installers';
@@ -50,7 +52,9 @@ function getCondaInstaller() {
     }
 
     if (process.platform === 'win32') {
-        sPath = path.join(sPath, 'Miniconda3-latest-Windows-x86_64.exe');
+      sPath = path.join(sPath, 'Miniconda3-latest-Windows-x86_64.exe');
+      console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++',sPath,'++++++++++++++++++++++++++++');
+      //sPath = path.join(sPath, 'Miniconda3-latest-Windows-x86_64.exe /InstallationType=JustMe /RegisterPython=0 /S /D=%ProgramFiles%\TEST');
     } else if (process.platform === 'linux') {
         sPath = path.join(sPath, 'Miniconda3-latest-Linux-x86_64.sh');
     } else if (process.platform === 'darwin') {
@@ -143,8 +147,8 @@ const scripts = {
     recipePath: getRecipePath(),
     condaInstallEnvScript: getCondaInstallEnvScript(),
     condaInstaller: getCondaInstaller(),
-    condaHome: path.join(os.homedir(),"miniconda3"),
-    condaPath: path.join(os.homedir(),"miniconda3","bin","activate"),
+    condaHome: path.join(new_path,"miniconda3"),
+    condaPath: path.join(new_path,"miniconda3","bin","activate"),
     deidEnv: deidEnv
 }
 
@@ -168,4 +172,5 @@ module.exports.metadata_form = path.join(formDir, "metadata.json");
 module.exports.requiredPrograms = requiredPrograms;
 module.exports.installHints = installHints;
 module.exports.scripts = scripts;
+module.exports.newPath = new_path;
 

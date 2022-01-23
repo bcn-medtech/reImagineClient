@@ -69,6 +69,11 @@
       "icon": "icon.ico",
       "target": "NSIS"
     },
+    "nsis": {
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false
+    },
     "mac": {
       "icon": "icon.icns",
       "identity": null

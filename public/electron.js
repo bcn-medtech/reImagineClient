@@ -10,6 +10,7 @@ const isDev = require('electron-is-dev');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
+const fsp = require('fs').promises;
 const os = require('os');
 
 const { ipcMain, dialog } = require('electron');
@@ -48,6 +49,7 @@ const newUpdates = {
   info: null
 };
 
+/*
 const {autoUpdater} = require("electron-updater");
 
 autoUpdater.logger = log;
@@ -84,7 +86,7 @@ autoUpdater.on('error', (err) => {
   sendStatusToWindow('Error in auto-updater. ' + err);
 })
 
-
+*/
 
 function sendStatusToWindow(text) {
   log.info(text);
@@ -200,7 +202,7 @@ app.on('ready', () => {
     } else mainWindow.show();
   })
 
-  autoUpdater.checkForUpdatesAndNotify();
+  //autoUpdater.checkForUpdatesAndNotify();
 
 })
 
@@ -373,7 +375,7 @@ ipcMain.on('quitapp', (event) => {
   console.log("quitapp")
   let isSilent = true
   let isForceRunAfter = true  
-  autoUpdater.quitAndInstall(isSilent, isForceRunAfter)
+  //autoUpdater.quitAndInstall(isSilent, isForceRunAfter)
 });
 
 

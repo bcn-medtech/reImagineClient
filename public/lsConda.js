@@ -1,12 +1,13 @@
 const path = require('path');
 const fs = require('fs');
-const exec = require('child_process');
+const execmod = require('child_process');
 const uuid = require("uuid")
 const shell = require("shelljs")
 const main = require("./electron.js")
 const config = main.getConfig();
 const util = require('util')
-const execFile = util.promisify(exec.execFile)
+const execFile = util.promisify(execmod.execFile)
+const exec = util.promisify(execmod.exec)
 
 async function doInstallRequestPromise(app) {
 
@@ -49,9 +50,19 @@ async function doInstallRequestPromise(app) {
 async function _installMiniconda() {
 
   var instArgs = []
+  let options = { shell: false };
+  let condainst = config.scripts.condaInstaller
 
   if (process.platform === "win32") {
-    instArgs = ["/InstallationType=JustMe", "/RegisterPython=0", "/S", "/D=" + config.scripts.condaHome]
+    console.log('***********************win32*************************');
+    console.log('***********************config.scripts.condaHome=',config.scripts.condaHome);
+    instArgs = ["/wait", condainst, "/InstallationType=JustMe", 
+                "/RegisterPython=0", "/S", 
+                "/D="+path.join(config.newPath,"miniconda3")]
+    condainst = "start"
+
+    options.shell = true 
+
   }
   else if ((process.platform === 'darwin') || (process.platform === 'linux')) {
     instArgs = ["-b", "-p " + config.scripts.condaHome]
@@ -61,11 +72,10 @@ async function _installMiniconda() {
     return res
   }
 
-  console.info("About to run:", config.scripts.condaInstaller, instArgs)
+  console.info("About to run:", condainst, instArgs, options)
 
-  let options = { shell: false };
   try {
-    let pInstall = execFile(config.scripts.condaInstaller, instArgs, options);
+    let pInstall = execFile(condainst, instArgs, options);
     pInstall.child.stdout.on('data', data => {
       console.log("INSTALLER stdout: ", data)
     })
@@ -222,15 +232,38 @@ async function runCondaAnonimizer(files, outDir, callback) {
   let argv;
 
   for (elem in files) {
-    argv = [files[elem], outDir, config.scripts.deidenScript,
-    config.sqlFile, config.scripts.condaPath,
-    config.scripts.recipePath, config.exportDbPath,
-    config.headersDir, config.scripts.deidEnv];
+    argv = ['"' + files[elem] + '"', 
+            '"' + outDir + '"', 
+            '"' + config.scripts.deidenScript + '"',
+            '"' + config.sqlFile + '"', 
+            '"' + config.scripts.condaPath + '"',
+            '"' + config.scripts.recipePath + '"', 
+            '"' + config.exportDbPath + '"',
+            '"' + config.headersDir + '"', 
+            '"' + config.scripts.deidEnv + '"'
+          ];
+    
+    //console.log("Non escaped path:", config.scripts.condaScript);
+/*
+    if (process.platform === "win32") {
+    }
+    else if ((process.platform === 'darwin') || (process.platform === 'linux')) {
 
-    console.log("About to run:", config.scripts.condaScript, argv);
+    }
+    else {
+      res = { status: false, reason: "Unknown platform: " + process.platform }
+      return res
+    }
+*/
+    let escapedScript = '"' + config.scripts.condaScript + '"'
+    //escapedScript = escapedScript.replace(/ /g, '\\ ');
+    //console.log("Escaped path:", escapedScript);    
     let options = { shell: false };
     try {
-      const pInstall = execFile(config.scripts.condaScript, argv, options);
+      //const pInstall = execFile(escapedScript, argv, options);
+      cmd_s = escapedScript + " " + argv.join(' ')
+      console.log("About to run:", cmd_s);
+      const pInstall = exec(cmd_s);
       pInstall.child.stdout.on('data', data => {
         console.log("ANONIMIZATION stdout: ", data)
       })

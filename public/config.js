@@ -20,7 +20,7 @@ const requiredPrograms = [
     {name: "conda", icon: "../assets/logo_anaconda.png"},
     {name: "deiden", icon: "../assets/logo_anaconda.png"},
   ]
-const new_path=app.getAppPath()+"/../../";
+const new_path=app.getAppPath();
 
 const installHints = {
     conda: [
@@ -172,4 +172,5 @@ module.exports.metadata_form = path.join(formDir, "metadata.json");
 module.exports.requiredPrograms = requiredPrograms;
 module.exports.installHints = installHints;
 module.exports.scripts = scripts;
+module.exports.newPath = new_path;
 

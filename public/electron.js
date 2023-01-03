@@ -106,6 +106,7 @@ function createWindow() {
         backgroundColor: "#1B1C1E",
         webPreferences: {
             nodeIntegration: true,
+            contextIsolation: false
         }
     });
     var urlLoc = url.format({
@@ -181,7 +182,6 @@ app.on('ready', () => {
   let contextMenu = Menu.buildFromTemplate(trayMenuTemplate)
   tray.setToolTip('This is my application.')
   tray.setContextMenu(contextMenu)
-  createWindow();
 
   tray.on('click', () => {
     if (mainWindow == null) {
@@ -208,6 +208,16 @@ app.on('ready', () => {
 
 
 //app.on('ready', createWindow);
+app.whenReady().then(() => {
+  console.log("App is ready!!!");
+
+  createWindow()
+  app.on('activate', () => {
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
 
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {

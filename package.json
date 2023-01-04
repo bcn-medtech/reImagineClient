@@ -40,13 +40,16 @@
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "tar": "^6.0.1",
-    "timers-browserify": "^2.0.12"
+    "timers-browserify": "^2.0.12",
+    "tmp": "^0.2.1"
   },
   "scripts": {
-    "start": "react-app-rewired --openssl-legacy-provider start",
-    "build": "react-app-rewired --openssl-legacy-provider build",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-app-rewired eject",
+    "dist": "yarn build && electron-builder -m",
+    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
     "electron-dev": "concurrently \"BROWSER=none yarn start\" \"yarn run electron .\"",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
@@ -94,6 +97,9 @@
       "entitlements": "entitlements.mac.plist",
       "entitlementsInherit": "entitlements.mac.plist"
     },
+    "files": [
+      "build/**/*"
+    ],
     "extraResources": [
       {
         "from": "installers/${os}/",

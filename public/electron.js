@@ -348,7 +348,43 @@ function areProgramsInstalled(programs) {
   }
   return [isOk, res]
 }
+const sqlite3 = require('sqlite3').verbose();
+const pathSqlFile=config.sqlFile;
 
+async function readSql() {
+  return new Promise((resolve, reject) => {
+    let data = null;
+    let db = new sqlite3.Database(`${pathSqlFile}`, sqlite3.OPEN_READONLY, (err) => {
+        if (err) {
+          reject(err);
+        }
+        console.log('Connected to the database.');
+    });
+    // query the data from the table
+    db.all(`SELECT * FROM patients`, [], (err, rows) => {
+        if (err) {
+          reject(err);
+        }
+        console.log(rows)
+        data = rows;
+        resolve(data);
+    }); 
+    // close the database connection
+    db.close((err) => {
+        if (err) {
+          reject(err);
+        }
+        console.log('Close the database connection.');
+    });
+  });
+}
+ipcMain.on('readSql',async (event,arg)=>{
+  let data=await readSql().then((res)=>{
+    console.log(res[0].anoncode);
+    event.reply('readSql', res)
+  })
+  ;//event.sender.send('readSql', data);
+});
 ipcMain.on('checkInstalled', (event, program) => {
   console.log("checkInstalled", program)
   let [isOk, res] = areProgramsInstalled([program])

@@ -6,6 +6,8 @@ import { Anonimizer } from './../../Components/Anonimizer/Anonimizer';
 import { Uploader } from './../../Components/Uploader/Uploader';
 import { Installers } from './../../Components/Installers/Installers';
 import { Logs } from './../../Components/Logs';
+import { DatabaseComponent } from './../../Components/DatabaseComponent';
+import { ExcelComponent } from './../../Components/ExcelComponent';
 import { CloudFunctionConfig } from 'minio';
 import {UpdateApp} from './../../Components/UpdateApp/UpdateApp';
 
@@ -184,6 +186,12 @@ export const RootPage = () => {
             case "GO TO LOGS":
                 setStep("console-log");
                 break;
+            case "GO TO DATABASE":
+                setStep("databaseComponent");
+                break;
+            case "GO TO ANON_EXCEL":
+                setStep("excelComponent");
+                break;           
             case "CHANGE_ANONIMIZATION_NOTES":
                 setAnonimizationNotes(action.value);
                 break;
@@ -242,6 +250,14 @@ export const RootPage = () => {
                     status={updateAppStatus}
                     onactiontoperform={onActionToPerform}
                     />)
+            case "databaseComponent":
+                return (
+                    <DatabaseComponent />
+                );
+            case "excelComponent":
+                return (
+                    <ExcelComponent/>
+                );                
             default:
                 break;
         }

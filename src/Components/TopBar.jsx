@@ -6,6 +6,8 @@ import Typography from '@material-ui/core/Typography';
 import { Logo } from './svgs/Logo';
 import IconButton from '@material-ui/core/IconButton';
 import ScreenShare from '@material-ui/icons/ScreenShare';
+import AppsRoundedIcon from '@material-ui/icons//AppsRounded';
+import PostAddIcon from '@material-ui/icons/PostAdd';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -91,6 +93,7 @@ export const TopBar = (props) => {
               </Menu>
             </div>
           )}
+          
           <div className={classes.sectionDesktop}>
             <IconButton
               aria-label="show more"
@@ -110,7 +113,27 @@ export const TopBar = (props) => {
             >
               <AssignmentIcon/>
             </IconButton>
-          </div>          
+          </div>
+          <div className={classes.sectionDesktop}>
+            <IconButton
+              aria-label="show more"
+              aria-haspopup="true"
+              color="inherit"
+              onClick={()=>{props.onactiontoperform({action:"GO TO DATABASE", values:false})}}
+            >
+              <AppsRoundedIcon />
+            </IconButton>
+          </div>
+          <div className={classes.sectionDesktop}>
+            <IconButton
+              aria-label="show more"
+              aria-haspopup="true"
+              color="inherit"
+              onClick={()=>{props.onactiontoperform({action:"GO TO ANON_EXCEL", values:false})}}
+            >
+              <PostAddIcon />
+            </IconButton>
+          </div>                   
         </Toolbar>
       </AppBar>
     </div>

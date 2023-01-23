@@ -14,6 +14,9 @@ const fsp = require('fs').promises;
 const os = require('os');
 
 const { ipcMain, dialog } = require('electron');
+const XLSX = require('xlsx');
+const readXlsxFile = require('read-excel-file/node');
+
 let mainWindow;
 
 var config = require("./config");
@@ -424,11 +427,34 @@ ipcMain.on('quitapp', (event) => {
   //autoUpdater.quitAndInstall(isSilent, isForceRunAfter)
 });
 
-
-
-
 ipcMain.on('open-folder', (event, args) => {
   shell.showItemInFolder(args)
 })
 
+ipcMain.on('open-file-dialog', (event) => {
+    console.log("********OPEN-FILE-DIALOG****************")
+    dialog.showOpenDialog({
+        title: 'Seleziona il file Excel da anonimizzare',
+        properties: ['openFile'],
+        filters: [
+            { name: 'Excel', extensions: ['xlsx', 'xls'] },
+        ]
+    }).then((res)=>{
+        console.log(res.filePaths);
+        console.log('******RES******');
+        let filePaths=res.filePaths[0]
+        console.log(filePaths);
+        if(!filePaths){
+          return
+        }
+        else{
+          readXlsxFile(filePaths, { sheet: 1 }).then((rows) => {
+          console.log(rows[0]);
+              // Send the selected file's data to the renderer process
+          event.sender.send('selected-file', rows);
+          });
+        }
+      });
+});
 
+ 

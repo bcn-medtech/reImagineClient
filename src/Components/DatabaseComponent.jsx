@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {Container, Button, Table, TableHead, TableBody, TableRow, TableCell, Select, FormControl,InputLabel} from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
+import {DatabaseSelectComponent} from './DatabaseSelectComponent.jsx'
 
 const { ipcRenderer } = window.require("electron");
 
@@ -81,39 +82,13 @@ export class DatabaseComponent extends Component {
                           Select File xlsx
                       </Button>
                       <div >
-                        <div style={{ position: 'fixed', bottom: '20px', left: '300px' }}>
-                        <InputLabel id="demo-simple-select-helper-label">ChiaveUno</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-helper-label"
-                                id="demo-simple-select-helper"
-                                value={selectedKeyOne}
-                                onChange={this.handleChangeKeyOne}
-                              
-                            >
-                                {listaUno.map(item => (
-                                    <MenuItem key={item} value={item}>
-                                        {item}
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                          <div style={{ position: 'fixed', bottom: '20px', left: '300px' }}>
+                            <DatabaseSelectComponent label="ChiaveUno" lista={this.state.listaUno}/>
                           </div>
                           <div style={{ position: 'fixed', bottom: '20px', left: '500px' }}>
-                            <InputLabel id="ChiaveDueLabel">ChiaveDue</InputLabel>
-                            <Select
-                                labelId="ChiaveDueLabel"
-                                id="ChiaveDue"
-                                value={selectedKeyTwo}
-                                onChange={this.handleChangeKeyTwo}
-                                
-                            >
-                                {listaDue.map(item => (
-                                    <MenuItem key={item} value={item}>
-                                        {item}
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                            <DatabaseSelectComponent label="ChiaveDue" lista={this.state.listaDue}/>
                           </div>
-                          
+                         
                       </div>
                   </div>
               </div>

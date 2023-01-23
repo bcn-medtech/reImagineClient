@@ -28,6 +28,9 @@ export class DatabaseComponent extends Component {
           this.setState({ listaUno:data[0],listaDue:data[0] });
       })
     }
+    saveFileExcel(){
+
+    }
       
     fetchData() {
         ipcRenderer.send('readSql');
@@ -46,8 +49,8 @@ export class DatabaseComponent extends Component {
 
     render() {
         //const { listaUno, listaDue } = this.props;
-        const { listaUno, listaDue }= this.state;
-        const { selectedKeyOne, selectedKeyTwo } = this.state;
+        //const { listaUno, listaDue }= this.state;
+        //const { selectedKeyOne, selectedKeyTwo } = this.state;
         return (
           <Container> 
               <div>
@@ -77,20 +80,25 @@ export class DatabaseComponent extends Component {
                   ) : (
                       <p>Loading...</p>
                   )}
-                  <div style={{ position: 'fixed', bottom: '20px', left: '10px' }}>
+                    <div style={{ position: 'fixed', bottom: '20px', left: '10px' }}>
                       <Button variant="contained" style={{backgroundColor: "#00BFFF",color:"#ffffff"}} onClick={() => this.functionExcel()}>
                           Select File xlsx
                       </Button>
-                      <div >
-                          <div style={{ position: 'fixed', bottom: '20px', left: '300px' }}>
-                            <DatabaseSelectComponent label="ChiaveUno" lista={this.state.listaUno}/>
-                          </div>
-                          <div style={{ position: 'fixed', bottom: '20px', left: '500px' }}>
-                            <DatabaseSelectComponent label="ChiaveDue" lista={this.state.listaDue}/>
-                          </div>
+                    </div>
+                      
+                    <div style={{ position: 'fixed', bottom: '20px', left: '300px' }}>
+                      <DatabaseSelectComponent label="ChiaveUno" lista={this.state.listaUno}/>
+                    </div>
+                    <div style={{ position: 'fixed', bottom: '20px', left: '500px' }}>
+                      <DatabaseSelectComponent label="ChiaveDue" lista={this.state.listaDue}/>
+                    </div>
                          
-                      </div>
-                  </div>
+                    <div style={{ position: 'fixed', bottom: '20px', right: '10px' }}>
+                      <Button variant="contained" style={{backgroundColor: "#E3494B",color:"#ffffff"}} onClick={() => this.saveFileExcel()}>
+                          save  File  xlsx
+                      </Button>
+                    </div>  
+                  
               </div>
           </Container>
       );

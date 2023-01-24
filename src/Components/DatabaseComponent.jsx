@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {Container, Button, Table, TableHead, TableBody, TableRow, TableCell, Select, FormControl,InputLabel} from '@material-ui/core';
+import {Container, Button, Table, TableHead, TableBody, TableRow, TableCell, Select, FormControl,InputLabel, Grid} from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import {DatabaseSelectComponent} from './DatabaseSelectComponent.jsx'
 
@@ -78,9 +78,11 @@ export class DatabaseComponent extends Component {
                           </TableBody>
                       </Table>
                   ) : (
-                      <p>Loading...</p>
+                      <p>empty...</p>
                   )}
-                    <Table style={{ position: 'fixed', bottom: '0px', left: '0px', border: '1px solid #D3D3D3', boxShadow: '10px 10px 5px 0px rgba(0,0,0,0.75)' }}>
+                
+                 
+                    <Table style={{marginTop: '20px', position: 'fixed', bottom: '0px', left: '0px', border: '1px solid #a0a0a0', boxShadow: '10px 10px 5px 0px rgba(0,0,0,0.75)',background:'#D3D3D3' }}>
                         <TableBody>
                             <TableRow>
                                 <TableCell>
@@ -95,14 +97,13 @@ export class DatabaseComponent extends Component {
                                     <DatabaseSelectComponent label="ChiaveDue" lista={this.state.listaDue} value={this.state.selectedKeyTwo} onChange={this.handleChangeKeyTwo}/>
                                 </TableCell>
                                 <TableCell>
-                                    <Button variant="contained" style={{backgroundColor: "#00BFFF",color:"#ffffff"}} onClick={() => this.saveFileExcel()}>
+                                    <Button variant="contained" style={{backgroundColor: "#E62C4B",color:"#ffffff"}} onClick={() => this.saveFileExcel()}>
                                     Save File xlsx
                                     </Button>
                                 </TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
-                  
               </div>
           </Container>
       );

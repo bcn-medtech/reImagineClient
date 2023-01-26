@@ -456,5 +456,21 @@ ipcMain.on('open-file-dialog', (event) => {
         }
       });
 });
+ipcMain.on('saveFileExcel', (event, args) => {
+  console.log(args)
+  let data = args//[['uno','due'],[1,2]];
+
+/* Create a new blank workbook */
+    let workbook = XLSX.utils.book_new();
+
+    /* Convert the data to a worksheet */
+    let worksheet = XLSX.utils.aoa_to_sheet(data);
+
+    /* Add the worksheet to the workbook */
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+    /* Write the workbook to a file */
+    //XLSX.writeFile(workbook, 'data.xlsx');
+})
 
  

@@ -11,8 +11,8 @@ export class DatabaseComponent extends Component {
         super(props);
         this.state = {
             data: null,
-            selectedKeyOne: 'Chiave Uno',
-            selectedKeyTwo: 'Chiave Due',
+            selectedKeyOne: 'Chiave Uno',//inserici il valore predefinito
+            selectedKeyTwo: 'Chiave Due',//inserisci il valore predefinito
             listaUno:['Chiave uno'],
             listaDue:['Chiave due']
         };
@@ -29,7 +29,7 @@ export class DatabaseComponent extends Component {
       })
     }
     saveFileExcel(){
-
+        ipcRenderer.send('saveFileExcel',["******dati inviati********"]);
     }
       
     fetchData() {

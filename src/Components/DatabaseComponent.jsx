@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import {Container, Button, Table, TableHead, TableBody, TableRow, TableCell, Select, FormControl,InputLabel, Grid} from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import {DatabaseSelectComponent} from './DatabaseSelectComponent.jsx'
+import { active } from 'timers-browserify';
 
 const { ipcRenderer } = window.require("electron");
 
@@ -14,7 +15,8 @@ export class DatabaseComponent extends Component {
             selectedKeyOne: 'Chiave Uno',//inserici il valore predefinito
             selectedKeyTwo: 'Chiave Due',//inserisci il valore predefinito
             listaUno:['Chiave uno'],
-            listaDue:['Chiave due']
+            listaDue:['Chiave due'],
+            dataExcel:null
         };
     }
 
@@ -26,10 +28,11 @@ export class DatabaseComponent extends Component {
         ipcRenderer.send('open-file-dialog');
         ipcRenderer.on('selected-file',(event, data) => {
           this.setState({ listaUno:data[0],listaDue:data[0] });
+          this.state.dataExcel=data;
       })
     }
     saveFileExcel(){
-        ipcRenderer.send('saveFileExcel',["******dati inviati********"]);
+        ipcRenderer.send('saveFileExcel',[this.state.data,this.state.dataExcel]);
     }
       
     fetchData() {

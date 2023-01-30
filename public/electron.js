@@ -431,6 +431,7 @@ ipcMain.on('open-folder', (event, args) => {
   shell.showItemInFolder(args)
 })
 
+let excelPath=null
 ipcMain.on('open-file-dialog', (event) => {
     console.log("********OPEN-FILE-DIALOG****************")
     dialog.showOpenDialog({
@@ -448,6 +449,7 @@ ipcMain.on('open-file-dialog', (event) => {
           return
         }
         else{
+          excelPath=filePaths;
           readXlsxFile(filePaths, { sheet: 1 }).then((rows) => {
           console.log(rows[0]);
               // Send the selected file's data to the renderer process
@@ -457,20 +459,50 @@ ipcMain.on('open-file-dialog', (event) => {
       });
 });
 ipcMain.on('saveFileExcel', (event, args) => {
-  console.log(args)
+  console.log(args[0]);
+  console.log(excelPath)
   let data = args//[['uno','due'],[1,2]];
+  anonExcel(args[0],args[1])
 
-/* Create a new blank workbook */
-    let workbook = XLSX.utils.book_new();
+})
+async function saveExcel(data){
+  /* Create a new blank workbook */
+  let workbook = XLSX.utils.book_new();
 
     /* Convert the data to a worksheet */
-    let worksheet = XLSX.utils.aoa_to_sheet(data);
+  let worksheet = XLSX.utils.aoa_to_sheet(data);
 
     /* Add the worksheet to the workbook */
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
 
     /* Write the workbook to a file */
-    //XLSX.writeFile(workbook, 'data.xlsx');
-})
-
+  XLSX.writeFile(workbook, excelPath);
+}
+async function anonExcel(dataSQL,rows) {
+  
+  let accessionNumber=null;
+  for(let i =0;i<dataSQL.length;i++){
+    //per ogni record del data base prendiamo prima l'anoncode
+    accessionNumber=dataSQL[i]["accessionNumber"];
+    //verifichiamo nel file excel se paziete per paziente esiste questo accessionNumber
+    for(let y=1;y<rows.length;y++){
+      if(rows[y][0]){
+        //console.log(rows[y][0]);
+        //cicliamo su i 4 accession Number di ogni paziente
+        for(let k=257;k<261;k++){
+          //console.log(rows[y][k])
+          if(rows[y][k]==accessionNumber){
+            rows[y][k]=dataSQL[i]["anoncode"];
+            if(!rows[y][5]){
+              rows[y][5]=dataSQL[i]["pid"];
+            }
+          }
+          else continue
+        }
+      }
+      else continue
+    }
+  }
+  saveExcel(rows);
+}
  

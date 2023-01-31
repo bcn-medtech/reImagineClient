@@ -7,7 +7,7 @@ import { Logo } from './svgs/Logo';
 import IconButton from '@material-ui/core/IconButton';
 import ScreenShare from '@material-ui/icons/ScreenShare';
 import AppsRoundedIcon from '@material-ui/icons//AppsRounded';
-import PostAddIcon from '@material-ui/icons/PostAdd';
+//import PostAddIcon from '@material-ui/icons/PostAdd';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -124,7 +124,7 @@ export const TopBar = (props) => {
               <AppsRoundedIcon />
             </IconButton>
           </div>
-          <div className={classes.sectionDesktop}>
+          {/* <div className={classes.sectionDesktop}>
             <IconButton
               aria-label="show more"
               aria-haspopup="true"
@@ -133,7 +133,7 @@ export const TopBar = (props) => {
             >
               <PostAddIcon />
             </IconButton>
-          </div>                   
+          </div>                    */}
         </Toolbar>
       </AppBar>
     </div>

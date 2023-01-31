@@ -433,7 +433,6 @@ ipcMain.on('open-folder', (event, args) => {
 
 let excelPath=null
 ipcMain.on('open-file-dialog', (event) => {
-    console.log("********OPEN-FILE-DIALOG****************")
     dialog.showOpenDialog({
         title: 'Seleziona il file Excel da anonimizzare',
         properties: ['openFile'],
@@ -441,17 +440,14 @@ ipcMain.on('open-file-dialog', (event) => {
             { name: 'Excel', extensions: ['xlsx', 'xls'] },
         ]
     }).then((res)=>{
-        console.log(res.filePaths);
-        console.log('******RES******');
         let filePaths=res.filePaths[0]
-        console.log(filePaths);
         if(!filePaths){
           return
         }
         else{
           excelPath=filePaths;
           readXlsxFile(filePaths, { sheet: 1 }).then((rows) => {
-          console.log(rows[0]);
+         
               // Send the selected file's data to the renderer process
           event.sender.send('selected-file', rows);
           });
@@ -459,10 +455,18 @@ ipcMain.on('open-file-dialog', (event) => {
       });
 });
 ipcMain.on('saveFileExcel', (event, args) => {
-  console.log(args[0]);
-  console.log(excelPath)
-  let data = args//[['uno','due'],[1,2]];
-  anonExcel(args[0],args[1])
+  let msg="error"
+  try {
+    anonExcel(args[0],args[1]).then(()=>{
+      msg="File Modified"
+      event.sender.send('excelModified', msg);
+    })
+    
+  } catch (e) {
+    console.log(e);
+  } finally{
+    event.sender.send('excelModified', msg);
+  }
 
 })
 async function saveExcel(data){
@@ -494,7 +498,7 @@ async function anonExcel(dataSQL,rows) {
           if(rows[y][k]==accessionNumber){
             rows[y][k]=dataSQL[i]["anoncode"];
             if(!rows[y][5]){
-              rows[y][5]=dataSQL[i]["pid"];
+              rows[y][4]=dataSQL[i]["pid"];
             }
           }
           else continue
@@ -503,6 +507,7 @@ async function anonExcel(dataSQL,rows) {
       else continue
     }
   }
+  rows[0][5]="PID";//cambia la colonna  in PID
   saveExcel(rows);
 }
  

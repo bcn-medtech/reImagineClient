@@ -485,6 +485,7 @@ async function saveExcel(data){
 async function anonExcel(dataSQL,rows) {
   
   let accessionNumber=null;
+  let accessionNumberList=[201,218,235,252,269,286];
   for(let i =0;i<dataSQL.length;i++){
     //per ogni record del data base prendiamo prima l'anoncode
     accessionNumber=dataSQL[i]["accessionNumber"];
@@ -493,12 +494,12 @@ async function anonExcel(dataSQL,rows) {
       if(rows[y][0]){
         //console.log(rows[y][0]);
         //cicliamo su i 4 accession Number di ogni paziente
-        for(let k=257;k<261;k++){
+        for(let k of accessionNumberList){
           //console.log(rows[y][k])
           if(rows[y][k]==accessionNumber){
             rows[y][k]=dataSQL[i]["anoncode"];
             if(!rows[y][5]){
-              rows[y][4]=dataSQL[i]["pid"];
+              rows[y][5]=dataSQL[i]["pid"];
             }
           }
           else continue

@@ -6,7 +6,7 @@ from deid.config import DeidRecipe
 from deid.dicom import get_files, get_identifiers, replace_identifiers
 from pydicom import read_file
 import SimpleITK as sitk
-
+import json
 import hashlib
 from operator import xor
 import uuid
@@ -111,11 +111,22 @@ def _find_or_create_anoncode(image, db, fields):
   p = res[0]
   _l.debug("Reusing existing patient Patient(%s, %s, %s)"%(p.pid, p.name, p.accessionNumber))    
   return res[0].anoncode
-        
+
+def save_pid_and_anoncode_to_json(pid, anoncode):
+  data = {
+      "pid": pid,
+      "anoncode": anoncode
+  }
+  file_path = os.path.join(os.path.abspath(os.sep), 'tmp', 'pid_and_anoncode.json')
+  with open(file_path, 'w') as f:
+      json.dump(data, f)
+       
 def main(args):
   patients = LocalDB(verbose=False, sqlfile=args.db_location)
   patients._initdb()
   basedir = os.getcwd()
+  pidExport= None
+  anoncodeExport= None
   if os.path.isfile(args.recipe):
     _l.info("Loading receipe from %s"%args.recipe)
     recipe = DeidRecipe(deid=args.recipe)
@@ -154,8 +165,11 @@ def main(args):
       anoncode = _find_or_create_anoncode(image, patients, fields)
       fields['entity_id'] = anoncode
       updated_ids[image] = fields
+     
+      pidExport=fields["PatientID"]
+      anoncodeExport=anoncode
 
-
+    save_pid_and_anoncode_to_json(pidExport,anoncodeExport)
     cleaned_files = replace_identifiers(dicom_files=dicom_files,
                                 deid=recipe,
                                 ids=updated_ids,

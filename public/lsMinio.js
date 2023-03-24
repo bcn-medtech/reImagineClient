@@ -41,9 +41,19 @@ function nex(fname) {
     console.error(err)
   }
 }
-
+//legge i PID and ANONCODE salvati in un JSON in tmp
+async function readPidAndAnoncodeInJsonTmp() {
+  const filePath = path.join(os.tmpdir(), 'pid_and_anoncode.json');
+  try {
+    const data = await fs.promises.readFile(filePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
 // uploading of images deidentificated for deid script
-function doMinioUpload(baseName, tmpDir,callback) {
+async function doMinioUpload(baseName, tmpDir,callback) {
 
   if (!tmpDir) tmpDir = tmp.dirSync();
   console.log('Temporary dir: '+tmpDir.name);  
@@ -90,12 +100,18 @@ function doMinioUpload(baseName, tmpDir,callback) {
   metaData = {
     'Content-Type': 'application/octet-stream'
   }
+  let pidAndAnon=await readPidAndAnoncodeInJsonTmp();
+    
+  
 
-  var upfname = path.basename(fname);
+  //var upfname = path.basename(fname);
+  var upfname2=`${pidAndAnon['pid']}/${pidAndAnon["anoncode"]}.tgz`;
+ 
+ 
   
   console.log('Uploading to '+bucket);
   try {
-      minioClient.fPutObject(bucket, upfname, fname, metaData, (err, etag) => {
+      minioClient.fPutObject(bucket, upfname2, fname, metaData, (err, etag) => {
       if (err) {
         console.log("Error in uploading file!"+err);
         callback(false);

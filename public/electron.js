@@ -112,6 +112,7 @@ function createWindow() {
             contextIsolation: false
         }
     });
+    mainWindow.webContents.openDevTools()
     var urlLoc = url.format({
         pathname: path.join(__dirname, '../build/index.html'),
         protocol: 'file:',
@@ -313,10 +314,8 @@ ipcMain.handle('write-annotations', async (event, jsondata, outDir) => {
   }
 });
 
-
 // uploading of images deidentificated for deid script
 ipcMain.on('MinioUpload', (event, uploadDir, tmpDir) => { 
-
   new Promise(resolve => {
     let res = false
     lsMinio.minioUpload(uploadDir, tmpDir,(result1)=>{

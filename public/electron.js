@@ -112,7 +112,7 @@ function createWindow() {
             contextIsolation: false
         }
     });
-    mainWindow.webContents.openDevTools()
+    //mainWindow.webContents.openDevTools()
     var urlLoc = url.format({
         pathname: path.join(__dirname, '../build/index.html'),
         protocol: 'file:',

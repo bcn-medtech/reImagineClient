@@ -112,12 +112,12 @@ def _find_or_create_anoncode(image, db, fields):
   _l.debug("Reusing existing patient Patient(%s, %s, %s)"%(p.pid, p.name, p.accessionNumber))    
   return res[0].anoncode
 
-def save_pid_and_anoncode_to_json(pid, anoncode):
+def save_anoncode_and_accessionNumber_json(accessionNumber, anoncode):
   data = {
-      "pid": pid,
+      "accessionNumber": accessionNumber,
       "anoncode": anoncode
   }
-  file_path = os.path.join(os.path.abspath(os.sep), 'tmp', 'pid_and_anoncode.json')
+  file_path = os.path.join(os.path.abspath(os.sep), 'tmp', 'anoncode_and_accessionNumber.json')
   with open(file_path, 'w') as f:
       json.dump(data, f)
        
@@ -125,7 +125,7 @@ def main(args):
   patients = LocalDB(verbose=False, sqlfile=args.db_location)
   patients._initdb()
   basedir = os.getcwd()
-  pidExport= None
+  accessionNumberExport= None
   anoncodeExport= None
   if os.path.isfile(args.recipe):
     _l.info("Loading receipe from %s"%args.recipe)
@@ -166,10 +166,10 @@ def main(args):
       fields['entity_id'] = anoncode
       updated_ids[image] = fields
      
-      pidExport=fields["PatientID"]
+      accessionNumberExport=fields["AccessionNumber"]
       anoncodeExport=anoncode
 
-    save_pid_and_anoncode_to_json(pidExport,anoncodeExport)
+    save_anoncode_and_accessionNumber_json(accessionNumberExport,anoncodeExport)
     cleaned_files = replace_identifiers(dicom_files=dicom_files,
                                 deid=recipe,
                                 ids=updated_ids,

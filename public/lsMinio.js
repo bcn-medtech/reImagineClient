@@ -42,8 +42,8 @@ function nex(fname) {
   }
 }
 //legge i PID and ANONCODE salvati in un JSON in tmp
-async function readPidAndAnoncodeInJsonTmp() {
-  const filePath = path.join(os.tmpdir(), 'pid_and_anoncode.json');
+async function readAccessionNumberAndAnoncodeInJsonTmp() {
+  const filePath = path.join(os.tmpdir(), 'anoncode_and_accessionNumber.json');
   try {
     const data = await fs.promises.readFile(filePath, 'utf8');
     return JSON.parse(data);
@@ -100,12 +100,12 @@ async function doMinioUpload(baseName, tmpDir,callback) {
   metaData = {
     'Content-Type': 'application/octet-stream'
   }
-  let pidAndAnon=await readPidAndAnoncodeInJsonTmp();
+  let accessionNumberAndAnon=await readAccessionNumberAndAnoncodeInJsonTmp();
     
   
 
   //var upfname = path.basename(fname);
-  var upfname2=`${pidAndAnon['pid']}/${pidAndAnon["anoncode"]}.tgz`;
+  var upfname2=`${accessionNumberAndAnon["anoncode"]}/${accessionNumberAndAnon["accessionNumber"]}.tgz`;
  
  
   

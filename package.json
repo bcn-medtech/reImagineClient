@@ -2,7 +2,7 @@
   "author": "Mario Ceresa <mario.ceresa@upf.edu>",
   "description": "Client for the reimagine analysis platform",
   "name": "reImagineClient",
-  "version": "1.4.42",
+  "version": "1.4.44",
   "repository": "https://bitbucket.org/simbiosys/reimagineclient/src/master/",
   "private": true,
   "devDependencies": {
@@ -58,7 +58,7 @@
     "eject": "react-app-rewired eject",
     "dist": "yarn build && electron-builder -m",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
-    "electron-dev": "concurrently \"BROWSER=none yarn start\" \"yarn run electron .\"",
+    "electron-dev": "concurrently \"BROWSER=none DANGEROUSLY_DISABLE_HOST_CHECK=true yarn start\" \"yarn run electron .\"",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
     "electron-pack-win": "yarn build && electron-builder -w",

@@ -85,14 +85,14 @@ def _find_or_create_anoncode(image, db, fields):
     pid = fields["PatientID"]
   else:
     pid = "UNKNOWN_" + str(uuid.uuid1())
-    _l.error("No patient id in %s? Setting it to %s"%(image, pid))
+    _l.warning("No patient id in %s? Setting it to %s"%(image, pid))
 
   name = None
   if "PatientName" in fields:
     name = fields["PatientName"]
   else:
     name = "UNKNOWN_" + str(uuid.uuid1())    
-    _l.error("No patient Name in %s? Setting it to %s"%(image, name))
+    _l.warning("No patient Name in %s? Setting it to %s"%(image, name))
     
 
   accNum = None
@@ -100,23 +100,40 @@ def _find_or_create_anoncode(image, db, fields):
     accNum = fields["AccessionNumber"]
   else:
     accNum = "UNKNOWN_" + str(uuid.uuid1())    
-    _l.error("No accession number %s? Setting it to %s"%(image, accNum))
+    _l.warning("No accession number %s? Setting it to %s"%(image, accNum))
     
-    
-  res = list(db.searchId(pid))
-  if not res:
-    _l.info("Creating new patient Patient(%s, %s, %s)"%(pid, name, accNum))
-    p = db.createPatient(_generateAnonCode(pid, name), pid, name, accNum)
-    return p.anoncode
-  p = res[0]
-  _l.debug("Reusing existing patient Patient(%s, %s, %s)"%(p.pid, p.name, p.accessionNumber))    
-  return res[0].anoncode
+  studyId = None
+  if "ClinicalStudyId" in fields:
+    studyId = fields["ClinicalStudyId"]
+  else:
+    studyId = "UNKNOWN_" + str(uuid.uuid1())    
+    _l.warning("No clinical study id %s? Setting it to %s"%(image, studyId))
 
-def save_anoncode_and_accessionNumber_json(accessionNumber, anoncode):
-  data = {
-      "accessionNumber": accessionNumber,
-      "anoncode": anoncode
-  }
+  patients = list(db.searchId(pid))
+  if not patients:
+    _l.info("Creating new patient Patient(%s, %s, %s)"%(pid, name, studyId))
+    p = db.createPatient(_generateAnonCode(pid, name), pid, name, studyId)
+  else:
+    if len(patients) != 1: _l.error("Found more than one patients with id %s"%pid)
+    p = patients[0]
+    _l.debug("Reusing existing patient Patient(%s, %s, %s)"%(p.pid, p.name, p.studyId))    
+
+  images = list(db.searchImage(accNum))
+  if not images:
+    image = db.createImage(accNum, p)
+  else:
+    _l.warning("Patient %s already has an image with code %s"%(p.pid, accNum))
+    image = images[0]
+
+  return p, image
+
+def save_new_images_data(images):
+  data = []
+  for image in images:
+    data.append( {
+        "imageId": image.imageId,
+        "anoncode": image.patient.anoncode
+    })
   file_path = os.path.join(os.path.abspath(os.sep), 'tmp', 'anoncode_and_accessionNumber.json')
   with open(file_path, 'w') as f:
       json.dump(data, f)
@@ -125,8 +142,7 @@ def main(args):
   patients = LocalDB(verbose=False, sqlfile=args.db_location)
   patients._initdb()
   basedir = os.getcwd()
-  accessionNumberExport= None
-  anoncodeExport= None
+
   if os.path.isfile(args.recipe):
     _l.info("Loading receipe from %s"%args.recipe)
     recipe = DeidRecipe(deid=args.recipe)
@@ -161,15 +177,15 @@ def main(args):
       _saveHeaders(dicom_files, hdirpre)
     
     updated_ids = dict()
+    new_images = []
     for image, fields in ids.items():  
-      anoncode = _find_or_create_anoncode(image, patients, fields)
-      fields['entity_id'] = anoncode
+      p, im = _find_or_create_anoncode(image, patients, fields)
+      fields['entity_id'] = p.anoncode
       updated_ids[image] = fields
      
-      accessionNumberExport=fields["AccessionNumber"]
-      anoncodeExport=anoncode
+      new_images.append(im)
 
-    save_anoncode_and_accessionNumber_json(accessionNumberExport,anoncodeExport)
+    save_new_images_data(new_images)
     cleaned_files = replace_identifiers(dicom_files=dicom_files,
                                 deid=recipe,
                                 ids=updated_ids,

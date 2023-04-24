@@ -7,6 +7,7 @@ const os = require("os")
 const uuid = require("uuid")
 const main = require("./electron.js")
 const config = main.getConfig();
+const { lambdaInvoke }= require('./lambdaInvoke');
 
 function getMinioClient() {
 
@@ -120,6 +121,7 @@ async function doMinioUpload(baseName, tmpDir,callback) {
       fs.unlinkSync(fname);
       tmpDir.removeCallback();
       callback(true);
+      //lambdaInvoke(minioClient,bucket,upfname);
     });
   } catch(err) {
     console.error(err);

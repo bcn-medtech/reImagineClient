@@ -42,16 +42,16 @@ function nex(fname) {
   }
 }
 //legge i PID and ANONCODE salvati in un JSON in tmp
-async function readAccessionNumberAndAnoncodeInJsonTmp() {
-  const filePath = path.join(os.tmpdir(), 'anoncode_and_accessionNumber.json');
-  try {
-    const data = await fs.promises.readFile(filePath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
+// async function readAccessionNumberAndAnoncodeInJsonTmp() {
+//   const filePath = path.join(os.tmpdir(), 'anoncode_and_accessionNumber.json');
+//   try {
+//     const data = await fs.promises.readFile(filePath, 'utf8');
+//     return JSON.parse(data);
+//   } catch (error) {
+//     console.error(error);
+//     return null;
+//   }
+// }
 // uploading of images deidentificated for deid script
 async function doMinioUpload(baseName, tmpDir,callback) {
 
@@ -100,18 +100,18 @@ async function doMinioUpload(baseName, tmpDir,callback) {
   metaData = {
     'Content-Type': 'application/octet-stream'
   }
-  let accessionNumberAndAnon=await readAccessionNumberAndAnoncodeInJsonTmp();
+  //let accessionNumberAndAnon=await readAccessionNumberAndAnoncodeInJsonTmp();
     
   
 
-  //var upfname = path.basename(fname);
-  var upfname2=`${accessionNumberAndAnon["anoncode"]}/${accessionNumberAndAnon["accessionNumber"]}.tgz`;
+  var upfname = path.basename(fname);
+  //var upfname2=`${accessionNumberAndAnon["anoncode"]}/${accessionNumberAndAnon["accessionNumber"]}.tgz`;
  
  
   
   console.log('Uploading to '+bucket);
   try {
-      minioClient.fPutObject(bucket, upfname2, fname, metaData, (err, etag) => {
+      minioClient.fPutObject(bucket, upfname, fname, metaData, (err, etag) => {
       if (err) {
         console.log("Error in uploading file!"+err);
         callback(false);

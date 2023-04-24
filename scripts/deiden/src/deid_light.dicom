@@ -16,7 +16,6 @@ REMOVE PersonName
 REMOVE PersonAddress
 REMOVE ContactDisplayName
 REMOVE AdditionalPatientHistory
-REMOVE AccessionNumber
 REMOVE ReferringPhysicianName
 REMOVE RequestingPhysician
 

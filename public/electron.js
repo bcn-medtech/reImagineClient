@@ -17,6 +17,7 @@ const { ipcMain, dialog } = require('electron');
 const XLSX = require('xlsx');
 const readXlsxFile = require('read-excel-file/node');
 const {readSqlB}=require('./readSqlite');
+const {anonExcel}=require('./anonExcel');
 
 let mainWindow;
 
@@ -430,7 +431,7 @@ ipcMain.on('open-file-dialog', (event) => {
 ipcMain.on('saveFileExcel', (event, args) => {
   let msg="error"
   try {
-    anonExcel(args[0],args[1]).then(()=>{
+    anonExcel(args[0],args[1],saveExcel).then(()=>{
       msg="File Modified"
       event.sender.send('excelModified', msg);
     })
@@ -455,33 +456,3 @@ async function saveExcel(data){
     /* Write the workbook to a file */
   XLSX.writeFile(workbook, excelPath);
 }
-async function anonExcel(dataSQL,rows) {
-  
-  let accessionNumber=null;
-  let accessionNumberList=[201,218,235,252,269,286];
-  for(let i =0;i<dataSQL.length;i++){
-    //per ogni record del data base prendiamo prima l'anoncode
-    accessionNumber=dataSQL[i]["accessionNumber"];
-    //verifichiamo nel file excel se paziete per paziente esiste questo accessionNumber
-    for(let y=1;y<rows.length;y++){
-      if(rows[y][0]){
-        //console.log(rows[y][0]);
-        //cicliamo su i 4 accession Number di ogni paziente
-        for(let k of accessionNumberList){
-          //console.log(rows[y][k])
-          if(rows[y][k]==accessionNumber){
-            rows[y][k]=dataSQL[i]["anoncode"];
-            if(!rows[y][5]){
-              rows[y][5]=dataSQL[i]["pid"];
-            }
-          }
-          else continue
-        }
-      }
-      else continue
-    }
-  }
-  rows[0][5]="PID";//cambia la colonna  in PID
-  saveExcel(rows);
-}
- 

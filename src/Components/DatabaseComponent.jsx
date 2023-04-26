@@ -11,6 +11,7 @@ export class DatabaseComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            selectedTable: 'patient',
             data: null,
             selectedKeyOne: 'Chiave Uno',//inserici il valore predefinito
             selectedKeyTwo: 'Chiave Due',//inserisci il valore predefinito
@@ -67,27 +68,23 @@ export class DatabaseComponent extends Component {
               <div>
                   {this.state.data ? (
                       <Table style={{ overflow: 'auto', maxHeight: '300px' }}>
-                          <TableHead>
-                              <TableRow>
-                                  <TableCell>idx</TableCell>
-                                  <TableCell>anoncode</TableCell>
-                                  <TableCell>pid</TableCell>
-                                  <TableCell>name</TableCell>
-                                  <TableCell>accessionNumber</TableCell>
-                              </TableRow>
-                          </TableHead>
-                          <TableBody>
-                              {this.state.data.map((row, index) => (
-                                  <TableRow key={index}>
-                                      <TableCell>{row.idx}</TableCell>
-                                      <TableCell>{row.anoncode}</TableCell>
-                                      <TableCell>{row.pid}</TableCell>
-                                      <TableCell>{row.name}</TableCell>
-                                      <TableCell>{row.accessionNumber}</TableCell>
-                                  </TableRow>
+                      <TableHead>
+                          <TableRow>
+                              {Object.keys(this.state.data['image'][0]).map((key, index) => (
+                                  <TableCell key={index}>{key}</TableCell>
                               ))}
-                          </TableBody>
-                      </Table>
+                          </TableRow>
+                      </TableHead>
+                      <TableBody>
+                          {this.state.data['image'].map((row, index) => (
+                              <TableRow key={index}>
+                                  {Object.values(row).map((value, index) => (
+                                      <TableCell key={index}>{value}</TableCell>
+                                  ))}
+                              </TableRow>
+                          ))}
+                      </TableBody>
+                  </Table>
                   ) : (
                       <p>empty...</p>
                   )}

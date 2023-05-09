@@ -107,12 +107,12 @@ async function doMinioUpload(baseName, tmpDir,callback) {
 
   var upfname = path.basename(fname);
   //var upfname2=`${accessionNumberAndAnon["anoncode"]}/${accessionNumberAndAnon["accessionNumber"]}.tgz`;
- 
+  let upfname2 = path.join('uploads', upfname);
  
   
   console.log('Uploading to '+bucket);
   try {
-      minioClient.fPutObject(bucket, upfname, fname, metaData, (err, etag) => {
+      minioClient.fPutObject(bucket, upfname2, fname, metaData, (err, etag) => {
       if (err) {
         console.log("Error in uploading file!"+err);
         callback(false);

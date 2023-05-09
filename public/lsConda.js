@@ -65,7 +65,7 @@ async function _installMiniconda() {
 
   }
   else if ((process.platform === 'darwin') || (process.platform === 'linux')) {
-    instArgs = ["-b", "-p " + config.scripts.condaHome]
+    instArgs = ["-b", "-p", config.scripts.condaHome]
   }
   else {
     res = { status: false, reason: "Unknown platform: " + process.platform }

@@ -3,8 +3,8 @@
   "description": "Client for the reimagine analysis platform",
   "name": "reImagineClient",
   "license": "MIT",
-  "version": "1.4.45",
-  "repository": "https://bitbucket.org/simbiosys/reimagineclient/src/master/",
+  "version": "1.4.46",
+  "repository": "https://github.com/bcn-medtech/reImagineClient",
   "private": true,
   "devDependencies": {
     "@electron/notarize": "^1.2.3",

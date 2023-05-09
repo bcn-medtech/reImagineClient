@@ -4,7 +4,8 @@ set envname=%3
 
 call %condapath% %condahome%
 
-call conda create -n %envname% python=3.10 sqlalchemy=2.0.12 -y
+call conda create -n %envname% python=3.10 -y
+call conda install --name %envname% -c conda-forge 'sqlalchemy>=2.0.1' -y
 call conda install --name %envname% -c SimpleITK SimpleITK=2.1 -y
 call conda install --name %envname% -c conda-forge pydicom=1.2.1 -y
 call conda install --name %envname% -c conda-forge deid=0.1.42 -y

@@ -107,7 +107,8 @@ async function doMinioUpload(baseName, tmpDir,callback) {
 
   var upfname = path.basename(fname);
   //var upfname2=`${accessionNumberAndAnon["anoncode"]}/${accessionNumberAndAnon["accessionNumber"]}.tgz`;
-  let upfname2 = path.join('uploads', upfname);
+  //let upfname2 = path.join('uploads', upfname);
+let upfname2=  `uploads/${upfname}`
  
   
   console.log('Uploading to '+bucket);

@@ -127,16 +127,16 @@ def _find_or_create_anoncode(image, db, fields):
 
   return p, image
 
-def save_new_images_data(images):
-  data = []
-  for image in images:
-    data.append( {
-        "imageId": image.imageId,
-        "anoncode": image.patient.anoncode
-    })
-  file_path = os.path.join(os.path.abspath(os.sep), 'tmp', 'anoncode_and_accessionNumber.json')
-  with open(file_path, 'w') as f:
-      json.dump(data, f)
+# def save_new_images_data(images):
+#   data = []
+#   for image in images:
+#     data.append( {
+#         "imageId": image.imageId,
+#         "anoncode": image.patient.anoncode
+#     })
+#   file_path = os.path.join(os.path.abspath(os.sep), 'tmp', 'anoncode_and_accessionNumber.json')
+#   with open(file_path, 'w') as f:
+#       json.dump(data, f)
        
 def main(args):
   patients = LocalDB(verbose=False, sqlfile=args.db_location)
@@ -177,15 +177,15 @@ def main(args):
       _saveHeaders(dicom_files, hdirpre)
     
     updated_ids = dict()
-    new_images = []
+    # new_images = []
     for image, fields in ids.items():  
       p, im = _find_or_create_anoncode(image, patients, fields)
       fields['entity_id'] = p.anoncode
       updated_ids[image] = fields
      
-      new_images.append(im)
+      # new_images.append(im)
 
-    save_new_images_data(new_images)
+    # save_new_images_data(new_images)
     cleaned_files = replace_identifiers(dicom_files=dicom_files,
                                 deid=recipe,
                                 ids=updated_ids,

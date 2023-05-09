@@ -2,7 +2,8 @@
   "author": "Mario Ceresa <mario.ceresa@upf.edu>",
   "description": "Client for the reimagine analysis platform",
   "name": "reImagineClient",
-  "version": "1.4.44",
+  "license": "MIT",
+  "version": "1.4.45",
   "repository": "https://bitbucket.org/simbiosys/reimagineclient/src/master/",
   "private": true,
   "devDependencies": {
@@ -142,7 +143,6 @@
       }
     ]
   },
-  "license": "MIT",
   "browserslist": [
     ">0.2%",
     "not dead",

@@ -113,7 +113,7 @@ export const Installers = (props) => {
                 <div className={"grid-block vertical align-center shrink " + classes.installationInfo}>
                     <div className="grid-block align-center shrink"><InstallationInProgressSVG done={true} /></div>
                     <div className={"grid-block align-center shrink " + classes.label1}>Installing third party software</div>
-                    <div className={"grid-block align-center text-center shrink " + classes.label2}>The installation can take up to 5 minutes, please wait and be sure that the computer is connected to internet.</div>
+                    <div className={"grid-block align-center text-center shrink " + classes.label2}>The installation can take up to 5-8 minutes, please wait and be sure that the computer is connected to internet.</div>
                     <Timer />
                 </div>
             )

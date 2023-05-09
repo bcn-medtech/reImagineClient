@@ -1,6 +1,6 @@
 
 const electron = require('electron');
-const { Menu, Tray } = require('electron')
+const { Menu, Tray, nativeImage } = require('electron')
 const {shell} = require('electron') // deconstructing assignment
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
@@ -161,7 +161,8 @@ app.on('ready', () => {
       console.log("CANNOT FIND ICON")
     }
   }
-  tray = new Tray(icon);
+  const icon_image = nativeImage.createFromPath(icon);
+  tray = new Tray(icon_image.resize({width: 16, height: 16}));
   const trayMenuTemplate = [
     {
       label: 'open window',

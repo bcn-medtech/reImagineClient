@@ -3,7 +3,7 @@
   "description": "Client for the reimagine analysis platform",
   "name": "reImagineClient",
   "license": "MIT",
-  "version": "1.4.46",
+  "version": "1.4.47",
   "repository": "https://github.com/bcn-medtech/reImagineClient",
   "private": true,
   "devDependencies": {

@@ -1,6 +1,6 @@
 # ReImagine client
 
-An electron-react app to anonimize and upload medical data for online processing
+An electron-react app to anonymize and upload medical data for online processing
 
 ## Requirements
  * Node >= 18.0
